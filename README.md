@@ -1,7 +1,7 @@
 # NextRealm
 
-The current structure is as follows:
-Python files for the backend
+The current structure is as follows:\n
+Python files for the backend\n
 -- main.py is the main runner file.
 -- player.py contains the player class.
 -- socket_events.py contains the socket events (I can't describe it better than this, sorry).
