@@ -1,0 +1,31 @@
+Classes:
+-- Arcanists - Basically magicians
+---- Pyromancer - Fire
+---- Cryomancer - Ice
+---- Voidcaller - Shadow magic
+---- Stormsinger - Lightning
+-- Sentinels - Strong melee
+---- Vanguard - Just a normal warrior with good damage
+---- Bulwark - Really strong and bulky warrior
+---- Battlepriest - A warrior with healing / buffs or something with some basic spells
+-- Pathfinders - Misc I think
+---- Hunter - Bows, guns, animals or something
+---- Tinkerer - Gadgets
+-- Mystics - Healer and support classes
+---- Healer - Heals
+---- Shaman - Buffs
+-- Quickblades - Fast melee
+---- Quickblade - Just really fast
+---- Assassin - Sneak attacks, in-and-out fighting style
+
+Factions and races:
+-- Celestial Council
+---- Aetherians - Kind of like fancy space people or something
+---- Draconians - Dragonkin
+-- Terran Union
+---- Terrans - Humans
+---- Sylvans - Elves of sorts
+---- Aqualis - Idk honestly, I want sea people but take creative liberty with any of this, this world is yours to make as you see fit
+-- Shadow Alliance
+---- Umbrals - Shadowy people I honestly don't know. Being made of darkness or shadows would be cool, however also kind of weird.
+---- Entomons - 🦗🦗🦗Bugs🦗🦗🦗
