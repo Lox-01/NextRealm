@@ -6,7 +6,6 @@ from player import Player
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins=[
-    "http://10.40.18.130:8080",
     "http://localhost:8080",
     "http://127.0.0.1:8080"
 ])
