@@ -1,0 +1,45 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    user-select: none;
+}
+
+#gamecanvas {
+    position: absolute;
+    z-index: 100;
+    height: 100%;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+}
+
+#chat {
+    z-index: 101;
+    background-color: coral;
+    height: 30%;
+    opacity: 0.5;
+    overflow-wrap: break-word;
+    white-space: normal;
+    padding-top: 10px;
+    overflow-y: auto;
+}
+
+#chatInput {
+    z-index: 99;
+    background-color: azure;
+    height: 3%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+#chat, #chatInput {
+    position: absolute;
+    width: 25%;
+    bottom: 0px;
+    left: 0px;
+    box-sizing: border-box;
+    border-width: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+}
