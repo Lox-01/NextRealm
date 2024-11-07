@@ -1,3 +1,5 @@
+By the way, I often work on this at school and therefore I do not know where I left off, there might be something unfinished but I will check that out if there is something like that.
+
 # NextRealm
 
 The current structure is as follows:
@@ -27,5 +29,3 @@ The current structure is as follows:
 -- ```utils.js``` contains a few helper functions which we might use.
 
 -- ```script.js``` is the game's script for the game page handling like connections disconnections movement rendering etc.
-
-## And a ```README.md``` file, which is this.
