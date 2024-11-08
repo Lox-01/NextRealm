@@ -53,10 +53,6 @@ def game():
 def connect():
     on_connect(socketio, players)
 
-@socketio.on('disconnect')
-def disconnect():
-    pass
-
 @socketio.on('id_unclaim')
 def unclaim(player_id):
     on_unclaim(player_id, players, socketio)
