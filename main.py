@@ -20,7 +20,7 @@ def index():
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form['username']
-    users = json.load(open('objects.json'))
+    users = json.load(open('players.json'))
     if username not in users:
         permid = max(users.values())+1
         users[username] = permid
@@ -33,7 +33,7 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
-    users = json.load(open('objects.json'))
+    users = json.load(open('players.json'))
     if username not in users:
         flash('Username does not exist', 'error')
         return redirect(url_for('index'))
@@ -49,13 +49,9 @@ def game():
     else:
         return render_template('game.html')
 
-@socketio.on('connect')
-def connect():
-    on_connect(socketio, players)
-
-@socketio.on('id_unclaim')
-def unclaim(player_id):
-    on_unclaim(player_id, players, socketio)
+@socketio.on('offline')
+def offline(player_id):
+    on_offline(player_id, players, socketio)
 
 @socketio.on('player_move')
 def player_moved(data):
