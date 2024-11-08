@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
@@ -12,9 +12,15 @@ socketio = SocketIO(app, cors_allowed_origins=[
 
 players = {}
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/signup')
+def signup():
+    return render_template('signup.html')
+
+@app.route('/game')
+def game():
+    if 'username' not in session:
+        return redirect(url_for('signup'))
+    return render_template('game.html')
 
 @socketio.on('connect')
 def connect():
