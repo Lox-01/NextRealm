@@ -49,6 +49,10 @@ def game():
     else:
         return render_template('game.html')
 
+@socketio.on('connect')
+def connect():
+    on_connect(socketio, players)
+
 @socketio.on('offline')
 def offline(player_id):
     on_offline(player_id, players, socketio)
