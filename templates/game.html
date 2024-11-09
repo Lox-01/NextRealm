@@ -11,6 +11,7 @@
     <link rel="icon" href="{{ url_for('static', filename='NextRealm.jpg') }}">
 </head>
 <body>
+    <input type="hidden" id="session_id" value="{{ session['id'] }}">
     <canvas id="gamecanvas"></canvas>
     <div id="chat"></div>
     <input type="text" id="chatInput"/>

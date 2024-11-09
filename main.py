@@ -19,28 +19,28 @@ def index():
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    username = request.form['username']
-    users = json.load(open('./data/users.json'))
+    username = request.form["username"]
+    users = json.load(open('./NextRealm/data/users.json'))
     if username not in users:
         permid = max(users.values())+1
         users[username] = permid
-        json.dump(users, open("./data/users.json", "w"), indent = 2)
+        json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
         session["id"] = permid
-        return render_template('game.html', id=session["id"])
+        return redirect(url_for('game'))
     else:
         flash('Username already exists', 'error')
         return redirect(url_for('index'))
 
 @app.route('/login', methods=['POST'])
 def login():
-    username = request.form['username']
-    users = json.load(open('./data/users.json'))
+    username = request.form["username"]
+    users = json.load(open('./NextRealm/data/users.json'))
     if username not in users:
         flash('Username does not exist', 'error')
         return redirect(url_for('index'))
     else:
         session["id"] = users[username]
-        return render_template('game.html', id=session["id"])
+        return redirect(url_for('game'))
         
 @app.route('/game')
 def game():
@@ -48,7 +48,7 @@ def game():
         flash('You need to be signed in to access the game', 'error')
         return redirect(url_for('index'))
     else:
-        return render_template('game.html', id=session["id"])
+        return render_template('game.html')
 
 @socketio.on('connect')
 def connect(player_id):

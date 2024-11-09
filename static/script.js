@@ -31,7 +31,8 @@ class PlayerCube {
 }
 document.addEventListener("DOMContentLoaded", (event) => {
     const playersCubes = {};
-    let my_id = {{ id }};
+    let my_id = document.getElementById('session_id').value;
+    console.log(my_id);
     let selected;
     let hovered;
     var socket = io.connect('http://localhost:8080', {query: {id: my_id}});
