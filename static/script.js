@@ -31,7 +31,7 @@ class PlayerCube {
 }
 document.addEventListener("DOMContentLoaded", (event) => {
     const playersCubes = {};
-    let my_id;
+    let my_id = {{ id }};
     let selected;
     let hovered;
     var socket = io.connect('http://localhost:8080');
@@ -115,13 +115,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     delete playersCubes[id];
                 }
             }
-        }
-    });
-    socket.on("claimed", (val) => {
-        if (my_id == null) {
-            my_id = val;
-            let data = { "id": my_id, "pos": { "x": cube.position.x, "y": cube.position.y, "z": cube.position.z }, "rot": { "xr": cube.rotation.x, "yr": cube.rotation.y, "zr": cube.rotation.z } };
-            socket.emit('player_move', data);
         }
     });
 
