@@ -20,10 +20,11 @@ def index():
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form['username']
-    users = json.load(open('players.json'))
+    users = json.load(open('./data/users.json'))
     if username not in users:
         permid = max(users.values())+1
         users[username] = permid
+        json.dump(users, open("./data/users.json", "w"), indent = 2)
         session["id"] = permid
         return render_template('game.html', id=session["id"])
     else:
@@ -33,7 +34,7 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
-    users = json.load(open('players.json'))
+    users = json.load(open('./data/users.json'))
     if username not in users:
         flash('Username does not exist', 'error')
         return redirect(url_for('index'))
