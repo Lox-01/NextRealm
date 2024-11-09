@@ -25,7 +25,7 @@ def signup():
         permid = max(users.values())+1
         users[username] = permid
         session["id"] = permid
-        return redirect(url_for('game'))
+        return render_template('game.html', id=session["id"])
     else:
         flash('Username already exists', 'error')
         return redirect(url_for('index'))
@@ -39,15 +39,15 @@ def login():
         return redirect(url_for('index'))
     else:
         session["id"] = users[username]
-        return redirect(url_for('game'))
-
+        return render_template('game.html', id=session["id"])
+        
 @app.route('/game')
 def game():
-    if 'username' not in session:
+    if 'id' not in session:
         flash('You need to be signed in to access the game', 'error')
         return redirect(url_for('index'))
     else:
-        return render_template('game.html')
+        return render_template('game.html', id=session["id"])
 
 @socketio.on('connect')
 def connect():
