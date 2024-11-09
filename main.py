@@ -50,8 +50,8 @@ def game():
         return render_template('game.html', id=session["id"])
 
 @socketio.on('connect')
-def connect():
-    on_connect(socketio, players)
+def connect(player_id):
+    on_connect(socketio, player_id, players)
 
 @socketio.on('offline')
 def offline(player_id):
