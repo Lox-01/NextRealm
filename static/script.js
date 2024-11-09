@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let my_id = {{ id }};
     let selected;
     let hovered;
-    var socket = io.connect('http://localhost:8080');
+    var socket = io.connect('http://localhost:8080', {query: {id: my_id}});
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const canvas = document.getElementById('gamecanvas');
