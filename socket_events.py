@@ -1,5 +1,6 @@
 from flask_socketio import emit
 from player import Player
+import json # Not sure if this is necessary but it might be.
 
 def on_connect(socketio, player_id, players):
     users = json.load(open('./NextRealm/data/users.json'))
@@ -11,6 +12,10 @@ def on_connect(socketio, player_id, players):
 
 def on_offline(player_id, players, socketio):
     users = json.load(open('./NextRealm/data/users.json'))
+    for username in users:
+        if users[username][0] == player_id:
+            users[username] = players[player_id]
+    json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
     print(f"id {player_id} disconnected")
     if player_id in players:
         del players[player_id]
