@@ -6,7 +6,7 @@ import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins=["*"])
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:8080"])
 
 players = {}
 
@@ -19,7 +19,7 @@ def signup():
     username = request.form["username"]
     users = json.load(open('./NextRealm/data/users.json'))
     if username not in users:
-        permid = max(users.values())+1
+        permid = max([user[0] for user in users.values()])+1
         users[username] = [permid, { "x"  : 0, "y"  : 0, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50]
         json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
         session["id"] = permid
@@ -48,7 +48,8 @@ def game():
         return render_template('game.html')
 
 @socketio.on('connect')
-def connect(player_id):
+def connect():
+    player_id = request.args.get('player_id')
     on_connect(socketio, player_id, players)
 
 @socketio.on('offline')
