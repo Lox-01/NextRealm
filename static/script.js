@@ -30,6 +30,7 @@ class PlayerCube {
     }
 }
 document.addEventListener("DOMContentLoaded", (event) => {
+    let firstRender = true;
     const playersCubes = {};
     let my_id = document.getElementById('session_id').value;
     let selected;
@@ -102,9 +103,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     playersCubes[id].updatePosition(data.position);
                     playersCubes[id].updateRotation(data.rotation);
                 }
-            } else {
+            } else if (firstRender == true) {
                 playersCubes[id].updatePosition(data.position);
                 playersCubes[id].updateRotation(data.rotation);
+                firstRender = false;
             }
         }
         for (const [id, cube] of Object.entries(playersCubes)) {
