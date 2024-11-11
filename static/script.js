@@ -102,6 +102,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     playersCubes[id].updatePosition(data.position);
                     playersCubes[id].updateRotation(data.rotation);
                 }
+            } else {
+                playersCubes[id].updatePosition(data.position);
+                playersCubes[id].updateRotation(data.rotation);
             }
         }
         for (const [id, cube] of Object.entries(playersCubes)) {
