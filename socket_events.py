@@ -3,8 +3,10 @@ from player import Player
 
 def on_connect(socketio, player_id, players):
     users = json.load(open('./NextRealm/data/users.json'))
-    if player_id not in users:
-        players[player_id] = Player(player_id, { "x"  : 0, "y"  : 0, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50)
+    for username in users:
+        if users[username][0] == player_id:
+            user = users[username]
+    players[player_id] = Player(player_id, user[1], user[2], user[3])
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
 
 def on_offline(player_id, players, socketio):
