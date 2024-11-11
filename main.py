@@ -23,7 +23,7 @@ def signup():
     users = json.load(open('./NextRealm/data/users.json'))
     if username not in users:
         permid = max(users.values())+1
-        users[username] = permid
+        users[username] = [permid, { "x"  : 0, "y"  : 0, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50]
         json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
         session["id"] = permid
         return redirect(url_for('game'))
@@ -39,7 +39,7 @@ def login():
         flash('Username does not exist', 'error')
         return redirect(url_for('index'))
     else:
-        session["id"] = users[username]
+        session["id"] = users[username][0]
         return redirect(url_for('game'))
         
 @app.route('/game')
