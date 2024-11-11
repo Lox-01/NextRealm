@@ -32,10 +32,13 @@ class PlayerCube {
 document.addEventListener("DOMContentLoaded", (event) => {
     const playersCubes = {};
     let my_id = document.getElementById('session_id').value;
-    console.log(my_id);
     let selected;
     let hovered;
-    var socket = io.connect('http://localhost:8080', {query: {id: my_id}});
+    var socket = io('http://localhost:8080', {
+        query: {
+            player_id: my_id
+        }
+    });
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const canvas = document.getElementById('gamecanvas');
@@ -177,7 +180,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     });
     
     window.addEventListener("beforeunload", function(e) {
-        socket.emit("id_unclaim", my_id);
+        socket.emit("offline", my_id);
     });
     let pressed = [];
     
