@@ -6,8 +6,9 @@
     <title>NextRealm - Game</title>
     
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='socket.io.js') }}"></script>
     <script type="application/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='three.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='NextRealm.jpg') }}">
 </head>
 <body>
