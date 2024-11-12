@@ -45,8 +45,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     const canvas = document.getElementById('gamecanvas');
     const renderer = new THREE.WebGLRenderer({ canvas });
     renderer.setSize(window.innerWidth, window.innerHeight);
-
-    /*
+    
     const geometry = new THREE.BoxGeometry();
     const material = [
         new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
@@ -57,7 +56,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
         new THREE.MeshBasicMaterial({ color: 0x0000ff })
     ];
     const cube = new THREE.Mesh(geometry, material);
-    */
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -65,10 +63,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = 0;
     scene.add(plane);
+    scene.add(cube);
     
-    const playerCube = new PlayerCube(my_id, { x: 0, y: 1, z: 0 }, { xr: 0, yr: 0, zr: 0 }, 50);
-    scene.add(playerCube.cube);
-
+    cube.position.x = 0;
+    cube.position.y = 1;
+    cube.position.z = 0;
     camera.position.y = 4;
     
     const raycaster = new THREE.Raycaster();
@@ -193,7 +192,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let isgrounded = false;
     
     function animate() {
-        if (playerCube.cube.position.y == 1) {
+        if (cube.position.y == 1) {
             isgrounded = true;
         } else {
             isgrounded = false;
@@ -202,39 +201,39 @@ document.addEventListener("DOMContentLoaded", (event) => {
         if (!chatopen) {
             let moved = false;
             if (pressed.includes('w')) {
-                let a = playerCube.cube.rotation.y;
+                let a = cube.rotation.y;
                 let b = Math.sin(a) / 15;
                 let c = Math.cos(a) / 15;
-                playerCube.cube.position.z += c;
-                playerCube.cube.position.x += b;
+                cube.position.z += c;
+                cube.position.x += b;
                 moved = true;
             }
             if (pressed.includes('s')) {
-                let a = playerCube.cube.rotation.y;
+                let a = cube.rotation.y;
                 let b = -Math.sin(a) / 30;
                 let c = -Math.cos(a) / 30;
-                playerCube.cube.position.z += c;
-                playerCube.cube.position.x += b;
+                cube.position.z += c;
+                cube.position.x += b;
                 moved = true;
             }
             if (pressed.includes('a')) {
-                playerCube.cube.rotation.y += Math.PI / 120;
+                cube.rotation.y += Math.PI / 120;
                 moved = true;
             }
             if (pressed.includes('d')) {
-                playerCube.cube.rotation.y -= Math.PI / 120;
+                cube.rotation.y -= Math.PI / 120;
                 moved = true;
             }
             
             if (moved === true) {
-                let data = { "id": my_id, "pos": { "x": playerCube.cube.position.x, "y": playerCube.cube.position.y, "z": playerCube.cube.position.z }, "rot": { "xr": playerCube.cube.rotation.x, "yr": playerCube.cube.rotation.y, "zr": playerCube.cube.rotation.z } };
+                let data = { "id": my_id, "pos": { "x": cube.position.x, "y": cube.position.y, "z": cube.position.z }, "rot": { "xr": cube.rotation.x, "yr": cube.rotation.y, "zr": cube.rotation.z } };
                 socket.emit('player_move', data);
             }
         }
-        camera.position.x = playerCube.cube.position.x - Math.sin(playerCube.cube.rotation.y) * 4;
-        camera.position.z = playerCube.cube.position.z - Math.cos(playerCube.cube.rotation.y) * 4;
-        camera.position.y = playerCube.cube.position.y + 3;
-        camera.lookAt(playerCube.cube.position);
+        camera.position.x = cube.position.x - Math.sin(cube.rotation.y) * 4;
+        camera.position.z = cube.position.z - Math.cos(cube.rotation.y) * 4;
+        camera.position.y = cube.position.y + 3;
+        camera.lookAt(cube.position);
         renderer.render(scene, camera);
     }
     
