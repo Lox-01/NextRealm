@@ -31,6 +31,10 @@ class PlayerCube {
     updateRotation(rotation) {
         this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
     }
+
+    updateHp(hp) {
+        this.hp = hp;
+    }
 }
 document.addEventListener("DOMContentLoaded", (event) => {
     let firstRender = true;
@@ -49,6 +53,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     const renderer = new THREE.WebGLRenderer({ canvas });
     renderer.setSize(window.innerWidth, window.innerHeight);
     
+    /*
     const geometry = new THREE.BoxGeometry();
     const material = [
         new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
@@ -59,6 +64,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
         new THREE.MeshBasicMaterial({ color: 0x0000ff })
     ];
     const cube = new THREE.Mesh(geometry, material);
+    */
+
+    // Make a player cube
+    const player = new PlayerCube(my_id, { x: 0, y: 1, z: 0 }, { xr: 0, yr: 0, zr: 0 }, 50);
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -66,11 +75,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = 0;
     scene.add(plane);
-    scene.add(cube);
+    scene.add(player.cube);
     
-    cube.position.x = 0;
-    cube.position.y = 1;
-    cube.position.z = 0;
+    player.cube.position.x = 0;
+    player.cube.position.y = 1;
+    player.cube.position.z = 0;
     camera.position.y = 4;
     
     const raycaster = new THREE.Raycaster();
@@ -100,16 +109,17 @@ document.addEventListener("DOMContentLoaded", (event) => {
         for (const [id, data] of Object.entries(players)) {
             if (id != my_id) {
                 if (!playersCubes[id]) {
-                    playersCubes[id] = new PlayerCube(id, data.position, data.rotation, 50);
+                    playersCubes[id] = new PlayerCube(id, data.position, data.rotation, data.hp);
                     scene.add(playersCubes[id].cube);
                 } else {
                     playersCubes[id].updatePosition(data.position);
                     playersCubes[id].updateRotation(data.rotation);
+                    playersCubes[id].updateHp(data.hp);
                 }
-            } else if (firstRender == true) {
-                playersCubes[id].updatePosition(data.position);
-                playersCubes[id].updateRotation(data.rotation);
-                firstRender = false;
+            } else {
+                player.updatePosition(data.position);
+                player.updateRotation(data.rotation);
+                player.updateHp(data.hp);
             }
         }
         for (const [id, cube] of Object.entries(playersCubes)) {
@@ -195,7 +205,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let isgrounded = false;
     
     function animate() {
-        if (cube.position.y == 1) {
+        if (player.cube.position.y == 1) {
             isgrounded = true;
         } else {
             isgrounded = false;
@@ -204,39 +214,39 @@ document.addEventListener("DOMContentLoaded", (event) => {
         if (!chatopen) {
             let moved = false;
             if (pressed.includes('w')) {
-                let a = cube.rotation.y;
+                let a = player.cube.rotation.y;
                 let b = Math.sin(a) / 15;
                 let c = Math.cos(a) / 15;
-                cube.position.z += c;
-                cube.position.x += b;
+                player.cube.position.z += c;
+                player.cube.position.x += b;
                 moved = true;
             }
             if (pressed.includes('s')) {
-                let a = cube.rotation.y;
+                let a = player.cube.rotation.y;
                 let b = -Math.sin(a) / 30;
                 let c = -Math.cos(a) / 30;
-                cube.position.z += c;
-                cube.position.x += b;
+                player.cube.position.z += c;
+                player.cube.position.x += b;
                 moved = true;
             }
             if (pressed.includes('a')) {
-                cube.rotation.y += Math.PI / 120;
+                player.cube.rotation.y += Math.PI / 120;
                 moved = true;
             }
             if (pressed.includes('d')) {
-                cube.rotation.y -= Math.PI / 120;
+                player.cube.rotation.y -= Math.PI / 120;
                 moved = true;
             }
             
             if (moved === true) {
-                let data = { "id": my_id, "pos": { "x": cube.position.x, "y": cube.position.y, "z": cube.position.z }, "rot": { "xr": cube.rotation.x, "yr": cube.rotation.y, "zr": cube.rotation.z } };
+                let data = { "id": my_id, "pos": { "x": player.cube.position.x, "y": player.cube.position.y, "z": player.cube.position.z }, "rot": { "xr": player.cube.rotation.x, "yr": player.cube.rotation.y, "zr": player.cube.rotation.z } };
                 socket.emit('player_move', data);
             }
         }
-        camera.position.x = cube.position.x - Math.sin(cube.rotation.y) * 4;
-        camera.position.z = cube.position.z - Math.cos(cube.rotation.y) * 4;
-        camera.position.y = cube.position.y + 3;
-        camera.lookAt(cube.position);
+        camera.position.x = player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
+        camera.position.z = player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
+        camera.position.y = player.cube.position.y + 3;
+        camera.lookAt(player.cube.position);
         renderer.render(scene, camera);
     }
     
