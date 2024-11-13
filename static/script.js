@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     const canvas = document.getElementById('gamecanvas');
     const renderer = new THREE.WebGLRenderer({ canvas });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    let player = null;
+    const player = new PlayerCube(my_id, { x: 0, y: 1, z: 0 }, { xr: 0, yr: 0, zr: 0 }, 50);
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -102,14 +102,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     playersCubes[id].updateHp(data.hp);
                 }
             } else {
-                if (!player) {
-                    player = new PlayerCube(id, data.position, data.rotation, data.hp);
-                    scene.add(player.cube);
-                } else {
-                    player.updatePosition(data.position);
-                    player.updateRotation(data.rotation);
-                    player.updateHp(data.hp);
-                }
+                player.updatePosition(data.position);
+                player.updateRotation(data.rotation);
+                player.updateHp(data.hp);
             }
         }
         for (const [id, cube] of Object.entries(playersCubes)) {
