@@ -20,7 +20,7 @@ def signup():
     users = json.load(open('./NextRealm/data/users.json'))
     if username not in users:
         permid = max([user[0] for user in users.values()])+1
-        users[username] = [permid, { "x"  : 0, "y"  : 0, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50]
+        users[username] = [permid, { "x"  : 0, "y"  : 1, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50]
         json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
         session["id"] = permid
         return redirect(url_for('game'))
