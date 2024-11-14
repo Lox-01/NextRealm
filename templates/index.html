@@ -3,17 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextRealm - Game</title>
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script type="application/javascript" src="{{ url_for('static', filename='socket.io.js') }}"></script>
-    <script type="application/javascript" src="{{ url_for('static', filename='three.js') }}"></script>
-    <script type="application/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+    <title>NextRealm - Login</title>
+    <script type="module" src="{{ url_for('static', filename='signscript.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='NextRealm.jpg') }}">
 </head>
 <body>
-    <canvas id="gamecanvas"></canvas>
-    <div id="chat"></div>
-    <input type="text" id="chatInput"/>
+    <form action="{{ url_for('signup') }}" method="POST">
+        <label for="username_signup">Username:</label>
+        <input type="text" name="username" id="username_signup" required>
+        <button type="submit">Sign Up</button>
+    </form>
+    <form action="{{ url_for('login') }}" method="POST">
+        <label for="username_login">Username:</label>
+        <input type="text" name="username" id="username_login" required>
+        <button type="submit">Login</button>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 </body>
 </html>

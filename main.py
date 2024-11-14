@@ -1,14 +1,12 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins=[
-    "http://localhost:8080",
-    "http://127.0.0.1:8080"
-])
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:8080", "http://127.0.0.1:8080"])
 
 players = {}
 
@@ -16,17 +14,48 @@ players = {}
 def index():
     return render_template('index.html')
 
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form["username"]
+    users = json.load(open('./NextRealm/data/users.json'))
+    if username not in users:
+        permid = max([user[0] for user in users.values()])+1
+        users[username] = [permid, { "x"  : 0, "y"  : 1, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50]
+        json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
+        session["id"] = permid
+        return redirect(url_for('game'))
+    else:
+        flash('Username already exists', 'error')
+        return redirect(url_for('index'))
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form["username"]
+    users = json.load(open('./NextRealm/data/users.json'))
+    if username not in users:
+        flash('Username does not exist', 'error')
+        return redirect(url_for('index'))
+    else:
+        session["id"] = users[username][0]
+        print(session["id"])
+        return redirect(url_for('game'))
+        
+@app.route('/game')
+def game():
+    if 'id' not in session:
+        flash('You need to be signed in to access the game', 'error')
+        return redirect(url_for('index'))
+    else:
+        return render_template('game.html')
+
 @socketio.on('connect')
 def connect():
-    on_connect(socketio, players)
+    player_id = request.args.get('player_id')
+    on_connect(socketio, player_id, players)
 
-@socketio.on('disconnect')
-def disconnect():
-    pass
-
-@socketio.on('id_unclaim')
-def unclaim(player_id):
-    on_unclaim(player_id, players, socketio)
+@socketio.on('offline')
+def offline(player_id):
+    on_offline(player_id, players, socketio)
 
 @socketio.on('player_move')
 def player_moved(data):
