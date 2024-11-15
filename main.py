@@ -28,6 +28,7 @@ def signup():
             json.dump(users, open("./data/users.json", "w"), indent = 2)
         elif os.path.exists("./NextRealm/data/users.json"):
             json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
+        session["id"] = users[username][0]
         return redirect(url_for('game'))
     else:
         flash('Username already exists', 'error')

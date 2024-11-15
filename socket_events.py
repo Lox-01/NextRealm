@@ -1,6 +1,6 @@
 from flask_socketio import emit
 from player import Player
-import json # Not sure if this is necessary but it might be.
+import json, os # Not sure if this is necessary but it might be.
 
 def on_connect(socketio, player_id, players):
     if os.path.exists("./data/users.json"):
