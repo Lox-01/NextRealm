@@ -3,7 +3,10 @@ from player import Player
 import json # Not sure if this is necessary but it might be.
 
 def on_connect(socketio, player_id, players):
-    users = json.load(open('./NextRealm/data/users.json'))
+    if os.path.exists("./data/users.json"):
+        users=json.load(open('./data/users.json'))
+    elif os.path.exists("./NextRealm/data/users.json"):
+        users=json.load(open('./NextRealm/data/users.json'))
     for username in users:
         if users[username][0] == int(player_id):
             user = users[username]
@@ -11,12 +14,18 @@ def on_connect(socketio, player_id, players):
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
 
 def on_offline(player_id, players, socketio):
-    users = json.load(open('./NextRealm/data/users.json'))
+    if os.path.exists("./data/users.json"):
+        users=json.load(open('./data/users.json'))
+    elif os.path.exists("./NextRealm/data/users.json"):
+        users=json.load(open('./NextRealm/data/users.json'))
     player_id = int(player_id)
     for username in users:
         if users[username][0] == player_id:
             users[username] = [players[player_id].id, players[player_id].position, players[player_id].rotation, players[player_id].hp]
-    json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
+    if os.path.exists("./data/users.json"):
+        json.dump(users, open("./data/users.json", "w"), indent = 2)
+    elif os.path.exists("./NextRealm/data/users.json"):
+        json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
     if player_id in players:
         del players[player_id]
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
