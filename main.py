@@ -2,13 +2,25 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
-import json
+import json, os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:8080", "http://127.0.0.1:8080"])
 
 players = {}
+
+def users_func(action, users=None):
+    if action.lower() == "get":
+        if os.path.exists("./data/users.json"):
+            return json.load(open('./data/users.json'))
+        elif os.path.exists("./NextRealm/data/users.json"):
+            return json.load(open('./NextRealm/data/users.json'))
+    elif action.lower() == "dump" and users:
+        if os.path.exists("./data/users.json"):
+            json.dump(users, open("./data/users.json", "w"), indent = 2)
+        elif os.path.exists("./NextRealm/data/users.json"):
+            json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
 
 @app.route('/')
 def index():
@@ -17,12 +29,11 @@ def index():
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form["username"]
-    users = json.load(open('./NextRealm/data/users.json'))
+    users = users_func("get")
     if username not in users:
         permid = max([user[0] for user in users.values()])+1
         users[username] = [permid, { "x"  : 0, "y"  : 1, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50]
-        json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
-        session["id"] = permid
+        users_func("dump", users)
         return redirect(url_for('game'))
     else:
         flash('Username already exists', 'error')
@@ -31,13 +42,12 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form["username"]
-    users = json.load(open('./NextRealm/data/users.json'))
+    users = users_func("get")
     if username not in users:
         flash('Username does not exist', 'error')
         return redirect(url_for('index'))
     else:
         session["id"] = users[username][0]
-        print(session["id"])
         return redirect(url_for('game'))
         
 @app.route('/game')
