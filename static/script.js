@@ -198,26 +198,26 @@ document.addEventListener("DOMContentLoaded", (event) => {
             let moved = false;
             if (pressed.includes('w')) {
                 let a = player.cube.rotation.y;
-                let b = Math.sin(a) / 17;
-                let c = Math.cos(a) / 17;
+                let b = Math.sin(a) / 20;
+                let c = Math.cos(a) / 20;
                 player.cube.position.z += c;
                 player.cube.position.x += b;
                 moved = true;
             }
             if (pressed.includes('s')) {
                 let a = player.cube.rotation.y;
-                let b = -Math.sin(a) / 33;
-                let c = -Math.cos(a) / 33;
+                let b = -Math.sin(a) / 40;
+                let c = -Math.cos(a) / 40;
                 player.cube.position.z += c;
                 player.cube.position.x += b;
                 moved = true;
             }
             if (pressed.includes('a')) {
-                player.cube.rotation.y += Math.PI / 120;
+                player.cube.rotation.y += Math.PI / 150;
                 moved = true;
             }
             if (pressed.includes('d')) {
-                player.cube.rotation.y -= Math.PI / 120;
+                player.cube.rotation.y -= Math.PI / 150;
                 moved = true;
             }
             
