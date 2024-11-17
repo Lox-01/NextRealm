@@ -23,6 +23,7 @@ class PlayerCube {
             new THREE.MeshBasicMaterial({ color: 0x0000ff })
         ];
         const cubeMesh = new THREE.Mesh(geometry, material);
+        cubeMesh.name = this.id;
         return cubeMesh;
     }
     updatePosition(position) {
@@ -37,7 +38,6 @@ class PlayerCube {
     }
 }
 document.addEventListener("DOMContentLoaded", (event) => {
-    let firstRender = true;
     const playersCubes = {};
     let my_id = document.getElementById('session_id').value;
     let selected;
@@ -60,12 +60,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = 0;
     scene.add(plane);
-    scene.add(player.cube);
-    
-    player.cube.position.x = 0;
-    player.cube.position.y = 1;
-    player.cube.position.z = 0;
-    camera.position.y = 4;
     
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
@@ -105,6 +99,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 player.updatePosition(data.position);
                 player.updateRotation(data.rotation);
                 player.updateHp(data.hp);
+                if (!scene.getObjectByName(my_id)) {
+                    scene.add(player.cube);
+                    animate();
+                }
             }
         }
         for (const [id, cube] of Object.entries(playersCubes)) {
@@ -200,16 +198,16 @@ document.addEventListener("DOMContentLoaded", (event) => {
             let moved = false;
             if (pressed.includes('w')) {
                 let a = player.cube.rotation.y;
-                let b = Math.sin(a) / 15;
-                let c = Math.cos(a) / 15;
+                let b = Math.sin(a) / 17;
+                let c = Math.cos(a) / 17;
                 player.cube.position.z += c;
                 player.cube.position.x += b;
                 moved = true;
             }
             if (pressed.includes('s')) {
                 let a = player.cube.rotation.y;
-                let b = -Math.sin(a) / 30;
-                let c = -Math.cos(a) / 30;
+                let b = -Math.sin(a) / 33;
+                let c = -Math.cos(a) / 33;
                 player.cube.position.z += c;
                 player.cube.position.x += b;
                 moved = true;
