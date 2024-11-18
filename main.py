@@ -69,8 +69,8 @@ def connect():
     on_connect(socketio, player_id, players)
 
 @socketio.on('offline')
-def offline(player_id):
-    on_offline(player_id, players, socketio)
+def offline(player_id, client_id):
+    on_offline(player_id, players, socketio, client_id, client_ids)
 
 @socketio.on('player_move')
 def player_moved(data):
