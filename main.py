@@ -46,6 +46,9 @@ def login():
     global client_ids
     username = request.form["username"]
     client_id = request.form["client_id"]
+    if client_id in client_ids:
+        flash('You are already logged in somewhere', 'error')
+        return redirect(url_for('index'))
     client_ids.append(client_id)
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
@@ -57,7 +60,7 @@ def login():
     else:
         session["id"] = users[username][0]
         session["username"] = username
-        if int(users[username][0]) in players or client_id in client_ids:
+        if int(users[username][0]) in players:
             flash('You are already logged in somewhere', 'error')
             return redirect(url_for('index'))
         else:
@@ -77,7 +80,8 @@ def connect():
     on_connect(socketio, player_id, players)
 
 @socketio.on('offline')
-def offline(player_id, client_id):
+def offline(vals):
+    player_id, client_id = vals[0], vals[1]
     on_offline(player_id, players, socketio, client_id, client_ids)
 
 @socketio.on('player_move')

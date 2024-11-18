@@ -38,15 +38,6 @@ class PlayerCube {
     }
 }
 document.addEventListener("DOMContentLoaded", (event) => {
-    function getClientId() {
-        let client_id = localStorage.getItem('client_id');
-        if (!client_id) {
-            client_id = 'client-'+Math.random().toString(36).substr(2, 16);
-            localStorage.setItem('client_id', client_id);
-        }
-        return client_id;
-    }
-    document.getElementById('client_id').value = getClientId();
     const playersCubes = {};
     let my_id = document.getElementById('session_id').value;
     let selected;
@@ -190,7 +181,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     });
     
     window.addEventListener("beforeunload", function(e) {
-        socket.emit("offline", my_id);
+        socket.emit("offline", [my_id, localStorage.getItem('client_id')]);
     });
     let pressed = [];
     

@@ -1,9 +1,21 @@
 document.addEventListener("DOMContentLoaded", (event) => {
-    const signup = document.getElementById("signup");
-    const login = document.getElementById("login");
+    function getClientId() {
+        let client_id = localStorage.getItem('client_id');
+        if (!client_id) {
+            client_id = 'client-'+Math.random().toString(36).substr(2, 16);
+            localStorage.setItem('client_id', client_id);
+        }
+        return client_id;
+    }
+    let client_id = getClientId();
+    for (let i = 0; i < document.querySelectorAll("#client_id").length; i++) {
+        document.querySelectorAll("#client_id")[i].value = client_id;
+    }
+    const signup = document.getElementById("username_signup");
+    const login = document.getElementById("username_login");
     signup.addEventListener("click", () => {
         const username = document.getElementById("username").value;
-        let body = JSON.stringify({"username":username});
+        let body = JSON.stringify({"username":username, "client_id":client_id});
         fetch("/signup", {
             method: "POST",
             headers: {
@@ -15,7 +27,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     });
     login.addEventListener("click", () => {
         const username = document.getElementById("username").value;
-        let body = JSON.stringify({"username":username});
+        let body = JSON.stringify({"username":username, "client_id":client_id});
         fetch("/login", {
             method: "POST",
             headers: {
