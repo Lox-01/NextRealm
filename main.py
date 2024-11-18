@@ -9,6 +9,7 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:8080", "http://127.0.0.1:8080"])
 
 players = {}
+client_ids = []
 
 @app.route('/')
 def index():
@@ -37,6 +38,7 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form["username"]
+    client_id = request.form["client_id"]
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
@@ -47,7 +49,7 @@ def login():
     else:
         session["id"] = users[username][0]
         session["username"] = username
-        if int(users[username][0]) in players:
+        if int(users[username][0]) in players or client_id in client_ids:
             flash('You are already logged in somewhere', 'error')
             return redirect(url_for('index'))
         else:
