@@ -46,7 +46,12 @@ def login():
         return redirect(url_for('index'))
     else:
         session["id"] = users[username][0]
-        return redirect(url_for('game'))
+        session["username"] = username
+        if users[username][0] in players:
+            flash('You are already logged in somewhere', 'error')
+            return redirect(url_for('index'))
+        else:
+            return redirect(url_for('game'))
         
 @app.route('/game')
 def game():
