@@ -17,7 +17,10 @@ def index():
 
 @app.route('/signup', methods=['POST'])
 def signup():
+    global client_ids
     username = request.form["username"]
+    client_id = request.form["client_id"]
+    client_ids.append(client_id)
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
@@ -37,8 +40,10 @@ def signup():
 
 @app.route('/login', methods=['POST'])
 def login():
+    global client_ids
     username = request.form["username"]
     client_id = request.form["client_id"]
+    client_ids.append(client_id)
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
