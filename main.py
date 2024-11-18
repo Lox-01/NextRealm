@@ -20,6 +20,9 @@ def signup():
     global client_ids
     username = request.form["username"]
     client_id = request.form["client_id"]
+    if client_id in client_ids:
+        flash('You are already logged in somewhere', 'error')
+        return redirect(url_for('index'))
     client_ids.append(client_id)
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
