@@ -11,11 +11,13 @@
     <form action="{{ url_for('signup') }}" method="POST">
         <label for="username_signup">Username:</label>
         <input type="text" name="username" id="username_signup" required>
+        <input type="hidden" name="client_id_signup" id="client_id">
         <button type="submit">Sign Up</button>
     </form>
     <form action="{{ url_for('login') }}" method="POST">
         <label for="username_login">Username:</label>
         <input type="text" name="username" id="username_login" required>
+        <input type="hidden" name="client_id_login" id="client_id">
         <button type="submit">Login</button>
     </form>
     {% with messages = get_flashed_messages(with_categories=true) %}
