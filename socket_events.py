@@ -13,7 +13,7 @@ def on_connect(socketio, player_id, players):
     players[int(player_id)] = Player(int(player_id), user[1], user[2], user[3])
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
 
-def on_offline(player_id, players, socketio):
+def on_offline(player_id, players, socketio, client_id, client_ids):
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
@@ -28,6 +28,8 @@ def on_offline(player_id, players, socketio):
         json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
     if player_id in players:
         del players[player_id]
+    if client_id in client_ids:
+        client_ids.remove(client_id)
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
 
 def on_player_move(data, players, socketio):
