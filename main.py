@@ -47,7 +47,7 @@ def login():
     else:
         session["id"] = users[username][0]
         session["username"] = username
-        if users[username][0] in players:
+        if int(users[username][0]) in players:
             flash('You are already logged in somewhere', 'error')
             return redirect(url_for('index'))
         else:
