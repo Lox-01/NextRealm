@@ -43,9 +43,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let selected;
     let hovered;
     const url = window.location.href;
-    const islocal = /^https?:\/\/localhost:8080(\/.*)?$/.test(url);
+    const islocal = /^https?:\/\/localhost:6052(\/.*)?$/.test(url);
     if (islocal) {
-        var socket = io('http://localhost:8080', {
+        var socket = io('http://localhost:6052', {
             query: {
                 player_id: my_id
             }
