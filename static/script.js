@@ -42,13 +42,21 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let my_id = document.getElementById('session_id').value;
     let selected;
     let hovered;
-    let link1 = 'http://45.90.12.32:6052';
-    let link2 = 'http://localhost:8080';
-    var socket = io(link2, {
-        query: {
-            player_id: my_id
-        }
-    });
+    const url = window.location.href;
+    const islocal = /^https?:\/\/localhost:8080(\/.*)?$/.test(url);
+    if (islocal) {
+        var socket = io('http://localhost:8080', {
+            query: {
+                player_id: my_id
+            }
+        });
+    } else {
+        var socket = io('http://45.90.12.32:6052', {
+            query: {
+                player_id: my_id
+            }
+        });
+    }
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const canvas = document.getElementById('gamecanvas');
