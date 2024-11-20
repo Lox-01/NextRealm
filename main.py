@@ -6,7 +6,7 @@ import json, os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:8080", "http://127.0.0.1:8080"])
+socketio = SocketIO(app, cors_allowed_origins=["http://45.90.12.32:6052", "http://localhost:6052", "http://127.0.0.1:6052"])
 
 players = {}
 client_ids = []
@@ -101,4 +101,4 @@ def player_hit(player_id):
     on_player_hit(player_id, players, socketio)
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=8080)
+    socketio.run(app, host="0.0.0.0", port=6052)
