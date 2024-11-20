@@ -42,7 +42,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let my_id = document.getElementById('session_id').value;
     let selected;
     let hovered;
-    var socket = io('http://localhost:8080', {
+    let link1 = 'http://45.90.12.32:6052';
+    let link2 = 'http://localhost:8080';
+    var socket = io(link2, {
         query: {
             player_id: my_id
         }
