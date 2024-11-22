@@ -58,9 +58,15 @@ document.addEventListener("DOMContentLoaded", (event) => {
     }
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.layers.enableAll();
     const canvas = document.getElementById('gamecanvas');
     const renderer = new THREE.WebGLRenderer({ canvas });
+    const labelRenderer = new CSS2DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize( window.innerWidth, window.innerHeight );
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0px';
+    document.body.appendChild(labelRenderer.domElement);
     const player = new PlayerCube(my_id, { x: 0, y: 1, z: 0 }, { xr: 0, yr: 0, zr: 0 }, 50);
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
@@ -110,6 +116,16 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 player.updateHp(data.hp);
                 if (!scene.getObjectByName(my_id)) {
                     scene.add(player.cube);
+                    player.cube.layers.enableAll();
+                    const playerDiv = document.createElement('div');
+                    playerDiv.className = 'label';
+                    playerDiv.textContent = 'Earth';
+                    playerDiv.style.backgroundColor = 'transparent';
+                    const playerLabel = new CSS2DObject( playerDiv );
+                    playerLabel.position.set( 0, 0, 0 );
+                    playerLabel.center.set( 0, 1 );
+                    player.cube.add( playerLabel );
+                    playerLabel.layers.set( 0 );
                     animate();
                 }
             }
@@ -240,6 +256,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         camera.position.y = player.cube.position.y + 3;
         camera.lookAt(player.cube.position);
         renderer.render(scene, camera);
+        labelRenderer.render( scene, camera );
     }
     
     let repeatInterval;

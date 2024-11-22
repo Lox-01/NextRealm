@@ -43,3 +43,11 @@ html, body {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+.label {
+    color: #FFF;
+    font-family: sans-serif;
+    padding: 2px;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10000000000000;
+}
