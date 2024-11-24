@@ -5,15 +5,17 @@ function dir(t) {if ("object" != typeof t || null === t) {console.log("Input is 
 function deffunc(n) {if ("function" != typeof n) {console.log("Input is not a valid function.");return;}let t = n.toString();console.log("Function Definition:");console.log(t);}
 
 class PlayerCube {
-    constructor(id, position, rotation, hp) {
+    constructor(id, position, rotation, hp, username) {
         this.id = id;
         this.hp = hp;
+        this.username = username;
         this.cube = this.createCube();
+        this.createLabel();
         this.updatePosition(position);
         this.updateRotation(rotation);
     }
     createCube() {
-        const geometry = new THREE.BoxGeometry();
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = [
             new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
             new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
@@ -26,6 +28,19 @@ class PlayerCube {
         cubeMesh.name = this.id;
         return cubeMesh;
     }
+
+    createLabel() {
+        const playerDiv = document.createElement('div');
+        playerDiv.className = 'label';
+        playerDiv.textContent = `${this.username}`;
+        playerDiv.style.backgroundColor = 'transparent';
+        const playerLabel = new CSS2DObject( playerDiv );
+        playerLabel.position.set( 0, 0, 0 );
+        playerLabel.center.set( 0.5, 5 );
+        this.cube.add( playerLabel );
+        playerLabel.layers.set( 0 );
+    }
+
     updatePosition(position) {
         this.cube.position.set(position.x, position.y, position.z);
     }
@@ -40,6 +55,7 @@ class PlayerCube {
 document.addEventListener("DOMContentLoaded", (event) => {
     const playersCubes = {};
     let my_id = document.getElementById('session_id').value;
+    let my_username = document.getElementById('session_username').value;
     let selected;
     let hovered;
     const url = window.location.href;
@@ -67,7 +83,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     labelRenderer.domElement.style.position = 'absolute';
     labelRenderer.domElement.style.top = '0px';
     document.body.appendChild(labelRenderer.domElement);
-    const player = new PlayerCube(my_id, { x: 0, y: 1, z: 0 }, { xr: 0, yr: 0, zr: 0 }, 50);
+    const player = new PlayerCube(my_id, { x: 0, y: 1, z: 0 }, { xr: 0, yr: 0, zr: 0 }, 50, my_username);
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -103,7 +119,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         for (const [id, data] of Object.entries(players)) {
             if (id != my_id) {
                 if (!playersCubes[id]) {
-                    playersCubes[id] = new PlayerCube(id, data.position, data.rotation, data.hp);
+                    playersCubes[id] = new PlayerCube(id, data.position, data.rotation, data.hp, data.username);
                     scene.add(playersCubes[id].cube);
                 } else {
                     playersCubes[id].updatePosition(data.position);
@@ -116,16 +132,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 player.updateHp(data.hp);
                 if (!scene.getObjectByName(my_id)) {
                     scene.add(player.cube);
-                    player.cube.layers.enableAll();
-                    const playerDiv = document.createElement('div');
-                    playerDiv.className = 'label';
-                    playerDiv.textContent = 'Earth';
-                    playerDiv.style.backgroundColor = 'transparent';
-                    const playerLabel = new CSS2DObject( playerDiv );
-                    playerLabel.position.set( 0, 0, 0 );
-                    playerLabel.center.set( 0, 1 );
-                    player.cube.add( playerLabel );
-                    playerLabel.layers.set( 0 );
                     animate();
                 }
             }
@@ -253,7 +259,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
         camera.position.x = player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
         camera.position.z = player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
-        camera.position.y = player.cube.position.y + 3;
+        camera.position.y = player.cube.position.y + 1.7;
         camera.lookAt(player.cube.position);
         renderer.render(scene, camera);
         labelRenderer.render( scene, camera );
