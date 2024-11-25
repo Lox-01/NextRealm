@@ -1,9 +1,9 @@
-function getRandomInt(min, max) {const minCeiled = Math.ceil(min);const maxFloored = Math.floor(max);return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);}
+function gri(min, max) {const minCeiled = Math.ceil(min);const maxFloored = Math.floor(max);return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);}
 function rtd(r) {return r * 180 / Math.PI;}
 function dtr(d) {return d / 180 * Math.PI;}
 function dir(t) {if ("object" != typeof t || null === t) {console.log("Input is not a valid object.");return;}let e = Object.getOwnPropertyNames(t);e.forEach(t => {console.log(`Property - ${t}`)});let o = Object.getPrototypeOf(t);for (; o;) {let r = Object.getOwnPropertyNames(o);r.forEach(t => {console.log(`Method - ${t}`)}), o = Object.getPrototypeOf(o)}}
 function deffunc(n) {if ("function" != typeof n) {console.log("Input is not a valid function.");return;}let t = n.toString();console.log("Function Definition:");console.log(t);}
-
+function tri(a,b) {return Math.sqrt((Number(a["x"])-Number(b["x"]))**2+(Number(a["y"])-Number(b["y"]))**2+(Number(a["z"])-Number(b["z"]))**2);}
 class PlayerCube {
     constructor(id, position, rotation, hp, username) {
         this.id = id;
@@ -39,6 +39,7 @@ class PlayerCube {
         playerLabel.center.set( 0.5, 5 );
         this.cube.add( playerLabel );
         playerLabel.layers.set( 0 );
+        playerLabel.element.style.fontSize="30px";
         return playerLabel;
     }
 
@@ -54,10 +55,10 @@ class PlayerCube {
     }
 
     updateLabel(distance) {
-        if (distance > 1000) {
-            this.label.element.style.scale = 1/ ( 1 + 0.1 * distance );
+        if (distance > 70) {
+            this.label.element.style.fontSize = "0px";
         } else {
-            this.label.element.style.scale = 1 / ( 1 + 0.1 * distance);
+            this.label.element.style.fontSize = `${(1 / ( 1 + 0.05 * distance))*30}px`;
         }
     }
 }
@@ -270,6 +271,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
         camera.position.z = player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
         camera.position.y = player.cube.position.y + 1.7;
         camera.lookAt(player.cube.position);
+        if (playersCubes != {} && playersCubes != null) {
+            for (const [id, oplayer] of Object.entries(playersCubes)) {
+                oplayer.updateLabel(tri(player.cube.position,oplayer.cube.position));
+            }
+        }
         renderer.render(scene, camera);
         labelRenderer.render( scene, camera );
     }
