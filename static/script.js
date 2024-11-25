@@ -10,7 +10,7 @@ class PlayerCube {
         this.hp = hp;
         this.username = username;
         this.cube = this.createCube();
-        this.createLabel();
+        this.label = this.createLabel();
         this.updatePosition(position);
         this.updateRotation(rotation);
     }
@@ -39,6 +39,7 @@ class PlayerCube {
         playerLabel.center.set( 0.5, 5 );
         this.cube.add( playerLabel );
         playerLabel.layers.set( 0 );
+        return playerLabel;
     }
 
     updatePosition(position) {
@@ -50,6 +51,14 @@ class PlayerCube {
 
     updateHp(hp) {
         this.hp = hp;
+    }
+
+    updateLabel(distance) {
+        if (distance > 1000) {
+            this.label.element.style.scale = 1/ ( 1 + 0.1 * distance );
+        } else {
+            this.label.element.style.scale = 1 / ( 1 + 0.1 * distance);
+        }
     }
 }
 document.addEventListener("DOMContentLoaded", (event) => {
