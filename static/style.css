@@ -49,5 +49,19 @@ html, body {
     font-family: sans-serif;
     padding: 2px;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 10000000000000;
+    z-index: 1000;
+}
+
+.hpback {
+  width: 40px;
+  height: 10px;
+  background-color: red;
+  z-index: 998;
+}
+
+.hpfront {
+  height: 100%;
+  width: 100%;
+  background-color: green;
+  z-index: 999;
 }
