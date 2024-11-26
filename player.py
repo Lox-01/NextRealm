@@ -1,10 +1,11 @@
 class Player:
-    def __init__(self, id, position, rotation, hp, username):
+    def __init__(self, id, position, rotation, hp, username, totalhp):
         self.id       = id
         self.hp       = hp
         self.position = position
         self.rotation = rotation
         self.username = username
+        self.totalhp  = totalhp
 
     def update_position(self, pos):
         self.position.update(pos)
@@ -21,5 +22,6 @@ class Player:
             "hp"       : self.hp,
             "position" : self.position,
             "rotation" : self.rotation,
-            "username" : self.username
+            "username" : self.username,
+            "totalhp"  : self.totalhp
         }
