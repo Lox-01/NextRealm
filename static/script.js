@@ -7,10 +7,12 @@ function tri(a,b) {return Math.sqrt((Number(a["x"])-Number(b["x"]))**2+(Number(a
 class PlayerCube {
     constructor(id, position, rotation, hp, username) {
         this.id = id;
-        this.hp = hp;
+        this.totalhp = hp;
+        this.currenthp = hp;
         this.username = username;
         this.cube = this.createCube();
         this.label = this.createLabel();
+        this.hpbar = this.createHpBar();
         this.updatePosition(position);
         this.updateRotation(rotation);
     }
@@ -43,6 +45,20 @@ class PlayerCube {
         return playerLabel;
     }
 
+    createHpBar() {
+        const playerHpBarBack = document.createElement('div');
+        const playerHpBarFront = document.createElement('div');
+        playerHpBarBack.className = 'hpback';
+        playerHpBarFront.className = 'hpfront';
+        playerHpBarBack.appendChild(playerHpBarFront);
+        const playerBar = new CSS2DObject( playerHpBarBack );
+        playerBar.position.set( 0, 0, 0 );
+        playerBar.center.set( 0.5, 5 );
+        this.cube.add( playerBar );
+        playerBar.layers.set( 0 );
+        return playerBar;
+    }
+
     updatePosition(position) {
         this.cube.position.set(position.x, position.y, position.z);
     }
@@ -51,7 +67,9 @@ class PlayerCube {
     }
 
     updateHp(hp) {
-        this.hp = hp;
+        this.currenthp = hp;
+        let percentageHp = this.currenthp/this.totalhp*100;
+        this.hpbar.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
     }
 
     updateLabel(distance) {
@@ -129,7 +147,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
         for (const [id, data] of Object.entries(players)) {
             if (id != my_id) {
                 if (!playersCubes[id]) {
-                    playersCubes[id] = new PlayerCube(id, data.position, data.rotation, data.hp, data.username);
+                    playersCubes[id] = new PlayerCube(id, data.position, data.rotation, 50, data.username);
+                    playersCubes[id].updateHp(data.hp);
                     scene.add(playersCubes[id].cube);
                 } else {
                     playersCubes[id].updatePosition(data.position);
