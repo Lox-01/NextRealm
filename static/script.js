@@ -69,7 +69,9 @@ class PlayerCube {
     updateHp(hp) {
         this.hp = hp;
         let percentageHp = this.hp/this.totalhp*100;
-        this.hpbar.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
+        console.log(percentageHp);
+        dir(this.hpbar);
+        this.hpbar.element.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
     }
 
     updateLabel(distance) {
@@ -111,7 +113,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     labelRenderer.domElement.style.position = 'absolute';
     labelRenderer.domElement.style.top = '0px';
     document.body.appendChild(labelRenderer.domElement);
-    const player = null;
+    let player = null;
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
