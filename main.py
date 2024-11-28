@@ -1,5 +1,3 @@
-# This is a test ignore it lmao.
-
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_socketio import SocketIO
 from socket_events import *

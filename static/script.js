@@ -38,7 +38,7 @@ class PlayerCube {
         playerDiv.style.backgroundColor = 'transparent';
         const playerLabel = new CSS2DObject( playerDiv );
         playerLabel.position.set( 0, 0, 0 );
-        playerLabel.center.set( 0.5, 5 );
+        playerLabel.center.set( 0.5, 3 );
         this.cube.add( playerLabel );
         playerLabel.layers.set( 0 );
         playerLabel.element.style.fontSize="30px";
@@ -52,6 +52,9 @@ class PlayerCube {
         playerHpBarFront.className = 'hpfront';
         playerHpBarBack.appendChild(playerHpBarFront);
         const playerBar = new CSS2DObject( playerHpBarBack );
+        playerHpBarBack.style.width = '100px';
+        playerHpBarBack.style.height = '15px';
+        playerHpBarBack.style.display = 'block';
         playerBar.position.set( 0, 0, 0 );
         playerBar.center.set( 0.5, 5 );
         this.cube.add( playerBar );
@@ -70,15 +73,17 @@ class PlayerCube {
         this.hp = hp;
         let percentageHp = this.hp/this.totalhp*100;
         console.log(percentageHp);
-        dir(this.hpbar);
         this.hpbar.element.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
     }
 
     updateLabel(distance) {
         if (distance > 70) {
             this.label.element.style.fontSize = "0px";
+            //this.hpbar.element.style.display = "none";
         } else {
-            this.label.element.style.fontSize = `${(1 / ( 1 + 0.05 * distance))*30}px`;
+            this.label.element.style.fontSize = `${(1 / ( 1 + 0.07 * distance))*30}px`;
+            this.label.center.set(0.5,3-distance*0.1);
+            //this.hpbar.element.style.display = "block";
         }
     }
 }
@@ -339,7 +344,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
         if (event.key === "1" && !chatopen) {
             if (selected) {
-                socket.emit("player_hit", selected.id);
+                if (selected.id != my_id) {
+                    socket.emit("player_hit", selected.id);
+                }
             }
         }
     });    
