@@ -6,6 +6,7 @@ class Player:
         self.rotation = rotation
         self.username = username
         self.totalhp  = totalhp
+        self.last_hit = None
 
     def update_position(self, pos):
         self.position.update(pos)

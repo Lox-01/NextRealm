@@ -98,8 +98,8 @@ def debug(data):
     on_debug(data)
 
 @socketio.on('player_hit')
-def player_hit(player_id):
-    on_player_hit(player_id, players, socketio)
+def player_hit(ids):
+    on_player_hit(ids[0], players, socketio, ids[1])
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", port=6052)

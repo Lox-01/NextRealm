@@ -360,7 +360,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         if (event.key === "1" && !chatopen) {
             if (selected) {
                 if (selected.id != my_id) {
-                    socket.emit("player_hit", selected.id);
+                    socket.emit("player_hit", [selected.id, my_id]);
                 }
             }
         }

@@ -1,6 +1,7 @@
 from flask_socketio import emit
 from player import Player
-import json, os # Not sure if this is necessary but it might be.
+from datetime import datetime, timedelta
+import json, os
 
 def on_connect(socketio, player_id, players):
     if os.path.exists("./data/users.json"):
@@ -62,11 +63,15 @@ def on_new_msg(vals, players, socketio):
 def on_debug(data):
     print(data)
 
-def on_player_hit(player_id, players, socketio):
-    if int(player_id) in players:
-        players[int(player_id)].decrease_hp(2)
-        socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-    for key in players:
-        print(key)
-        print(players[key].hp)
-        print(players[key].totalhp)
+def on_player_hit(player_id, players, socketio, hitter_id):
+    if int(player_id) in players and int(hitter_id) in players:
+        d = datetime.now()
+        if (players[int(hitter_id)].last_hit):
+            if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):
+                players[int(player_id)].decrease_hp(2)
+                socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
+                players[int(hitter_id)].last_hit=d
+        else:
+            players[int(player_id)].decrease_hp(2)
+            socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
+            players[int(hitter_id)].last_hit=d
