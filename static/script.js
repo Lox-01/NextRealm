@@ -38,7 +38,7 @@ class PlayerCube {
         playerDiv.style.backgroundColor = 'transparent';
         const playerLabel = new CSS2DObject( playerDiv );
         playerLabel.position.set( 0, 0, 0 );
-        playerLabel.center.set( 0.5, 3 );
+        playerLabel.center.set( 0.5, 4.5 );
         this.cube.add( playerLabel );
         playerLabel.layers.set( 0 );
         playerLabel.element.style.fontSize="30px";
@@ -52,11 +52,10 @@ class PlayerCube {
         playerHpBarFront.className = 'hpfront';
         playerHpBarBack.appendChild(playerHpBarFront);
         const playerBar = new CSS2DObject( playerHpBarBack );
-        playerHpBarBack.style.width = '100px';
-        playerHpBarBack.style.height = '15px';
-        playerHpBarBack.style.display = 'block';
+        playerHpBarBack.style.width = '200px';
+        playerHpBarBack.style.height = '20px';
         playerBar.position.set( 0, 0, 0 );
-        playerBar.center.set( 0.5, 5 );
+        playerBar.center.set( 0.5, 6.5 );
         this.cube.add( playerBar );
         playerBar.layers.set( 0 );
         return playerBar;
@@ -72,18 +71,34 @@ class PlayerCube {
     updateHp(hp) {
         this.hp = hp;
         let percentageHp = this.hp/this.totalhp*100;
-        console.log(percentageHp);
         this.hpbar.element.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
     }
 
     updateLabel(distance) {
         if (distance > 70) {
-            this.label.element.style.fontSize = "0px";
-            //this.hpbar.element.style.display = "none";
+            if (this.hpbar.element.classList.contains("hpback")) {
+                this.hpbar.element.classList.remove("hpback");
+                this.hpbar.element.classList.add("nodisp");
+            }
+            if (this.label.element.classList.contains("label")) {
+                this.label.element.classList.remove("label");
+                this.label.element.classList.add("nodisp");
+            }
         } else {
-            this.label.element.style.fontSize = `${(1 / ( 1 + 0.07 * distance))*30}px`;
-            this.label.center.set(0.5,3-distance*0.1);
-            //this.hpbar.element.style.display = "block";
+            const scaleFactor = 1/(1+0.07*distance);
+            this.label.element.style.fontSize = `${scaleFactor*30}px`;
+            this.hpbar.element.style.width = `${200 * scaleFactor}px`;
+            this.hpbar.element.style.height = `${20 * scaleFactor}px`;
+            this.label.center.set(0.5,4.5-distance*0.04);
+            this.hpbar.center.set(0.5,6.5-distance*0.05);
+            if (this.hpbar.element.classList.contains("nodisp")) {
+                this.hpbar.element.classList.remove("nodisp");
+                this.hpbar.element.classList.add("hpback");
+            }
+            if (this.label.element.classList.contains("nodisp")) {
+                this.label.element.classList.remove("nodisp");
+                this.label.element.classList.add("label");
+            }
         }
     }
 }

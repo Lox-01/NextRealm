@@ -30,7 +30,7 @@ def signup():
         users=json.load(open('./NextRealm/data/users.json'))
     if username not in users:
         permid = max([user[0] for user in users.values()])+1
-        users[username] = [permid, { "x"  : 0, "y"  : 1, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50, 50]
+        users[username] = [permid, { "x"  : 0, "y"  : 0.5, "z"  : 0 }, { "xr" : 0, "yr" : 0, "zr" : 0 }, 50, 50]
         if os.path.exists("./data/users.json"):
             json.dump(users, open("./data/users.json", "w"), indent = 2)
         elif os.path.exists("./NextRealm/data/users.json"):

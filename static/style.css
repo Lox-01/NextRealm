@@ -50,11 +50,13 @@ html, body {
     padding: 2px;
     background: rgba(0, 0, 0, 0.6);
     z-index: 1000;
+    display: "block";
 }
 
 .hpback {
   background-color: red;
   z-index: 998;
+  display: "block";
 }
 
 .hpfront {
@@ -62,4 +64,8 @@ html, body {
   height: 100%;
   background-color: green;
   z-index: 999;
+}
+
+.nodisp {
+    display: none;
 }
