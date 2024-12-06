@@ -69,3 +69,7 @@ html, body {
 .nodisp {
     display: none;
 }
+
+.dark {
+    filter: brightness(50%);
+}
