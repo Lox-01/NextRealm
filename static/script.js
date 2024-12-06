@@ -255,7 +255,15 @@ document.addEventListener("DOMContentLoaded", (event) => {
             }
         }
     });
-    
+    let spellconversion = {1:"one",2:"two",3:"three",4:"four",5:"five",6:"six",7:"seven",8:"eight",9:"nine",10:"ten"};
+    socket.on("refresh_spell", (info) => {
+        if (info[0] == my_id) {
+            if (Array.from(document.getElementById("spellone").classList).includes("dark")) {
+                document.getElementById(`spell${spellconversion[info[1]]}`).classList.remove("dark");
+            }
+        }
+    });
+              
     window.addEventListener("beforeunload", function(e) {
         socket.emit("offline", [my_id, localStorage.getItem('client_id')]);
     });
@@ -361,6 +369,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
             if (selected) {
                 if (selected.id != my_id) {
                     socket.emit("player_hit", [selected.id, my_id]);
+                    if (!Array.from(document.getElementById("spellone").classList).includes("dark")) {
+   		                document.getElementById("spellone").classList.add("dark");
+                    }
                 }
             }
         }
