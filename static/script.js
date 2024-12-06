@@ -163,6 +163,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     window.addEventListener("mouseup", (event) => {
         selected = hovered;
+        console.log(selected.id);
     });
 
     socket.on("render_players", (players) => {
@@ -258,7 +259,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let spellconversion = {"1":"one","2":"two","3":"three","4":"four","5":"five","6":"six","7":"seven","8":"eight","9":"nine","10":"ten"};
     let spellcools = {"1":true,"2":true,"3":true,"4":true,"5":true,"6":true,"7":true,"8":true,"9":true,"10":true};
     socket.on("refresh_spell", (info) => {
-        console.log(info);
         if (info[0] == my_id) {
             spellcools[`${info[1]}`] = true;
             if (Array.from(document.getElementById("spellone").classList).includes("dark")) {
@@ -271,8 +271,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
         socket.emit("offline", [my_id, localStorage.getItem('client_id')]);
     });
     let pressed = [];
-    
-    let isgrounded = false;
     
     function animate() {
         requestAnimationFrame(animate);
