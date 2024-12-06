@@ -1,7 +1,7 @@
 from flask_socketio import emit
 from player import Player
 from datetime import datetime, timedelta
-import json, os
+import json, os, time
 
 def on_connect(socketio, player_id, players):
     if os.path.exists("./data/users.json"):
@@ -70,10 +70,12 @@ def on_player_hit(player_id, players, socketio, hitter_id):
             if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):
                 players[int(player_id)].decrease_hp(2)
                 socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-                socketio.emit("refresh_spell", [hitter_id, 1])
                 players[int(hitter_id)].last_hit=d
+                time.sleep(1)
+                socketio.emit("refresh_spell", [hitter_id, 1])
         else:
             players[int(player_id)].decrease_hp(2)
             socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-            socketio.emit("refresh_spell", [hitter_id, 1])
             players[int(hitter_id)].last_hit=d
+            time.sleep(1)
+            socketio.emit("refresh_spell", [hitter_id, 1])

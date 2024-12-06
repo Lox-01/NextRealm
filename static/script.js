@@ -255,11 +255,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
             }
         }
     });
-    let spellconversion = {1:"one",2:"two",3:"three",4:"four",5:"five",6:"six",7:"seven",8:"eight",9:"nine",10:"ten"};
+    let spellconversion = {"1":"one","2":"two","3":"three","4":"four","5":"five","6":"six","7":"seven","8":"eight","9":"nine","10":"ten"};
+    let spellcools = {"1":true,"2":true,"3":true,"4":true,"5":true,"6":true,"7":true,"8":true,"9":true,"10":true};
     socket.on("refresh_spell", (info) => {
+        console.log(info);
         if (info[0] == my_id) {
+            spellcools[`${info[1]}`] = true;
             if (Array.from(document.getElementById("spellone").classList).includes("dark")) {
-                document.getElementById(`spell${spellconversion[info[1]]}`).classList.remove("dark");
+                document.getElementById(`spell${spellconversion[`${info[1]}`]}`).classList.remove("dark");
             }
         }
     });
@@ -366,11 +369,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
             }
         }
         if (event.key === "1" && !chatopen) {
-            if (selected) {
-                if (selected.id != my_id) {
-                    socket.emit("player_hit", [selected.id, my_id]);
-                    if (!Array.from(document.getElementById("spellone").classList).includes("dark")) {
-   		                document.getElementById("spellone").classList.add("dark");
+            if (spellcools["1"] == true) {
+                if (selected) {
+                    if (selected.id != my_id) {
+                        socket.emit("player_hit", [selected.id, my_id]);
+                        spellcools["1"] = false;
+                        if (!Array.from(document.getElementById("spellone").classList).includes("dark")) {
+                            document.getElementById("spellone").classList.add("dark");
+                        }
                     }
                 }
             }
