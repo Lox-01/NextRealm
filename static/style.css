@@ -43,3 +43,29 @@ html, body {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+.label {
+    color: #FFF;
+    font-family: sans-serif;
+    padding: 2px;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: "block";
+}
+
+.hpback {
+  background-color: red;
+  z-index: 998;
+  display: "block";
+}
+
+.hpfront {
+  width: 100%;
+  height: 100%;
+  background-color: green;
+  z-index: 999;
+}
+
+.nodisp {
+    display: none;
+}

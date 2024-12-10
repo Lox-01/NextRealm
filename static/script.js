@@ -1,19 +1,23 @@
-function getRandomInt(min, max) {const minCeiled = Math.ceil(min);const maxFloored = Math.floor(max);return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);}
+function gri(min, max) {const minCeiled = Math.ceil(min);const maxFloored = Math.floor(max);return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);}
 function rtd(r) {return r * 180 / Math.PI;}
 function dtr(d) {return d / 180 * Math.PI;}
 function dir(t) {if ("object" != typeof t || null === t) {console.log("Input is not a valid object.");return;}let e = Object.getOwnPropertyNames(t);e.forEach(t => {console.log(`Property - ${t}`)});let o = Object.getPrototypeOf(t);for (; o;) {let r = Object.getOwnPropertyNames(o);r.forEach(t => {console.log(`Method - ${t}`)}), o = Object.getPrototypeOf(o)}}
 function deffunc(n) {if ("function" != typeof n) {console.log("Input is not a valid function.");return;}let t = n.toString();console.log("Function Definition:");console.log(t);}
-
+function tri(a,b) {return Math.sqrt((Number(a["x"])-Number(b["x"]))**2+(Number(a["y"])-Number(b["y"]))**2+(Number(a["z"])-Number(b["z"]))**2);}
 class PlayerCube {
-    constructor(id, position, rotation, hp) {
+    constructor(id, position, rotation, hp, username, totalhp) {
         this.id = id;
+        this.totalhp = totalhp;
         this.hp = hp;
+        this.username = username;
         this.cube = this.createCube();
+        this.label = this.createLabel();
+        this.hpbar = this.createHpBar();
         this.updatePosition(position);
         this.updateRotation(rotation);
     }
     createCube() {
-        const geometry = new THREE.BoxGeometry();
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = [
             new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
             new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
@@ -26,6 +30,37 @@ class PlayerCube {
         cubeMesh.name = this.id;
         return cubeMesh;
     }
+
+    createLabel() {
+        const playerDiv = document.createElement('div');
+        playerDiv.className = 'label';
+        playerDiv.textContent = `${this.username}`;
+        playerDiv.style.backgroundColor = 'transparent';
+        const playerLabel = new CSS2DObject( playerDiv );
+        playerLabel.position.set( 0, 0, 0 );
+        playerLabel.center.set( 0.5, 4.5 );
+        this.cube.add( playerLabel );
+        playerLabel.layers.set( 0 );
+        playerLabel.element.style.fontSize="30px";
+        return playerLabel;
+    }
+
+    createHpBar() {
+        const playerHpBarBack = document.createElement('div');
+        const playerHpBarFront = document.createElement('div');
+        playerHpBarBack.className = 'hpback';
+        playerHpBarFront.className = 'hpfront';
+        playerHpBarBack.appendChild(playerHpBarFront);
+        const playerBar = new CSS2DObject( playerHpBarBack );
+        playerHpBarBack.style.width = '200px';
+        playerHpBarBack.style.height = '20px';
+        playerBar.position.set( 0, 0, 0 );
+        playerBar.center.set( 0.5, 6.5 );
+        this.cube.add( playerBar );
+        playerBar.layers.set( 0 );
+        return playerBar;
+    }
+
     updatePosition(position) {
         this.cube.position.set(position.x, position.y, position.z);
     }
@@ -35,11 +70,42 @@ class PlayerCube {
 
     updateHp(hp) {
         this.hp = hp;
+        let percentageHp = this.hp/this.totalhp*100;
+        this.hpbar.element.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
+    }
+
+    updateLabel(distance) {
+        if (distance > 70) {
+            if (this.hpbar.element.classList.contains("hpback")) {
+                this.hpbar.element.classList.remove("hpback");
+                this.hpbar.element.classList.add("nodisp");
+            }
+            if (this.label.element.classList.contains("label")) {
+                this.label.element.classList.remove("label");
+                this.label.element.classList.add("nodisp");
+            }
+        } else {
+            const scaleFactor = 1/(1+0.07*distance);
+            this.label.element.style.fontSize = `${scaleFactor*30}px`;
+            this.hpbar.element.style.width = `${200 * scaleFactor}px`;
+            this.hpbar.element.style.height = `${20 * scaleFactor}px`;
+            this.label.center.set(0.5,4.5-distance*0.04);
+            this.hpbar.center.set(0.5,6.5-distance*0.05);
+            if (this.hpbar.element.classList.contains("nodisp")) {
+                this.hpbar.element.classList.remove("nodisp");
+                this.hpbar.element.classList.add("hpback");
+            }
+            if (this.label.element.classList.contains("nodisp")) {
+                this.label.element.classList.remove("nodisp");
+                this.label.element.classList.add("label");
+            }
+        }
     }
 }
 document.addEventListener("DOMContentLoaded", (event) => {
     const playersCubes = {};
     let my_id = document.getElementById('session_id').value;
+    let my_username = document.getElementById('session_username').value;
     let selected;
     let hovered;
     const url = window.location.href;
@@ -58,10 +124,16 @@ document.addEventListener("DOMContentLoaded", (event) => {
     }
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.layers.enableAll();
     const canvas = document.getElementById('gamecanvas');
     const renderer = new THREE.WebGLRenderer({ canvas });
+    const labelRenderer = new CSS2DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    const player = new PlayerCube(my_id, { x: 0, y: 1, z: 0 }, { xr: 0, yr: 0, zr: 0 }, 50);
+    labelRenderer.setSize( window.innerWidth, window.innerHeight );
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0px';
+    document.body.appendChild(labelRenderer.domElement);
+    let player = null;
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -95,22 +167,17 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     socket.on("render_players", (players) => {
         for (const [id, data] of Object.entries(players)) {
-            if (id != my_id) {
-                if (!playersCubes[id]) {
-                    playersCubes[id] = new PlayerCube(id, data.position, data.rotation, data.hp);
-                    scene.add(playersCubes[id].cube);
-                } else {
-                    playersCubes[id].updatePosition(data.position);
-                    playersCubes[id].updateRotation(data.rotation);
-                    playersCubes[id].updateHp(data.hp);
-                }
+            if (!playersCubes[id]) {
+                playersCubes[id] = new PlayerCube(id, data.position, data.rotation, data.hp, data.username, data.totalhp);
+                scene.add(playersCubes[id].cube);
             } else {
-                player.updatePosition(data.position);
-                player.updateRotation(data.rotation);
-                player.updateHp(data.hp);
-                if (!scene.getObjectByName(my_id)) {
-                    scene.add(player.cube);
-                    animate();
+                playersCubes[id].updatePosition(data.position);
+                playersCubes[id].updateRotation(data.rotation);
+                playersCubes[id].updateHp(data.hp);
+            }
+            if (!player) {
+                if (my_id == id) {
+                    player = playersCubes[id]
                 }
             }
         }
@@ -197,49 +264,51 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let isgrounded = false;
     
     function animate() {
-        if (player.cube.position.y == 1) {
-            isgrounded = true;
-        } else {
-            isgrounded = false;
-        }
         requestAnimationFrame(animate);
-        if (!chatopen) {
-            let moved = false;
-            if (pressed.includes('w')) {
-                let a = player.cube.rotation.y;
-                let b = Math.sin(a) / 20;
-                let c = Math.cos(a) / 20;
-                player.cube.position.z += c;
-                player.cube.position.x += b;
-                moved = true;
+        if (player) {
+            if (!chatopen) {
+                let moved = false;
+                if (pressed.includes('w')) {
+                    let a = player.cube.rotation.y;
+                    let b = Math.sin(a) / 20;
+                    let c = Math.cos(a) / 20;
+                    player.cube.position.z += c;
+                    player.cube.position.x += b;
+                    moved = true;
+                }
+                if (pressed.includes('s')) {
+                    let a = player.cube.rotation.y;
+                    let b = -Math.sin(a) / 40;
+                    let c = -Math.cos(a) / 40;
+                    player.cube.position.z += c;
+                    player.cube.position.x += b;
+                    moved = true;
+                }
+                if (pressed.includes('a')) {
+                    player.cube.rotation.y += Math.PI / 150;
+                    moved = true;
+                }
+                if (pressed.includes('d')) {
+                    player.cube.rotation.y -= Math.PI / 150;
+                    moved = true;
+                }
+                if (moved === true) {
+                    let data = { "id": my_id, "pos": { "x": player.cube.position.x, "y": player.cube.position.y, "z": player.cube.position.z }, "rot": { "xr": player.cube.rotation.x, "yr": player.cube.rotation.y, "zr": player.cube.rotation.z } };
+                    socket.emit('player_move', data);
+                }
             }
-            if (pressed.includes('s')) {
-                let a = player.cube.rotation.y;
-                let b = -Math.sin(a) / 40;
-                let c = -Math.cos(a) / 40;
-                player.cube.position.z += c;
-                player.cube.position.x += b;
-                moved = true;
-            }
-            if (pressed.includes('a')) {
-                player.cube.rotation.y += Math.PI / 150;
-                moved = true;
-            }
-            if (pressed.includes('d')) {
-                player.cube.rotation.y -= Math.PI / 150;
-                moved = true;
-            }
-            
-            if (moved === true) {
-                let data = { "id": my_id, "pos": { "x": player.cube.position.x, "y": player.cube.position.y, "z": player.cube.position.z }, "rot": { "xr": player.cube.rotation.x, "yr": player.cube.rotation.y, "zr": player.cube.rotation.z } };
-                socket.emit('player_move', data);
+            camera.position.x = player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
+            camera.position.z = player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
+            camera.position.y = player.cube.position.y + 1.7;
+            camera.lookAt(player.cube.position);
+            if (playersCubes != {} && playersCubes != null) {
+                for (const [id, oplayer] of Object.entries(playersCubes)) {
+                    oplayer.updateLabel(tri(player.cube.position,oplayer.cube.position));
+                }
             }
         }
-        camera.position.x = player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
-        camera.position.z = player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
-        camera.position.y = player.cube.position.y + 3;
-        camera.lookAt(player.cube.position);
         renderer.render(scene, camera);
+        labelRenderer.render( scene, camera );
     }
     
     let repeatInterval;
@@ -290,7 +359,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
         if (event.key === "1" && !chatopen) {
             if (selected) {
-                socket.emit("player_hit", selected.id);
+                if (selected.id != my_id) {
+                    socket.emit("player_hit", selected.id);
+                }
             }
         }
     });    

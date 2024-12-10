@@ -7,10 +7,12 @@ def on_connect(socketio, player_id, players):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
         users=json.load(open('./NextRealm/data/users.json'))
+    username_save = None
     for username in users:
         if users[username][0] == int(player_id):
             user = users[username]
-    players[int(player_id)] = Player(int(player_id), user[1], user[2], user[3])
+            username_save = username
+    players[int(player_id)] = Player(int(player_id), user[1], user[2], user[3], str(username_save), user[4])
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
 
 def on_offline(player_id, players, socketio, client_id, client_ids):
@@ -21,7 +23,7 @@ def on_offline(player_id, players, socketio, client_id, client_ids):
     player_id = int(player_id)
     for username in users:
         if users[username][0] == player_id:
-            users[username] = [players[player_id].id, players[player_id].position, players[player_id].rotation, players[player_id].hp]
+            users[username] = [players[player_id].id, players[player_id].position, players[player_id].rotation, players[player_id].hp, players[player_id].totalhp]
     if os.path.exists("./data/users.json"):
         json.dump(users, open("./data/users.json", "w"), indent = 2)
     elif os.path.exists("./NextRealm/data/users.json"):
@@ -67,3 +69,4 @@ def on_player_hit(player_id, players, socketio):
     for key in players:
         print(key)
         print(players[key].hp)
+        print(players[key].totalhp)
