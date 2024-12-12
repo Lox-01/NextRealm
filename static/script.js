@@ -112,7 +112,7 @@ class DamageNumber {
         this.element.style.position = 'absolute';
         this.element.style.top = '0px';
         this.element.style.left = '0px';
-        this.element.style.fontSize = '30px';
+        this.element.style.fontSize = `${1/(1+0.07*tri(playersCubes[my_id].cube.position,player.cube.position))*30}px`;
         this.element.style.color = 'red';
         this.element.style.fontWeight = 'bold';
         this.element.style.opacity = 1;
@@ -130,10 +130,13 @@ class DamageNumber {
         }
     }
 }
+let playersCubes;
+let my_id;
+let my_username;
 document.addEventListener("DOMContentLoaded", (event) => {
-    const playersCubes = {};
-    let my_id = document.getElementById('session_id').value;
-    let my_username = document.getElementById('session_username').value;
+    playersCubes = {};
+    my_id = document.getElementById('session_id').value;
+    my_username = document.getElementById('session_username').value;
     let selected;
     let hovered;
     const url = window.location.href;
