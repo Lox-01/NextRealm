@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let player = null;
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = 0;
@@ -200,22 +200,33 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
     });
 
+    function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+    
     function formatMessage(vals) {
         const localDate = new Date(vals[2]);
         const formattedTime = localDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return `${formattedTime} ${vals[1]}: ${vals[0]}`;
+        const sanitizedMessage = escapeHTML(vals[0]);
+        return `<p class='name'>${my_username}</p><div class='message'><p class='text'>${sanitizedMessage}</p><span class='time'>${formattedTime}</span></div>`;
     }
-
+    
     socket.on("append_msg", (vals) => {
         const messageElement = document.createElement('div');
-        messageElement.textContent = formatMessage(vals);
+        messageElement.innerHTML = formatMessage(vals);
+        messageElement.classList.add('message-container');
         chatobj.appendChild(messageElement);
-        const isAtBottom = chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
+    
+        const isAtBottom = Math.abs(chatobj.scrollHeight - chatobj.scrollTop - chatobj.clientHeight) < 1;
         if (isAtBottom) {
             chatobj.scrollTop = chatobj.scrollHeight;
         }
+    
         if (chatobj.childElementCount > 60) {
-            while (chatobj.childElementCount > 60) {
+            const excessMessages = chatobj.childElementCount - 60;
+            for (let i = 0; i < excessMessages; i++) {
                 chatobj.firstChild.remove();
             }
         }
