@@ -49,10 +49,6 @@ html, body {
     border-radius: 10px;
 }
 
-#chat .time {
-    font-size: 10px;
-}
-
 #chatInput {
     z-index: 99;
     background-color: azure;

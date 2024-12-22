@@ -206,16 +206,19 @@ document.addEventListener("DOMContentLoaded", (event) => {
         return div.innerHTML;
     }
     
-    function formatMessage(vals) {
-        const localDate = new Date(vals[2]);
-        const formattedTime = localDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const sanitizedMessage = escapeHTML(vals[0]);
-        return `<p class='name'>${my_username}</p><div class='message'><p class='text'>${sanitizedMessage}</p><span class='time'>${formattedTime}</span></div>`;
+    function formatMessage(vals, p) {
+        if (!p) {
+            const sanitizedMessage = escapeHTML(vals[0]);
+            return `<p class='name'>${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
+        } else {
+            const sanitizedMessage = escapeHTML(vals[0]);
+            return `<p class='name'>(PRIVATE) ${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`
+        }
     }
     
     socket.on("append_msg", (vals) => {
         const messageElement = document.createElement('div');
-        messageElement.innerHTML = formatMessage(vals);
+        messageElement.innerHTML = formatMessage(vals, false);
         messageElement.classList.add('message-container');
         chatobj.appendChild(messageElement);
     
@@ -233,11 +236,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
     });
 
     socket.on("private_msg", (vals) => {
-        if (vals[1] == my_id) {
+        if (vals[1] == my_username) {
             const messageElement = document.createElement('div');
-            let newvals = vals;
-            newvals.splice(1,1);
-            messageElement.textContent = `Private message: ${formatMessage(newvals)}`;
+            messageElement.innerHTML = formatMessage(vals, true);
+            messageElement.classList.add('message-container');
             chatobj.appendChild(messageElement);
             const isAtBottom = chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
             if (isAtBottom) {
@@ -252,7 +254,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     });
     
     socket.on("pm_fail", (failid) => {
-        if (failid == my_id) {
+        if (failid == my_username) {
             const messageElement = document.createElement('div');
             messageElement.textContent = 'The format for a private message is: "/pm target_id message". Please try again.';
             chatobj.appendChild(messageElement);
@@ -416,8 +418,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     function sendMessage() {
         const message = enterInput.value.trim();
         if (message) {
-            const gmttime = Date.now();
-            socket.emit('new_msg', [message, my_id, gmttime]);
+            socket.emit('new_msg', [message, my_username]);
             enterInput.value = "";
         }
     }
