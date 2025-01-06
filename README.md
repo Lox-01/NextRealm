@@ -1,37 +1,24 @@
 # NextRealm
 
-The current structure is as follows:
+Since I (Lox) am back, here's a list of things (for me) to do!
 
-## Python files for the backend
+1. Verify the current functionality of what we have in the main branch:
+  - Movement
+  - Damage mechanics
+  - Chat
+  - Private Messaging
+  - Anything else?
 
--- ```main.py``` is the main runner file.
+2. For the following branches verify the same functionality, and whatever they added works, then merge:
+   - cooldowns
+   - damage-text
+   - chat-ui
 
--- ```player.py``` contains the player class.
-
--- ```socket_events.py``` contains the socket events.
-
-## A "templates" folder containing HTML files to be rendered.
-
--- ```index.html``` is the login and signup page right now.
-
--- ```game.html``` is the game page right now.
-
-## A "data" folder that will contain JSON files and other data things.
-
--- ```users.json``` stores user data for when they go offline and online.
-
--- ```data.json``` is who knows what?
-
-## A "static" folder which contains javascript files (for the frontend logic), css files as needed and the logo. Probably other stuff later for the frontend.
-
--- ```NextRealm.jpg``` is self-explanatory.
-
--- ```style.css``` is the... style lol.
-
--- ```three.js, css2d.js``` 3D rendering related stuff (not made by us).
-
--- ```signscript.js``` is the script for the login and signup page.
-
--- ```socket.io.js``` is the socket.io connection js file (not made by us).
-
--- ```script.js``` is the game's script for the game page handling like connections disconnections movement rendering etc.
+3. Create a new branch for work on the mobs!
+   What does a mob need?
+   - Health
+   - An attack
+   - An origin (home coordinates)
+   - A range to follow hostiles from the home coordinates
+   - A model (cube for now)
+   - A speed and other stats
