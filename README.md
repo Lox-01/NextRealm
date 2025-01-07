@@ -9,10 +9,10 @@ Since I (Lox) am back, here's a list of things (for me) to do!
   - ~~Private Messaging~~
   - ~~Anything else?~~
 
-2. For the following branches verify the same functionality, and whatever they added works, then merge:
+2. ~~For the following branches verify the same functionality, and whatever they added works, then merge:~~
    - ~~cooldowns~~
-   - damage-text
-   - chat-ui
+   - ~~damage-text~~
+   - ~~chat-ui~~
 
 3. Update the Silly Development files using the panel I'm working on.
 
