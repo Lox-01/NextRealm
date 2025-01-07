@@ -102,10 +102,41 @@ class PlayerCube {
         }
     }
 }
+class DamageNumber {
+    constructor(scene, player, damage) {
+        this.scene = scene;
+        this.player = player;
+        this.damage = damage;
+        this.element = document.createElement('div');
+        this.element.textContent = damage.toString();
+        this.element.style.position = 'absolute';
+        this.element.style.top = '0px';
+        this.element.style.left = '0px';
+        this.element.style.fontSize = `${1/(1+0.07*tri(playersCubes[my_id].cube.position,player.cube.position))*30}px`;
+        this.element.style.color = 'red';
+        this.element.style.fontWeight = 'bold';
+        this.element.style.opacity = 1;
+        this.css2dObject = new CSS2DObject(this.element);
+        this.css2dObject.position.copy(player.cube.position);
+        this.css2dObject.position.y += 1;
+        this.scene.add(this.css2dObject);
+    }
+    update() {
+        this.element.style.opacity -= 0.05;
+        this.css2dObject.position.copy(this.player.cube.position);
+        this.css2dObject.position.y+=2-this.element.style.opacity;
+        if (this.element.style.opacity <= 0.5) {
+            this.scene.remove(this.css2dObject);
+        }
+    }
+}
+let playersCubes;
+let my_id;
+let my_username;
 document.addEventListener("DOMContentLoaded", (event) => {
-    const playersCubes = {};
-    let my_id = document.getElementById('session_id').value;
-    let my_username = document.getElementById('session_username').value;
+    playersCubes = {};
+    my_id = document.getElementById('session_id').value;
+    my_username = document.getElementById('session_username').value;
     let selected;
     let hovered;
     const url = window.location.href;
@@ -163,7 +194,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     window.addEventListener("mouseup", (event) => {
         selected = hovered;
-        console.log(selected.id);
     });
 
     socket.on("render_players", (players) => {
@@ -174,6 +204,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
             } else {
                 playersCubes[id].updatePosition(data.position);
                 playersCubes[id].updateRotation(data.rotation);
+                if (data.hp != playersCubes[id].hp) {
+                    const damageNumber = new DamageNumber(scene, playersCubes[id], playersCubes[id].hp - data.hp);
+                    setInterval(() => {
+                        damageNumber.update();
+                    }, 250);
+
+                }
                 playersCubes[id].updateHp(data.hp);
             }
             if (!player) {

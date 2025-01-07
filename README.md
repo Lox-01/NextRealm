@@ -1,37 +1,37 @@
 # NextRealm
 
-The current structure is as follows:
+Since I (Lox) am back, here's a list of things (for me) to do!
 
-## Python files for the backend
+~~1. Verify the current functionality of what we have in the main branch:~~
+  - ~~Movement~~
+  - ~~Damage mechanics~~
+  - ~~Chat~~
+  - ~~Private Messaging~~
+  - ~~Anything else?~~
 
--- ```main.py``` is the main runner file.
+2. For the following branches verify the same functionality, and whatever they added works, then merge:
+   - ~~cooldowns~~
+   - damage-text
+   - chat-ui
 
--- ```player.py``` contains the player class.
+3. Update the Silly Development files using the panel I'm working on.
 
--- ```socket_events.py``` contains the socket events.
+4. Create a new branch for work on the mobs!
+   What does a mob need?
+   - A name
+   - Health
+   - An attack (will need range, strength, whatever else but for now this will be good)
+   - Attack cooldown
+   - An origin (home coordinates)
+   - A range to follow hostiles from the home coordinates
+   - A model (cube for now)
+   - A speed and other stats
 
-## A "templates" folder containing HTML files to be rendered.
+5. We will need a file to keep track of all of the mobs in the game.
+   - JSON file
+   - **Not** live-updated (so we don't update the HP of monsters as they are attacked in the JSON file, it's just permanent data)
+   - The format for information for a mob will be like this:
+     - {"name":"xyz", "health": 50, "attack": 50, "origin": [1234,5678,90], "range": 50, "speed": 1}
 
--- ```index.html``` is the login and signup page right now.
-
--- ```game.html``` is the game page right now.
-
-## A "data" folder that will contain JSON files and other data things.
-
--- ```users.json``` stores user data for when they go offline and online.
-
--- ```data.json``` is who knows what?
-
-## A "static" folder which contains javascript files (for the frontend logic), css files as needed and the logo. Probably other stuff later for the frontend.
-
--- ```NextRealm.jpg``` is self-explanatory.
-
--- ```style.css``` is the... style lol.
-
--- ```three.js, css2d.js``` 3D rendering related stuff (not made by us).
-
--- ```signscript.js``` is the script for the login and signup page.
-
--- ```socket.io.js``` is the socket.io connection js file (not made by us).
-
--- ```script.js``` is the game's script for the game page handling like connections disconnections movement rendering etc.
+6. Fix the player and all the other stuff / data to use a dictionary instead of a list.
+   I.e. instead of [1, 2, 3, 4] and then accessing stuff based on position (list[0]) change it to {"name": 1, "x": 2} etc. and access based on key (list["name"]).
