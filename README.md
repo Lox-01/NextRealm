@@ -1,6 +1,6 @@
 # NextRealm
 
-Since I (Lox) am back, here's a list of things (for me) to do!
+---Since--- I (Lox) am back, here's a list of things (for me) to do!
 
 1. Verify the current functionality of what we have in the main branch:
   - Movement
