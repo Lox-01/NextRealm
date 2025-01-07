@@ -10,7 +10,7 @@ Since I (Lox) am back, here's a list of things (for me) to do!
   - ~~Anything else?~~
 
 2. For the following branches verify the same functionality, and whatever they added works, then merge:
-   - cooldowns
+   - ~~cooldowns~~
    - damage-text
    - chat-ui
 
