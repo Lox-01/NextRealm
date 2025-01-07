@@ -51,9 +51,9 @@ def on_new_msg(vals, players, socketio):
         if len(splitted) < 3:
             socketio.emit("pm_fail", vals[1])
         else:
-            pmid = splitted[1]
-            if int(pmid) in players:
-                newvals = [" ".join(splitted[2:]), splitted[1], vals[1], vals[2]]
+            usern = splitted[1]
+            if str(usern) in [player.username for player in players.values()]:
+                newvals = [" ".join(splitted[2:]), usern, vals[1]]
                 socketio.emit("private_msg", newvals)
             else:
                 socketio.emit("pm_fail", vals[1])

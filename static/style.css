@@ -16,13 +16,37 @@ html, body {
 
 #chat {
     z-index: 101;
-    background-color: coral;
+    background-color: #3a4757;
     height: 30%;
     opacity: 0.5;
     overflow-wrap: break-word;
     white-space: normal;
     padding-top: 10px;
     overflow-y: auto;
+}
+
+#chat .message-container {
+    width: fit-content;
+    overflow-wrap: break-word;
+    margin-bottom: 20px;
+}
+
+#chat .name {
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+#chat .message {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#chat .text {
+    margin: 0;
+    padding: 7px 10px;
+    background-color: #fff;
+    border-radius: 10px;
 }
 
 #chatInput {
@@ -76,7 +100,6 @@ html, body {
 
 #ui {
     position: absolute;
-    z-index: 1000;
     width: 100%;
     height: 100%;
     text-align: center;

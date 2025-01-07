@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     let player = null;
     
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = 0;
@@ -237,33 +237,46 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
     });
 
-    function formatMessage(vals) {
-        const localDate = new Date(vals[2]);
-        const formattedTime = localDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return `${formattedTime} ${vals[1]}: ${vals[0]}`;
+    function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
-
+    
+    function formatMessage(vals, p) {
+        if (!p) {
+            const sanitizedMessage = escapeHTML(vals[0]);
+            return `<p class='name'>${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
+        } else {
+            const sanitizedMessage = escapeHTML(vals[0]);
+            return `<p class='name'>(PRIVATE) ${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`
+        }
+    }
+    
     socket.on("append_msg", (vals) => {
         const messageElement = document.createElement('div');
-        messageElement.textContent = formatMessage(vals);
+        messageElement.innerHTML = formatMessage(vals, false);
+        messageElement.classList.add('message-container');
         chatobj.appendChild(messageElement);
-        const isAtBottom = chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
+    
+        const isAtBottom = Math.abs(chatobj.scrollHeight - chatobj.scrollTop - chatobj.clientHeight) < 1;
         if (isAtBottom) {
             chatobj.scrollTop = chatobj.scrollHeight;
         }
+    
         if (chatobj.childElementCount > 60) {
-            while (chatobj.childElementCount > 60) {
+            const excessMessages = chatobj.childElementCount - 60;
+            for (let i = 0; i < excessMessages; i++) {
                 chatobj.firstChild.remove();
             }
         }
     });
 
     socket.on("private_msg", (vals) => {
-        if (vals[1] == my_id) {
+        if (vals[1] == my_username) {
             const messageElement = document.createElement('div');
-            let newvals = vals;
-            newvals.splice(1,1);
-            messageElement.textContent = `Private message: ${formatMessage(newvals)}`;
+            messageElement.innerHTML = formatMessage(vals, true);
+            messageElement.classList.add('message-container');
             chatobj.appendChild(messageElement);
             const isAtBottom = chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
             if (isAtBottom) {
@@ -278,7 +291,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     });
     
     socket.on("pm_fail", (failid) => {
-        if (failid == my_id) {
+        if (failid == my_username) {
             const messageElement = document.createElement('div');
             messageElement.textContent = 'The format for a private message is: "/pm target_id message". Please try again.';
             chatobj.appendChild(messageElement);
@@ -442,8 +455,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     function sendMessage() {
         const message = enterInput.value.trim();
         if (message) {
-            const gmttime = Date.now();
-            socket.emit('new_msg', [message, my_id, gmttime]);
+            socket.emit('new_msg', [message, my_username]);
             enterInput.value = "";
         }
     }
