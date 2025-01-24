@@ -198,12 +198,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     socket.on("render_players", (players) => {
         for (const [id, data] of Object.entries(players)) {
+            console.log(id);
+            console.log(data);
             if (!playersCubes[id]) {
-                playersCubes[id] = new PlayerCube(id, data.position, data.rotation, data.hp, data.username, data.totalhp);
+                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
                 scene.add(playersCubes[id].cube);
             } else {
-                playersCubes[id].updatePosition(data.position);
-                playersCubes[id].updateRotation(data.rotation);
+                playersCubes[id].updatePosition(data.pos);
+                playersCubes[id].updateRotation(data.rot);
                 if (data.hp != playersCubes[id].hp) {
                     const damageNumber = new DamageNumber(scene, playersCubes[id], playersCubes[id].hp - data.hp);
                     setInterval(() => {
