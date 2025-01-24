@@ -14,7 +14,8 @@ Since I (Lox) am back, here's a list of things (for me) to do!
    - ~~damage-text~~
    - ~~chat-ui~~
 
-3. Update the Silly Development files using the panel I'm working on.
+~~3. Update the Silly Development files using the panel I'm working on.~~
+**Doing this, but delaying it since it's probably me procrastinating.**
 
 4. Create a new branch for work on the mobs!
    What does a mob need?
