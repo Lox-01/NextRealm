@@ -18,8 +18,8 @@ Since I (Lox) am back, here's a list of things (for me) to do!
 
 **Doing this, but delaying it since it's probably me procrastinating.**
 
-4. Fix the player and all the other stuff / data to use a dictionary instead of a list.
-  I.e. instead of [1, 2, 3, 4] and then accessing stuff based on position (list[0]) change it to {"name": 1, "x": 2} etc. and access based on key (list["name"]).
+~~4. Fix the player and all the other stuff / data to use a dictionary instead of a list.
+  I.e. instead of [1, 2, 3, 4] and then accessing stuff based on position (list[0]) change it to {"name": 1, "x": 2} etc. and access based on key (list["name"]).~~
 
 5. Create a new branch for work on the mobs!
   What does a mob need?
