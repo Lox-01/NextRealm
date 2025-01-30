@@ -21,8 +21,8 @@ class Player:
         return {
             "id"       : self.id,
             "hp"       : self.hp,
-            "pos" : self.position,
-            "rot" : self.rotation,
+            "pos"      : self.position,
+            "rot"      : self.rotation,
             "username" : self.username,
             "totalhp"  : self.totalhp
         }

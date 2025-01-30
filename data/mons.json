@@ -1,0 +1,28 @@
+{
+    "testboi": {
+        "name": "testyboi",
+        "hp": 50,
+        "totalhp": 50,
+        "attack": 2,
+        "arange": 0.1,
+        "cooldown": 1,
+        "origin": {
+            "x": 10,
+            "y": 0.5,
+            "z": 20
+        },
+        "position": {
+            "x": 10,
+            "y": 0.5,
+            "z": 20
+        },
+        "rotation": {
+            "xr": 0,
+            "yr": 0,
+            "zr": 0
+        },
+        "aggrorange": 5,
+        "followrange": 15,
+        "speed": 1
+    }
+}

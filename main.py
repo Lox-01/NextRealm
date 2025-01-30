@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
+from monster import Monster
 import json, os
 
 app = Flask(__name__)
@@ -9,7 +10,19 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins=["http://45.90.12.32:6052", "http://localhost:6052", "http://127.0.0.1:6052"])
 
 players = {}
+mons = {}
 client_ids = []
+
+if os.path.exists("./data/mons.json"):
+    tempmons = json.load(open('./data/mons.json'))
+    for mon in tempmons:
+        tm = tempmons[mon]
+        mons[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["position"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"])
+elif os.path.exists("./NextRealm/data/mons.json"):
+    tempmons = json.load(open('./NextRealm/data/mons.json'))
+    for mon in tempmons:
+        tm = tempmons[mon]
+        mons[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["position"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"])
 
 @app.route('/')
 def index():
@@ -78,7 +91,7 @@ def game():
 @socketio.on('connect')
 def connect():
     player_id = request.args.get('player_id')
-    on_connect(socketio, player_id, players)
+    on_connect(socketio, player_id, players, mons)
 
 @socketio.on('offline')
 def offline(vals):

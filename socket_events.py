@@ -3,7 +3,7 @@ from player import Player
 from datetime import datetime, timedelta
 import json, os, time
 
-def on_connect(socketio, player_id, players):
+def on_connect(socketio, player_id, players, mons):
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
@@ -15,6 +15,7 @@ def on_connect(socketio, player_id, players):
             username_save = username
     players[int(player_id)] = Player(int(player_id), user['pos'], user['rot'], user['hp'], str(username_save), user['totalhp'])
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
+    socketio.emit("render_mons", {pid: monster.to_dict() for pid, monster in mons.items()})
 
 def on_offline(player_id, players, socketio, client_id, client_ids):
     if os.path.exists("./data/users.json"):

@@ -135,6 +135,7 @@ let my_id;
 let my_username;
 document.addEventListener("DOMContentLoaded", (event) => {
     playersCubes = {};
+    monsCubes = {};
     my_id = document.getElementById('session_id').value;
     my_username = document.getElementById('session_username').value;
     let selected;
@@ -198,8 +199,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     socket.on("render_players", (players) => {
         for (const [id, data] of Object.entries(players)) {
-            console.log(id);
-            console.log(data);
             if (!playersCubes[id]) {
                 playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
                 scene.add(playersCubes[id].cube);
@@ -235,6 +234,32 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 if (playersCubes[id]) {
                     delete playersCubes[id];
                 }
+            }
+        }
+    });
+
+    socket.on("render_mons", (mons) => {
+        for (const [id, data] of Object.entries(mons)) {
+            console.log(id);
+            console.log(data);
+            if (!monsCubes[id]) {
+                /*monsCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
+                scene.add(monsCubes[id].cube);*/
+                console.log("New mon.");
+            } else {
+                /*
+                monsCubes[id].updatePosition(data.pos);
+                monsCubes[id].updateRotation(data.rot);
+                if (data.hp != monsCubes[id].hp) {
+                    const damageNumber = new DamageNumber(scene, monsCubes[id], monsCubes[id].hp - data.hp);
+                    setInterval(() => {
+                        damageNumber.update();
+                    }, 250);
+
+                }
+                monsCubes[id].updateHp(data.hp);
+                */
+               console.log("Existing mon.");
             }
         }
     });
