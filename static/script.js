@@ -102,6 +102,111 @@ class PlayerCube {
         }
     }
 }
+class MonsterCube {
+    constructor(id, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed) {
+        this.id = id;
+        this.name = name;
+        this.hp = hp;
+        this.totalhp = totalhp;
+        this.attack = attack;
+        this.arange = arange;
+        this.cooldown = cooldown;
+        this.origin = origin;
+        this.aggrorange = aggrorange;
+        this.followrange = followrange;
+        this.speed = speed;
+        this.cube = this.createCube();
+        this.label = this.createLabel();
+        this.hpbar = this.createHpBar();
+        this.updatePosition(origin);
+        this.updateRotation(rotation);
+    }
+    createCube() {
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = [
+            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
+            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
+            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
+            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
+            new THREE.MeshBasicMaterial({ color: 0x0000ff }),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+        ];
+        const cubeMesh = new THREE.Mesh(geometry, material);
+        cubeMesh.name = this.id;
+        return cubeMesh;
+    }
+
+    createLabel() {
+        const monsterDiv = document.createElement('div');
+        monsterDiv.className = 'label';
+        monsterDiv.textContent = `${this.name}`;
+        monsterDiv.style.backgroundColor = 'transparent';
+        const monsterLabel = new CSS2DObject( monsterDiv );
+        monsterLabel.position.set( 0, 0, 0 );
+        monsterLabel.center.set( 0.5, 4.5 );
+        this.cube.add( monsterLabel );
+        monsterLabel.layers.set( 0 );
+        monsterLabel.element.style.fontSize="30px";
+        return monsterLabel;
+    }
+
+    createHpBar() {
+        const monsterHpBarBack = document.createElement('div');
+        const monsterHpBarFront = document.createElement('div');
+        monsterHpBarBack.className = 'hpback';
+        monsterHpBarFront.className = 'hpfront';
+        monsterHpBarBack.appendChild(monsterHpBarFront);
+        const monsterBar = new CSS2DObject( monsterHpBarBack );
+        monsterHpBarBack.style.width = '200px';
+        monsterHpBarBack.style.height = '20px';
+        monsterBar.position.set( 0, 0, 0 );
+        monsterBar.center.set( 0.5, 6.5 );
+        this.cube.add( monsterBar );
+        monsterBar.layers.set( 0 );
+        return monsterBar;
+    }
+
+    updatePosition(position) {
+        this.cube.position.set(position.x, position.y, position.z);
+    }
+    updateRotation(rotation) {
+        this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
+    }
+
+    updateHp(hp) {
+        this.hp = hp;
+        let percentageHp = this.hp/this.totalhp*100;
+        this.hpbar.element.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
+    }
+
+    updateLabel(distance) {
+        if (distance > 70) {
+            if (this.hpbar.element.classList.contains("hpback")) {
+                this.hpbar.element.classList.remove("hpback");
+                this.hpbar.element.classList.add("nodisp");
+            }
+            if (this.label.element.classList.contains("label")) {
+                this.label.element.classList.remove("label");
+                this.label.element.classList.add("nodisp");
+            }
+        } else {
+            const scaleFactor = 1/(1+0.07*distance);
+            this.label.element.style.fontSize = `${scaleFactor*30}px`;
+            this.hpbar.element.style.width = `${200 * scaleFactor}px`;
+            this.hpbar.element.style.height = `${20 * scaleFactor}px`;
+            this.label.center.set(0.5,4.5-distance*0.04);
+            this.hpbar.center.set(0.5,6.5-distance*0.05);
+            if (this.hpbar.element.classList.contains("nodisp")) {
+                this.hpbar.element.classList.remove("nodisp");
+                this.hpbar.element.classList.add("hpback");
+            }
+            if (this.label.element.classList.contains("nodisp")) {
+                this.label.element.classList.remove("nodisp");
+                this.label.element.classList.add("label");
+            }
+        }
+    }
+}
 class DamageNumber {
     constructor(scene, player, damage) {
         this.scene = scene;
@@ -131,11 +236,12 @@ class DamageNumber {
     }
 }
 let playersCubes;
+let monstersCubes;
 let my_id;
 let my_username;
 document.addEventListener("DOMContentLoaded", (event) => {
     playersCubes = {};
-    monsCubes = {};
+    monstersCubes = {};
     my_id = document.getElementById('session_id').value;
     my_username = document.getElementById('session_username').value;
     let selected;
@@ -181,15 +287,28 @@ document.addEventListener("DOMContentLoaded", (event) => {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(pointer, camera);
-        const intersects = raycaster.intersectObjects( Object.values(playersCubes).map(player => player.cube), false );
+        cubes = Object.values(playersCubes).map(player => player.cube).concat(Object.values(monstersCubes).map(monster => monster.cube));
+        const intersects = raycaster.intersectObjects( cubes, false );
         if (intersects.length > 0) {
             const intersectedCube = intersects[0].object;
-            for (const player of Object.values(playersCubes)) {
-                if (player.cube == intersectedCube) {
-                    hovered = player;
+            for (const oplayer of Object.values(playersCubes)) {
+                if (oplayer.cube == intersectedCube) {
+                    if (tri(player.cube.position,oplayer.cube.position)) {
+                        hovered = oplayer;
+                    }
                     break;
                 }
             }
+            for (const omonster of Object.values(monstersCubes)) {
+                if (omonster.cube == intersectedCube) {
+                    if (tri(player.cube.position,omonster.cube.position)) {
+                        hovered = omonster;
+                    }
+                    break;
+                }
+            }
+        } else {
+            hovered = null;
         }
     });
 
@@ -240,26 +359,20 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     socket.on("render_mons", (mons) => {
         for (const [id, data] of Object.entries(mons)) {
-            console.log(id);
-            console.log(data);
-            if (!monsCubes[id]) {
-                /*monsCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
-                scene.add(monsCubes[id].cube);*/
-                console.log("New mon.");
+            if (!monstersCubes[id]) {
+                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.origin, data.rot, data.aggrorange, data.followrange, data.speed);
+                scene.add(monstersCubes[id].cube);
             } else {
-                /*
-                monsCubes[id].updatePosition(data.pos);
-                monsCubes[id].updateRotation(data.rot);
-                if (data.hp != monsCubes[id].hp) {
-                    const damageNumber = new DamageNumber(scene, monsCubes[id], monsCubes[id].hp - data.hp);
+                monstersCubes[id].updatePosition(data.pos);
+                monstersCubes[id].updateRotation(data.rot);
+                if (data.hp != monstersCubes[id].hp) {
+                    const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
                     setInterval(() => {
                         damageNumber.update();
                     }, 250);
 
                 }
-                monsCubes[id].updateHp(data.hp);
-                */
-               console.log("Existing mon.");
+                monstersCubes[id].updateHp(data.hp);
             }
         }
     });
@@ -390,6 +503,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
             if (playersCubes != {} && playersCubes != null) {
                 for (const [id, oplayer] of Object.entries(playersCubes)) {
                     oplayer.updateLabel(tri(player.cube.position,oplayer.cube.position));
+                }
+            }
+            if (monstersCubes != {} && monstersCubes != null) {
+                for (const [id, omonster] of Object.entries(monstersCubes)) {
+                    omonster.updateLabel(tri(player.cube.position,omonster.cube.position));
                 }
             }
         }

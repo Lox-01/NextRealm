@@ -1,5 +1,5 @@
 class Monster:
-    def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, position, rotation, aggrorange, followrange, speed):
+    def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed):
         self.name = name
         self.hp = hp
         self.totalhp = totalhp
@@ -7,7 +7,7 @@ class Monster:
         self.arange = arange
         self.cooldown = cooldown
         self.origin = origin
-        self.position = position
+        self.position = origin
         self.rotation = rotation
         self.aggrorange = aggrorange
         self.followrange = followrange
