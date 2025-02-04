@@ -10,19 +10,19 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins=["http://45.90.12.32:6052", "http://localhost:6052", "http://127.0.0.1:6052"])
 
 players = {}
-mons = {}
+monsters = {}
 client_ids = []
 
 if os.path.exists("./data/mons.json"):
     tempmons = json.load(open('./data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        mons[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"])
+        monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"])
 elif os.path.exists("./NextRealm/data/mons.json"):
     tempmons = json.load(open('./NextRealm/data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        mons[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"])
+        monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"])
 
 @app.route('/')
 def index():
@@ -91,7 +91,7 @@ def game():
 @socketio.on('connect')
 def connect():
     player_id = request.args.get('player_id')
-    on_connect(socketio, player_id, players, mons)
+    on_connect(socketio, player_id, players, monsters)
 
 @socketio.on('offline')
 def offline(vals):
@@ -112,7 +112,7 @@ def debug(data):
 
 @socketio.on('player_hit')
 def player_hit(ids):
-    on_player_hit(ids[0], players, socketio, ids[1])
+    on_player_hit(ids[0], players, socketio, ids[1], monsters, ids[2])
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", port=6052)

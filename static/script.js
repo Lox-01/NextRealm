@@ -6,6 +6,7 @@ function deffunc(n) {if ("function" != typeof n) {console.log("Input is not a va
 function tri(a,b) {return Math.sqrt((Number(a["x"])-Number(b["x"]))**2+(Number(a["y"])-Number(b["y"]))**2+(Number(a["z"])-Number(b["z"]))**2);}
 class PlayerCube {
     constructor(id, position, rotation, hp, username, totalhp) {
+        this.type = "player";
         this.id = id;
         this.totalhp = totalhp;
         this.hp = hp;
@@ -104,6 +105,7 @@ class PlayerCube {
 }
 class MonsterCube {
     constructor(id, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed) {
+        this.type = "monster";
         this.id = id;
         this.name = name;
         this.hp = hp;
@@ -565,7 +567,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             if (spellcools["1"] == true) {
                 if (selected) {
                     if (selected.id != my_id) {
-                        socket.emit("player_hit", [selected.id, my_id]);
+                        socket.emit("player_hit", [selected.id, my_id, selected.type]);
                         spellcools["1"] = false;
                         if (!Array.from(document.getElementById("spellone").classList).includes("dark")) {
                             document.getElementById("spellone").classList.add("dark");

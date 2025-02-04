@@ -65,19 +65,36 @@ def on_new_msg(vals, players, socketio):
 def on_debug(data):
     print(data)
 
-def on_player_hit(player_id, players, socketio, hitter_id):
-    if int(player_id) in players and int(hitter_id) in players:
-        d = datetime.now()
-        if (players[int(hitter_id)].last_hit):
-            if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):
+def on_player_hit(player_id, players, socketio, hitter_id, monsters, typet):
+    if typet == "player":
+        if int(player_id) in players and int(hitter_id) in players:
+            d = datetime.now()
+            if (players[int(hitter_id)].last_hit):
+                if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):
+                    players[int(player_id)].decrease_hp(2)
+                    socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
+                    players[int(hitter_id)].last_hit=d
+                    time.sleep(1)
+                    socketio.emit("refresh_spell", [hitter_id, 1])
+            else:
                 players[int(player_id)].decrease_hp(2)
                 socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
                 players[int(hitter_id)].last_hit=d
                 time.sleep(1)
                 socketio.emit("refresh_spell", [hitter_id, 1])
-        else:
-            players[int(player_id)].decrease_hp(2)
-            socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-            players[int(hitter_id)].last_hit=d
-            time.sleep(1)
-            socketio.emit("refresh_spell", [hitter_id, 1])
+    elif typet == "monster":
+        if str(player_id) in monsters and int(hitter_id) in players:
+            d = datetime.now()
+            if (players[int(hitter_id)].last_hit):
+                if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):
+                    monsters[str(player_id)].decrease_hp(2)
+                    socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in monsters.items()})
+                    players[int(hitter_id)].last_hit=d
+                    time.sleep(1)
+                    socketio.emit("refresh_spell", [hitter_id, 1])
+            else:
+                monsters[str(player_id)].decrease_hp(2)
+                socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in monsters.items()})
+                players[int(hitter_id)].last_hit=d
+                time.sleep(1)
+                socketio.emit("refresh_spell", [hitter_id, 1])
