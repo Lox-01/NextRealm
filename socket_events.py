@@ -9,6 +9,7 @@ def on_connect(socketio, player_id, players, mons):
     elif os.path.exists("./NextRealm/data/users.json"):
         users=json.load(open('./NextRealm/data/users.json'))
     username_save = None
+    user = None
     for username in users:
         if users[username]['id'] == int(player_id):
             user = users[username]
