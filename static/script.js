@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
     });
 
-    socket.on("render_mons", (mons) => {
+    socket.on("render_monsters", (mons) => {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
                 monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.origin, data.rot, data.aggrorange, data.followrange, data.speed);
