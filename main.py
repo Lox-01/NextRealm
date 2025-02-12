@@ -112,7 +112,18 @@ def debug(data):
 
 @socketio.on('player_hit')
 def player_hit(ids):
-    on_player_hit(ids[0], players, socketio, ids[1], monsters, ids[2])
+    on_player_hit("player", ids[0], players, socketio, ids[1], monsters, ids[2])
+
+def game_loop():
+    while True:
+        for monster_id, monster in monsters.items():
+            for player_id, player in players.items():
+                if monster.is_in_arange(player):
+                    on_player_hit("monster", player_id, players, socketio, monster_id, monsters, "player")
+                    print(player.hp)
+                    socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
+        time.sleep(0.1)
 
 if __name__ == '__main__':
+    socketio.start_background_task(game_loop)
     socketio.run(app, host="0.0.0.0", port=6052)

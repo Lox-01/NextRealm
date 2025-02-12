@@ -1,3 +1,4 @@
+import math
 class Monster:
     def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed):
         self.name = name
@@ -23,6 +24,12 @@ class Monster:
 
     def decrease_hp(self, amount):
         self.hp = max(0,self.hp - amount)
+
+    def is_in_arange(self, player):
+        return self.arange >= math.sqrt((self.position["x"]-player.position["x"])**2+(self.position["y"]-player.position["y"])**2+(self.position["z"]-player.position["z"])**2)
+
+    def attack_player(self, player):
+        player.decrease_hp(self.attack)
 
     def to_dict(self):
         return {
