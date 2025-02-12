@@ -120,7 +120,6 @@ def game_loop():
             for player_id, player in players.items():
                 if monster.is_in_arange(player):
                     on_player_hit("monster", player_id, players, socketio, monster_id, monsters, "player")
-                    print(player.hp)
                     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
         time.sleep(0.1)
 
