@@ -391,7 +391,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             return `<p class='name'>${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
         } else {
             const sanitizedMessage = escapeHTML(vals[0]);
-            return `<p class='name'>(PRIVATE) ${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`
+            return `<p class='name'>(PRIVATE) ${vals[1]} -> ${vals[2]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`
         }
     }
     
@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     });
 
     socket.on("private_msg", (vals) => {
-        if (vals[1] == my_username) {
+        if (vals[1] == my_username || vals[2] == my_username) {
             const messageElement = document.createElement('div');
             messageElement.innerHTML = formatMessage(vals, true);
             messageElement.classList.add('message-container');
