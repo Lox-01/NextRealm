@@ -124,8 +124,8 @@ def game_loop():
                     del monster.threats[player.id]
             if monster.threats:
                 maxthreat = max(monster.threats, key=monster.threats.get)
-                if monster.is_in_arange(players[maxthreat]) and int(maxthreat) == int(player_id):
-                    on_player_hit("monster", player_id, players, socketio, monster_id, monsters, "player")
+                if monster.is_in_arange(players[maxthreat]):
+                    on_player_hit("monster", maxthreat, players, socketio, monster_id, monsters, "player")
                     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
             print(monster.to_dict())
         time.sleep(0.1)
