@@ -118,9 +118,16 @@ def game_loop():
     while True:
         for monster_id, monster in monsters.items():
             for player_id, player in players.items():
-                if monster.is_in_arange(player):
+                if monster.is_in_aggrorange(player) and player.id not in monster.threats:
+                    monster.threats[player.id] = 0
+                elif not monster.is_in_aggrorange(player) and player.id in monster.threats:
+                    del monster.threats[player.id]
+            if monster.threats:
+                maxthreat = max(monster.threats, key=monster.threats.get)
+                if monster.is_in_arange(players[maxthreat]) and int(maxthreat) == int(player_id):
                     on_player_hit("monster", player_id, players, socketio, monster_id, monsters, "player")
                     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
+            print(monster.to_dict())
         time.sleep(0.1)
 
 if __name__ == '__main__':

@@ -85,6 +85,8 @@ def on_player_hit(htype, player_id, players, socketio, hitter_id, monsters, type
                     socketio.emit("refresh_spell", [hitter_id, 1])
         elif typet == "monster":
             if str(player_id) in monsters and int(hitter_id) in players:
+                if int(hitter_id) in monsters[str(player_id)].threats:
+                    monsters[str(player_id)].threats[int(hitter_id)] += 2
                 d = datetime.now()
                 if (players[int(hitter_id)].last_hit):
                     if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):

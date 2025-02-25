@@ -15,6 +15,7 @@ class Monster:
         self.speed = speed
         self.last_hit = None
         self.target = None
+        self.threats = {}
 
     def update_position(self, pos):
         self.position.update(pos)
@@ -27,6 +28,12 @@ class Monster:
 
     def is_in_arange(self, player):
         return self.arange >= math.sqrt((self.position["x"]-player.position["x"])**2+(self.position["y"]-player.position["y"])**2+(self.position["z"]-player.position["z"])**2)
+    
+    def is_in_aggrorange(self, player):
+        return self.aggrorange >= math.sqrt((self.position["x"]-player.position["x"])**2+(self.position["y"]-player.position["y"])**2+(self.position["z"]-player.position["z"])**2)
+    
+    def is_in_followrange(self, player):
+        return self.followrange >= math.sqrt((self.position["x"]-player.position["x"])**2+(self.position["y"]-player.position["y"])**2+(self.position["z"]-player.position["z"])**2)
 
     def attack_player(self, player):
         player.decrease_hp(self.attack)
@@ -44,5 +51,6 @@ class Monster:
             "rot"          :   self.rotation,
             "aggrorange"   :   self.aggrorange,
             "followrange"  :   self.followrange,
-            "speed"        :   self.speed
+            "speed"        :   self.speed,
+            "threats"      :   self.threats
         }
