@@ -96,7 +96,7 @@ def connect():
 @socketio.on('offline')
 def offline(vals):
     player_id, client_id = vals[0], vals[1]
-    on_offline(player_id, players, socketio, client_id, client_ids)
+    on_offline(player_id, players, socketio, client_id, client_ids, monsters)
 
 @socketio.on('player_move')
 def player_moved(data):
@@ -124,7 +124,7 @@ def game_loop():
                     del monster.threats[player.id]
             if monster.threats:
                 maxthreat = max(monster.threats.values())
-                candidates = [pid for pid, threat in monster.threats.items() if threat == maxthreat]
+                candidates = [pid for pid, threat in monster.threats.items() if threat == maxthreat and pid in players]
                 if len(candidates) > 1:
                     maxthreatid = min(candidates, key=lambda pid: math.sqrt((monster.position["x"] - players[pid].position["x"]) ** 2 +(monster.position["y"] - players[pid].position["y"]) ** 2 +(monster.position["z"] - players[pid].position["z"]) ** 2))
                 else:
