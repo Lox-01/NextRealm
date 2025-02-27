@@ -5,34 +5,6 @@ function dir(t) {if ("object" != typeof t || null === t) {console.log("Input is 
 function deffunc(n) {if ("function" != typeof n) {console.log("Input is not a valid function.");return;}let t = n.toString();console.log("Function Definition:");console.log(t);}
 function tri(a,b) {return Math.sqrt((Number(a["x"])-Number(b["x"]))**2+(Number(a["y"])-Number(b["y"]))**2+(Number(a["z"])-Number(b["z"]))**2);}
 
-class DamageNumber {
-    constructor(scene, player, damage) {
-        this.scene = scene;
-        this.player = player;
-        this.damage = damage;
-        this.element = document.createElement('div');
-        this.element.textContent = damage.toString();
-        this.element.style.position = 'absolute';
-        this.element.style.top = '0px';
-        this.element.style.left = '0px';
-        this.element.style.fontSize = `${1/(1+0.07*tri(playersCubes[my_id].cube.position,player.cube.position))*30}px`;
-        this.element.style.color = 'red';
-        this.element.style.fontWeight = 'bold';
-        this.element.style.opacity = 1;
-        this.css2dObject = new CSS2DObject(this.element);
-        this.css2dObject.position.copy(player.cube.position);
-        this.css2dObject.position.y += 1;
-        this.scene.add(this.css2dObject);
-    }
-    update() {
-        this.element.style.opacity -= 0.05;
-        this.css2dObject.position.copy(this.player.cube.position);
-        this.css2dObject.position.y+=2-this.element.style.opacity;
-        if (this.element.style.opacity <= 0.5) {
-            this.scene.remove(this.css2dObject);
-        }
-    }
-}
 let playersCubes;
 let monstersCubes;
 let my_id;
@@ -146,6 +118,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
         for (const [id, cube] of Object.entries(playersCubes)) {
             if (!players[id]) {
+                cube.cleanup();
                 scene.remove(cube.cube);
                 if (cube.cube.geometry) {
                     cube.cube.geometry.dispose();

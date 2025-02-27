@@ -56,6 +56,17 @@ class PlayerCube {
         return playerBar;
     }
 
+    cleanup() {
+        if (this.label && this.label.element && this.label.element.parentNode) {
+            this.label.element.parentNode.removeChild(this.label.element);
+        }
+        if (this.hpbar && this.hpbar.element && this.hpbar.element.parentNode) {
+            this.hpbar.element.parentNode.removeChild(this.hpbar.element);
+        }
+        this.cube.remove(this.label);
+        this.cube.remove(this.hpbar);
+    }
+
     updatePosition(position) {
         this.cube.position.set(position.x, position.y, position.z);
     }
