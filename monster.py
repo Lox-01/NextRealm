@@ -1,4 +1,5 @@
-import math
+import math, time
+
 class Monster:
     def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed):
         self.name = name
@@ -37,6 +38,15 @@ class Monster:
 
     def attack_player(self, player):
         player.decrease_hp(self.attack)
+
+    def decay_threat(self, player):
+        if player.id in self.threats:
+            curr = time.time()
+            for player_id, threat_time in list(self.threats.items()):
+                if curr - threat_time[1] > 2:
+                    self.threats[player_id][0] = round(self.threats[player_id][0] - 0.2, 2)
+                if self.threats[player_id][0] <= 0:
+                    del self.threats[player_id]
 
     def to_dict(self):
         return {

@@ -3,7 +3,7 @@ from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
 from monster import Monster
-import json, os, math
+import json, os, math, time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -118,13 +118,17 @@ def game_loop():
     while True:
         for monster_id, monster in monsters.items():
             for player_id, player in players.items():
-                if monster.is_in_aggrorange(player) and player.id not in monster.threats:
-                    monster.threats[player.id] = 0
-                elif not monster.is_in_aggrorange(player) and player.id in monster.threats:
-                    del monster.threats[player.id]
+                if monster.is_in_aggrorange(player):
+                    if player.id not in monster.threats:
+                        monster.threats[player.id] = [1, time.time()]
+                    else:
+                        monster.threats[player.id][1] = time.time()
+                else:
+                    if player.id in monster.threats:
+                        monster.decay_threat(player)
             if monster.threats:
-                maxthreat = max(monster.threats.values())
-                candidates = [pid for pid, threat in monster.threats.items() if threat == maxthreat and pid in players]
+                maxthreat = max(monster.threats.values(), key=lambda threat: threat[0])[0]
+                candidates = [pid for pid, threat in monster.threats.items() if threat[0] == maxthreat and pid in players]
                 if len(candidates) > 1:
                     maxthreatid = min(candidates, key=lambda pid: math.sqrt((monster.position["x"] - players[pid].position["x"]) ** 2 +(monster.position["y"] - players[pid].position["y"]) ** 2 +(monster.position["z"] - players[pid].position["z"]) ** 2))
                 else:
