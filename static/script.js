@@ -73,6 +73,10 @@ class PlayerCube {
         this.hp = hp;
         let percentageHp = this.hp/this.totalhp*100;
         this.hpbar.element.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
+
+        if (this.hp <= 0) {
+            this.handleDeath();
+        }
     }
 
     updateLabel(distance) {
@@ -100,6 +104,66 @@ class PlayerCube {
                 this.label.element.classList.remove("nodisp");
                 this.label.element.classList.add("label");
             }
+        }
+    }
+
+    handleDeath() {
+        console.log(`Handling death for player ${this.username}`);
+        if (this.cube.parent) {
+            this.cube.parent.remove(this.cube);
+        }
+        if (this.label.parent) {
+            this.label.parent.remove(this.label);
+        }
+        if (this.hpbar.parent) {
+            this.hpbar.parent.remove(this.hpbar);
+        }
+        this.showDeathMessage();
+    }
+
+    showDeathMessage() {
+        let existingDeathMessage = document.getElementById("death-message");
+    
+        if (existingDeathMessage) {
+            existingDeathMessage.remove();
+        }
+    
+        const deathMessage = document.createElement("div");
+        deathMessage.id = "death-message";
+        deathMessage.innerHTML = `<p>YOU DIED...</p><button id='respawn-btn'>Respawn</button>`;
+        document.body.appendChild(deathMessage);
+    
+        setTimeout(() => {
+            const respawnBtn = document.getElementById("respawn-btn");
+            if (respawnBtn) {
+                respawnBtn.addEventListener("click", () => {
+                    this.respawn({ x: 0, y: 0, z: 0 }, { xr: 0, yr: 0, zr: 0 });
+                    document.body.removeChild(deathMessage);
+                });
+            } else {
+                console.error("Respawn button not found.");
+            }
+        }, 0);
+    }
+
+    respawn(position, rotation) {
+        this.hp = this.totalhp;
+        this.updateHp(this.totalhp);
+    
+        const safeY = position.y + 0.5;
+        this.updatePosition({ x: position.x, y: safeY, z: position.z });
+        this.updateRotation(rotation);
+    
+        if (!this.cube.parent) {
+            scene.add(this.cube);
+        }
+    
+        if (!this.hpbar.parent) {
+            this.cube.add(this.hpbar);
+        }
+    
+        if (!this.label.parent) {
+            this.cube.add(this.label);
         }
     }
 }
@@ -241,6 +305,7 @@ let playersCubes;
 let monstersCubes;
 let my_id;
 let my_username;
+let scene;
 document.addEventListener("DOMContentLoaded", (event) => {
     playersCubes = {};
     monstersCubes = {};
@@ -262,7 +327,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             }
         });
     }
-    const scene = new THREE.Scene();
+    scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.layers.enableAll();
     const canvas = document.getElementById('gamecanvas');
