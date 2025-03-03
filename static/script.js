@@ -135,10 +135,17 @@ document.addEventListener("DOMContentLoaded", (event) => {
         }
     });
 
+    socket.on("monster_position_update", (mon) => {
+        if (monstersCubes[mon.id]) {
+            monstersCubes[mon.id].updatePosition(mon.pos);
+            monstersCubes[mon.id].updateRotation(mon.rot);
+        }
+    });
+
     socket.on("render_monsters", (mons) => {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
-                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.origin, data.rot, data.aggrorange, data.followrange, data.speed);
+                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed);
                 scene.add(monstersCubes[id].cube);
             } else {
                 monstersCubes[id].updatePosition(data.pos);

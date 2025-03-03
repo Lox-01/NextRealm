@@ -17,13 +17,13 @@ if os.path.exists("./data/mons.json"):
     tempmons = json.load(open('./data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"])
+        monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
 elif os.path.exists("./NextRealm/data/mons.json"):
     tempmons = json.load(open('./NextRealm/data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"])
-
+        monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
+monsters["testboi"].position["x"] += 200
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -116,7 +116,12 @@ def player_hit(ids):
 
 def game_loop():
     while True:
+        print([monster.to_dict() for mid, monster in monsters.items()])
         for monster_id, monster in monsters.items():
+            if not monster.is_in_followrange():
+                monster.move_to_origin()
+                socketio.emit('monster_position_update', monster.to_dict())
+                continue
             for player_id, player in players.items():
                 if monster.is_in_aggrorange(player):
                     if player.id not in monster.threats:
@@ -135,8 +140,13 @@ def game_loop():
                     maxthreatid = candidates[0]
                 if monster.is_in_arange(players[maxthreatid]):
                     on_player_hit("monster", maxthreatid, players, socketio, monster_id, monsters, "player")
-                    socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-            print(monster.to_dict())
+                elif monster.is_in_aggrorange(players[maxthreatid]):
+                    # try to get to the player
+                    pass
+            elif monster.position != monster.origin:
+                monster.move_to_origin()
+                socketio.emit('monster_position_update', monster.to_dict())
+                pass
         time.sleep(0.1)
 
 if __name__ == '__main__':

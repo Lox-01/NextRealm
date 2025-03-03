@@ -1,7 +1,7 @@
 import math, time
 
 class Monster:
-    def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed):
+    def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed, id):
         self.name = name
         self.hp = hp
         self.totalhp = totalhp
@@ -9,7 +9,7 @@ class Monster:
         self.arange = arange
         self.cooldown = cooldown
         self.origin = origin
-        self.position = origin
+        self.position = origin.copy()
         self.rotation = rotation
         self.aggrorange = aggrorange
         self.followrange = followrange
@@ -17,6 +17,7 @@ class Monster:
         self.last_hit = None
         self.target = None
         self.threats = {}
+        self.id = id
 
     def update_position(self, pos):
         self.position.update(pos)
@@ -33,8 +34,8 @@ class Monster:
     def is_in_aggrorange(self, player):
         return self.aggrorange >= math.sqrt((self.position["x"]-player.position["x"])**2+(self.position["y"]-player.position["y"])**2+(self.position["z"]-player.position["z"])**2)
     
-    def is_in_followrange(self, player):
-        return self.followrange >= math.sqrt((self.position["x"]-player.position["x"])**2+(self.position["y"]-player.position["y"])**2+(self.position["z"]-player.position["z"])**2)
+    def is_in_followrange(self):
+        return self.followrange >= math.sqrt((self.origin["x"]-self.position["x"])**2+(self.origin["y"]-self.position["y"])**2+(self.origin["z"]-self.position["z"])**2)
 
     def attack_player(self, player):
         player.decrease_hp(self.attack)
@@ -47,6 +48,22 @@ class Monster:
                     self.threats[player_id][0] = round(self.threats[player_id][0] - 0.2, 2)
                 if self.threats[player_id][0] <= 0:
                     del self.threats[player_id]
+
+    def move_to_origin(self):
+        direction = {"x": self.origin["x"] - self.position["x"],"y": self.origin["y"] - self.position["y"],"z": self.origin["z"] - self.position["z"]}
+        distance = math.sqrt(direction["x"]**2 + direction["y"]**2 + direction["z"]**2)
+        if distance > 0:
+            norm = math.sqrt(direction["x"]**2 + direction["y"]**2 + direction["z"]**2)
+            direction["x"] /= norm
+            direction["y"] /= norm
+            direction["z"] /= norm
+            self.position["x"] += direction["x"] * self.speed
+            self.position["y"] += direction["y"] * self.speed
+            self.position["z"] += direction["z"] * self.speed
+            if distance <= self.speed:
+                self.position["x"] = self.origin["x"]
+                self.position["y"] = self.origin["y"]
+                self.position["z"] = self.origin["z"]
 
     def to_dict(self):
         return {
@@ -62,5 +79,6 @@ class Monster:
             "aggrorange"   :   self.aggrorange,
             "followrange"  :   self.followrange,
             "speed"        :   self.speed,
-            "threats"      :   self.threats
+            "threats"      :   self.threats,
+            "id"           :   self.id
         }
