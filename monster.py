@@ -1,5 +1,6 @@
 import math
 import time
+from character import Character
 
 class Monster(Character):
     def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed, id):
