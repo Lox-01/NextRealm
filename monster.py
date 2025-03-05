@@ -40,21 +40,32 @@ class Monster(Character):
                     del self.threats[player_id]
 
     def move_to_origin(self):
-        direction = {"x": self.origin["x"] - self.position["x"],"y": self.origin["y"] - self.position["y"],"z": self.origin["z"] - self.position["z"]}
-        distance = math.sqrt(direction["x"]**2 + direction["y"]**2 + direction["z"]**2)
+        direction = {axis: self.origin[axis] - self.position[axis] for axis in ['x', 'y', 'z']}
+        distance = math.sqrt(sum(direction[axis] ** 2 for axis in direction))
         if distance > 0:
-            norm = math.sqrt(direction["x"]**2 + direction["y"]**2 + direction["z"]**2)
-            direction["x"] /= norm
-            direction["y"] /= norm
-            direction["z"] /= norm
-            self.position["x"] += direction["x"] * self.speed
-            self.position["y"] += direction["y"] * self.speed
-            self.position["z"] += direction["z"] * self.speed
+            norm = distance
+            for axis in direction:
+                direction[axis] /= norm
+                self.position[axis] += direction[axis] * self.speed
             self.rotation["yr"] = math.atan2(direction["x"], direction["z"])
-            self.rotation["xr"] = math.atan2(direction["y"], math.sqrt(direction["x"]**2 + direction["z"]**2))
+            self.rotation["xr"] = math.atan2(direction["y"], math.hypot(direction["x"], direction["z"]))
             if distance <= self.speed:
                 self.position = self.origin.copy()
                 self.rotation = self.orotation.copy()
+    
+    def move_to_player(self, player):
+        direction = {axis: player.position[axis] - self.position[axis] for axis in ['x', 'y', 'z']}
+        distance = math.sqrt(sum(direction[axis] ** 2 for axis in direction))
+        if distance > 0:
+            norm = distance
+            for axis in direction:
+                direction[axis] /= norm
+                self.position[axis] += direction[axis] * self.speed
+            self.rotation["yr"] = math.atan2(direction["x"], direction["z"])
+            self.rotation["xr"] = math.atan2(direction["y"], math.hypot(direction["x"], direction["z"]))
+            if distance <= self.speed:
+                self.position = player.position.copy()
+                self.rotation = player.rotation.copy()
 
     def to_dict(self):
         base_dict = super().to_dict()

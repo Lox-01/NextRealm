@@ -23,8 +23,7 @@ elif os.path.exists("./NextRealm/data/mons.json"):
     for mon in tempmons:
         tm = tempmons[mon]
         monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
-monsters["testboi"].position["x"] += 70
-monsters["testboi"].position["z"] += 70
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -142,8 +141,8 @@ def game_loop():
                 if monster.is_in_arange(players[maxthreatid]):
                     on_player_hit("monster", maxthreatid, players, socketio, monster_id, monsters, "player")
                 elif monster.is_in_aggrorange(players[maxthreatid]):
-                    # try to get to the player
-                    pass
+                    monster.move_to_player(players[maxthreatid])
+                    socketio.emit('monster_position_update', monster.to_dict())
             elif monster.position != monster.origin:
                 monster.move_to_origin()
                 socketio.emit('monster_position_update', monster.to_dict())
