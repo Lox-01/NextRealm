@@ -4,12 +4,13 @@ from character import Character
 
 class Monster(Character):
     def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed, id):
-        super().__init__(id, origin.copy(), rotation, hp, totalhp)
+        super().__init__(id, origin.copy(), rotation.copy(), hp, totalhp)
         self.name = name
         self.attack = attack
         self.arange = arange
         self.cooldown = cooldown
         self.origin = origin
+        self.orotation = rotation
         self.aggrorange = aggrorange
         self.followrange = followrange
         self.speed = speed
@@ -53,6 +54,7 @@ class Monster(Character):
             self.rotation["xr"] = math.atan2(direction["y"], math.sqrt(direction["x"]**2 + direction["z"]**2))
             if distance <= self.speed:
                 self.position = self.origin.copy()
+                self.rotation = self.orotation.copy()
 
     def to_dict(self):
         base_dict = super().to_dict()
