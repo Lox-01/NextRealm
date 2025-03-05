@@ -10,7 +10,8 @@ class Monster:
         self.cooldown = cooldown
         self.origin = origin
         self.position = origin.copy()
-        self.rotation = rotation
+        self.orotation = rotation
+        self.rotation = rotation.copy()
         self.aggrorange = aggrorange
         self.followrange = followrange
         self.speed = speed
@@ -60,10 +61,15 @@ class Monster:
             self.position["x"] += direction["x"] * self.speed
             self.position["y"] += direction["y"] * self.speed
             self.position["z"] += direction["z"] * self.speed
+            self.rotation["yr"] = math.atan2(direction["x"], direction["z"])
+            self.rotation["xr"] = math.atan2(direction["y"], math.sqrt(direction["x"]**2 + direction["z"]**2))
             if distance <= self.speed:
                 self.position["x"] = self.origin["x"]
                 self.position["y"] = self.origin["y"]
                 self.position["z"] = self.origin["z"]
+                self.rotation["xr"] = self.orotation["xr"]
+                self.rotation["yr"] = self.orotation["yr"]
+                self.rotation["zr"] = self.orotation["zr"]
 
     def to_dict(self):
         return {

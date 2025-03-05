@@ -23,7 +23,8 @@ elif os.path.exists("./NextRealm/data/mons.json"):
     for mon in tempmons:
         tm = tempmons[mon]
         monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
-monsters["testboi"].position["x"] += 200
+monsters["testboi"].position["x"] += 70
+monsters["testboi"].position["z"] += 70
 @app.route('/')
 def index():
     return render_template('index.html')
