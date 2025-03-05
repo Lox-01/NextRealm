@@ -17,19 +17,13 @@ class Monster(Character):
         self.threats = {}
 
     def is_in_arange(self, player):
-        return self.arange >= math.sqrt((self.position["x"] - player.position["x"])**2 + 
-                                         (self.position["y"] - player.position["y"])**2 + 
-                                         (self.position["z"] - player.position["z"])**2)
+        return self.arange >= math.sqrt((self.position["x"] - player.position["x"])**2 + (self.position["y"] - player.position["y"])**2 + (self.position["z"] - player.position["z"])**2)
 
     def is_in_aggrorange(self, player):
-        return self.aggrorange >= math.sqrt((self.position["x"] - player.position["x"])**2 + 
-                                             (self.position["y"] - player.position["y"])**2 + 
-                                             (self.position["z"] - player.position["z"])**2)
+        return self.aggrorange >= math.sqrt((self.position["x"] - player.position["x"])**2 + (self.position["y"] - player.position["y"])**2 + (self.position["z"] - player.position["z"])**2)
 
     def is_in_followrange(self):
-        return self.followrange >= math.sqrt((self.origin["x"] - self.position["x"])**2 + 
-                                              (self.origin["y"] - self.position["y"])**2 + 
-                                              (self.origin["z"] - self.position["z"])**2)
+        return self.followrange >= math.sqrt((self.origin["x"] - self.position["x"])**2 + (self.origin["y"] - self.position["y"])**2 + (self.origin["z"] - self.position["z"])**2)
 
     def attack_player(self, player):
         player.decrease_hp(self.attack)
@@ -44,9 +38,7 @@ class Monster(Character):
                     del self.threats[player_id]
 
     def move_to_origin(self):
-        direction = {"x": self.origin["x"] - self.position["x"],
-                     "y": self.origin["y"] - self.position["y"],
-                     "z": self.origin["z"] - self.position["z"]}
+        direction = {"x": self.origin["x"] - self.position["x"],"y": self.origin["y"] - self.position["y"],"z": self.origin["z"] - self.position["z"]}
         distance = math.sqrt(direction["x"]**2 + direction["y"]**2 + direction["z"]**2)
         if distance > 0:
             norm = math.sqrt(direction["x"]**2 + direction["y"]**2 + direction["z"]**2)
