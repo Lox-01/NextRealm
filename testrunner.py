@@ -9,9 +9,10 @@ if os.getenv("ENABLE_DEBUG") == "true":
     print("Waiting for debugger to attach...")
     debugpy.wait_for_client()  # Wait for the debugger to attach
 
-# Start coverage measurement
-cov = coverage.Coverage(data_file=".coverage.local")
-cov.start()
+# Check if running in a CI/CD environment
+if os.getenv("CI") is None:  # Only run coverage if not in CI
+    cov = coverage.Coverage()
+    cov.start()
 
 # Discover and run tests
 if __name__ == "__main__":
@@ -24,14 +25,12 @@ if __name__ == "__main__":
         test_runner = TextTestRunner(verbosity=2, stream=output)
         test_runner.run(test_suite)
 
-    # Stop coverage measurement
-    cov.stop()
-    cov.save()
-
-    # Generate an HTML coverage report
-    cov.html_report(directory="htmlcov")
-    print("Test report saved as 'test-report.txt'.")
-    print("HTML coverage report generated in the 'htmlcov' directory.")
+    if os.getenv("CI") is None:  # Stop coverage only if not in CI
+        cov.stop()
+        cov.save()
+        cov.html_report(directory="htmlcov")
+        print("Test report saved as 'test-report.txt'.")
+        print("HTML coverage report generated in the 'htmlcov' directory.")
 
 # run these commands to copy reports from docker container to host    
 # docker cp nextrealm_test_container:/app/test-report.txt ./test-report.txt
