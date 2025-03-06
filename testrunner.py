@@ -10,7 +10,7 @@ if os.getenv("ENABLE_DEBUG") == "true":
     debugpy.wait_for_client()  # Wait for the debugger to attach
 
 # Start coverage measurement
-cov = coverage.Coverage()
+cov = coverage.Coverage(data_file=".coverage.local")
 cov.start()
 
 # Discover and run tests
