@@ -2,8 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
-from monster import Monster
-import json, os, math, time
+import json, os
+
+if os.getenv("ENABLE_DEBUG") == "true":
+    print("debug mode")
+    import debugpy
+    debugpy.listen(("0.0.0.0", 5678))
+    print("Debugpy is waiting for the debugger to attach...") 
+    debugpy.wait_for_client()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -150,5 +156,5 @@ def game_loop():
         time.sleep(0.1)
 
 if __name__ == '__main__':
-    socketio.start_background_task(game_loop)
-    socketio.run(app, host="0.0.0.0", port=6052)
+    allow_unsafe = os.getenv("ALLOW_UNSAFE_WERKZEUG", "false").lower() == "true"
+    socketio.run(app, host="0.0.0.0", port=6052, allow_unsafe_werkzeug=allow_unsafe)
