@@ -8,4 +8,5 @@ Branches and changes to implement:
 
 ## Getting started
 * install [docker](https://docs.docker.com/get-started/get-docker/)
-* run script `sh scripts\run-docker-with-retry.sh` or vscode debuger "Python: Docker Remote Attach".
+* run script `sh scripts\run-docker-with-retry.sh` or vscode debugger "Python: Docker Remote Attach".
+* you can run unit tests using vscode debugger "Python: Test Docker Remote Attach".

@@ -1,0 +1,27 @@
+# Use a Python base image
+FROM python:3.10-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy only the requirements file first to leverage Docker's caching
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install pytest or unittest
+RUN pip install pytest ipdb
+RUN pip install unittest-xml-reporting coverage
+
+# Copy your application files into the container
+COPY . /app
+
+# Default command (can be overridden in the Docker run command)
+EXPOSE 5679
+# Set environment variable (can override at runtime)
+ENV ENABLE_DEBUG=true
+# Expose the debugpy port
+CMD ["python", "testrunner.py"]
+# Use the script as the default command
+# CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5679", "-m", "pytest"]

@@ -21,6 +21,23 @@
       ]
     },
     {
+      "name": "Python: Test Docker Remote Attach",
+      "type": "python",
+      "justMyCode": false,
+      "preLaunchTask": "Rebuild and Run Docker Test Container",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5679
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "/app"
+        }
+      ]
+    },
+    {
       "name": "Python Debugger: Current File",
       "type": "debugpy",
       "request": "launch",
