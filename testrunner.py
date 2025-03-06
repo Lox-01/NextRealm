@@ -1,5 +1,5 @@
 import unittest, os
-from xmlrunner import XMLTestRunner  # For JUnit-style XML reports
+from unittest import TextTestRunner
 import coverage
 
 if os.getenv("ENABLE_DEBUG") == "true":
@@ -19,9 +19,9 @@ if __name__ == "__main__":
     test_loader = unittest.TestLoader()
     test_suite = test_loader.discover(start_dir='tests', pattern='test_*.py')  # Adjust start_dir as needed
     # Run tests with XMLTestRunner to generate a JUnit-style XML report
-    with open("junit-report.xml", "wb") as output:
-        test_runner = XMLTestRunner(output=output, verbosity=2)
-        # test_runner = unittest.TextTestRunner(verbosity=2)
+    # Run tests with TextTestRunner (no XML reporting)
+    with open("test-report.txt", "w") as output:  # Change output file to .txt
+        test_runner = TextTestRunner(verbosity=2, stream=output)
         test_runner.run(test_suite)
 
     # Stop coverage measurement
@@ -30,9 +30,9 @@ if __name__ == "__main__":
 
     # Generate an HTML coverage report
     cov.html_report(directory="htmlcov")
-    print("JUnit XML report saved as 'junit-report.xml'.")
+    print("Test report saved as 'test-report.txt'.")
     print("HTML coverage report generated in the 'htmlcov' directory.")
 
 # run these commands to copy reports from docker container to host    
-# docker cp nextrealm_test_container:/app/junit-report.xml ./junit-report.xml
+# docker cp nextrealm_test_container:/app/test-report.txt ./test-report.txt
 # docker cp nextrealm_test_container:/app/htmlcov ./htmlcov
