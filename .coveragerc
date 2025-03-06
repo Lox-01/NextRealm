@@ -1,3 +1,4 @@
 [run]
 source = .
 omit = */tests/*, testrunner.py
+data_file = .coverage.local
