@@ -158,4 +158,6 @@ def game_loop():
 if __name__ == '__main__':
     allow_unsafe = os.getenv("ALLOW_UNSAFE_WERKZEUG", "false").lower() == "true"
     socketio.start_background_task(game_loop)
+    socketio.start_background_task(game_loop)
     socketio.run(app, host="0.0.0.0", port=6052, allow_unsafe_werkzeug=allow_unsafe)
+>>>>>>>>> Temporary merge branch 2
