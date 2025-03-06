@@ -137,7 +137,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     socket.on("monster_position_update", (mon) => {
         if (monstersCubes[mon.id]) {
-            monstersCubes[mon.id].updatePosition(mon.pos);
+            //monstersCubes[mon.id].updatePosition(mon.pos);
+            monstersCubes[mon.id].startLerpToPosition(mon.pos);
             monstersCubes[mon.id].updateRotation(mon.rot);
         }
     });
@@ -148,7 +149,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed);
                 scene.add(monstersCubes[id].cube);
             } else {
-                monstersCubes[id].updatePosition(data.pos);
+                //monstersCubes[id].updatePosition(data.pos);
+                monstersCubes[id].startLerpToPosition(data.pos);
                 monstersCubes[id].updateRotation(data.rot);
                 if (data.hp != monstersCubes[id].hp) {
                     const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
@@ -293,6 +295,15 @@ document.addEventListener("DOMContentLoaded", (event) => {
             if (monstersCubes != {} && monstersCubes != null) {
                 for (const [id, omonster] of Object.entries(monstersCubes)) {
                     omonster.updateLabel(tri(player.cube.position,omonster.cube.position));
+                    if (omonster.lerpStart && omonster.lerpTarget) {
+                        const now = performance.now();
+                        const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);
+                        omonster.cube.position.lerpVectors(omonster.lerpStart, omonster.lerpTarget, t);
+                        if (t === 1) {
+                            omonster.lerpStart = null;
+                            omonster.lerpTarget = null;
+                        }
+                    }
                 }
             }
         }
