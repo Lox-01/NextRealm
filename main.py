@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
-import json, os
+import json, os, time
 
 if os.getenv("ENABLE_DEBUG") == "true":
     print("debug mode")
