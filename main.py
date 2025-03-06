@@ -3,7 +3,7 @@ from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
 from monster import Monster
-import json, os, time
+import json, os, time, math
 
 if os.getenv("ENABLE_DEBUG") == "true":
     print("debug mode")
@@ -121,39 +121,50 @@ def debug(data):
 def player_hit(ids):
     on_player_hit("player", ids[0], players, socketio, ids[1], monsters, ids[2])
 
+def monster_to_origin(monster):
+    monster.move_to_origin()
+    socketio.emit('monster_position_update', monster.to_dict())
+
+def monster_threats(monster):
+    for player_id, player in players.items():
+        if monster.is_in_aggrorange(player):
+            if player_id not in monster.threats:
+                monster.threats[player_id] = [1, time.time()]
+            else:
+                monster.threats[player_id][1] = time.time()
+        elif player_id in monster.threats:
+            monster.decay_threat(player)
+
+def monster_behavior(monster, monster_id):
+    if not monster.threats:
+        if monster.position != monster.origin:
+            monster_to_origin(monster)
+        return
+    maxthreatid = max_threat(monster)
+    if monster.is_in_arange(players[maxthreatid]):
+        on_player_hit("monster", maxthreatid, players, socketio, monster_id, monsters, "player")
+    elif monster.is_in_aggrorange(players[maxthreatid]):
+        monster.move_to_player(players[maxthreatid])
+        socketio.emit('monster_position_update', monster.to_dict())
+
+def max_threat(monster):
+    maxthreat = max(monster.threats.values(), key=lambda threat: threat[0])[0]
+    candidates = [pid for pid, threat in monster.threats.items() if threat[0] == maxthreat and pid in players]
+    if len(candidates) > 1:
+        return min(candidates, key=lambda pid: distance(monster, players[pid]))
+    return candidates[0]
+
+def distance(monster, player):
+    return math.sqrt((monster.position["x"] - player.position["x"]) ** 2 +(monster.position["y"] - player.position["y"]) ** 2 +(monster.position["z"] - player.position["z"]) ** 2)
+
 def game_loop():
     while True:
-        print([monster.to_dict() for mid, monster in monsters.items()])
         for monster_id, monster in monsters.items():
             if not monster.is_in_followrange():
-                monster.move_to_origin()
-                socketio.emit('monster_position_update', monster.to_dict())
+                monster_to_origin(monster)
                 continue
-            for player_id, player in players.items():
-                if monster.is_in_aggrorange(player):
-                    if player.id not in monster.threats:
-                        monster.threats[player.id] = [1, time.time()]
-                    else:
-                        monster.threats[player.id][1] = time.time()
-                else:
-                    if player.id in monster.threats:
-                        monster.decay_threat(player)
-            if monster.threats:
-                maxthreat = max(monster.threats.values(), key=lambda threat: threat[0])[0]
-                candidates = [pid for pid, threat in monster.threats.items() if threat[0] == maxthreat and pid in players]
-                if len(candidates) > 1:
-                    maxthreatid = min(candidates, key=lambda pid: math.sqrt((monster.position["x"] - players[pid].position["x"]) ** 2 +(monster.position["y"] - players[pid].position["y"]) ** 2 +(monster.position["z"] - players[pid].position["z"]) ** 2))
-                else:
-                    maxthreatid = candidates[0]
-                if monster.is_in_arange(players[maxthreatid]):
-                    on_player_hit("monster", maxthreatid, players, socketio, monster_id, monsters, "player")
-                elif monster.is_in_aggrorange(players[maxthreatid]):
-                    monster.move_to_player(players[maxthreatid])
-                    socketio.emit('monster_position_update', monster.to_dict())
-            elif monster.position != monster.origin:
-                monster.move_to_origin()
-                socketio.emit('monster_position_update', monster.to_dict())
-                pass
+            monster_threats(monster)
+            monster_behavior(monster, monster_id)
         time.sleep(0.1)
 
 if __name__ == '__main__':
