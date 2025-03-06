@@ -12,6 +12,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      CI: true
 
     steps:
     # Step 1: Check out the code
