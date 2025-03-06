@@ -18,6 +18,6 @@
         },
         "aggrorange": 10,
         "followrange": 40,
-        "speed": 1
+        "speed": 0.1
     }
 }
