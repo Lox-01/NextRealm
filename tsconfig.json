@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "./static/js",
+    "rootDir": "./src",
+    "target": "es6",
+    "module": "commonjs"
+  },
+  "include": ["src/**/*ts"]
+}

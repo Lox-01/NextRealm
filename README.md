@@ -10,3 +10,4 @@ Branches and changes to implement:
 * install [docker](https://docs.docker.com/get-started/get-docker/)
 * run script `sh scripts\run-docker-with-retry.sh` or vscode debugger "Python: Docker Remote Attach".
 * you can run unit tests using vscode debugger "Python: Test Docker Remote Attach".
+* install nodejs. `npm install` and `npm run build`
