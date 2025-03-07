@@ -1,28 +1,14 @@
-class Player:
+from character import Character
+
+class Player(Character):
     def __init__(self, id, position, rotation, hp, username, totalhp):
-        self.id       = id
-        self.hp       = hp
-        self.position = position
-        self.rotation = rotation
+        super().__init__(id, position, rotation, hp, totalhp)
         self.username = username
-        self.totalhp  = totalhp
         self.last_hit = None
 
-    def update_position(self, pos):
-        self.position.update(pos)
-
-    def update_rotation(self, rot):
-        self.rotation.update(rot)
-
-    def decrease_hp(self, amount):
-        self.hp = max(0,self.hp - amount)
-
     def to_dict(self):
-        return {
-            "id"       : self.id,
-            "hp"       : self.hp,
-            "pos" : self.position,
-            "rot" : self.rotation,
-            "username" : self.username,
-            "totalhp"  : self.totalhp
-        }
+        base_dict = super().to_dict()
+        base_dict.update({
+            "username": self.username
+        })
+        return base_dict
