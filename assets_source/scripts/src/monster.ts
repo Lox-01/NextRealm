@@ -9,8 +9,8 @@ export interface SocketMonster {
     arange : number;
     cooldown : number;
     origin : {x: number, y: number, z: number};
-    position : {x: number, y: number, z: number};
-    rotation : {xr: number, yr: number, zr: number};
+    pos : {x: number, y: number, z: number};
+    rot : {xr: number, yr: number, zr: number};
     aggrorange : number;
     followrange : number;
     speed : number;

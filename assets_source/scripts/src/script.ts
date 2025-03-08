@@ -16,12 +16,11 @@ function dir(t) {if ("object" != typeof t || null === t) {console.log("Input is 
 function deffunc(n) {if ("function" != typeof n) {console.log("Input is not a valid function.");return;}let t = n.toString();console.log("Function Definition:");console.log(t);}
 
 export function scriptPage () { 
-
 // document.addEventListener("DOMContentLoaded", (event) => {
-    playersCubes = {};
-    monstersCubes = {};
-    my_id = (document.getElementById('session_id') as HTMLInputElement).value;
-    my_username = (document.getElementById('session_username') as HTMLInputElement).value;
+    globalThis.playersCubes = {};
+    globalThis.monstersCubes = {};
+    globalThis.my_id = (document.getElementById('session_id') as HTMLInputElement).value;
+    globalThis.my_username = (document.getElementById('session_username') as HTMLInputElement).value;
     let selected;
     let hovered;
     const url = window.location.href;
@@ -104,11 +103,11 @@ export function scriptPage () {
     socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
         for (const [id, data] of Object.entries(players)) {
             if (!playersCubes[id]) {
-                playersCubes[id] = new PlayerCube(id, data.position, data.rotation, data.hp, data.username, data.totalhp);
+                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
                 scene.add(playersCubes[id].cube);
             } else {
-                playersCubes[id].updatePosition(data.position);
-                playersCubes[id].updateRotation(data.rotation);
+                playersCubes[id].updatePosition(data.pos);
+                playersCubes[id].updateRotation(data.rot);
                 if (data.hp != playersCubes[id].hp) {
                     const damageNumber = new DamageNumber(scene, playersCubes[id], playersCubes[id].hp - data.hp);
                     setInterval(() => {
@@ -154,12 +153,12 @@ export function scriptPage () {
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
-                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.position, data.rotation, data.aggrorange, data.followrange, data.speed);
+                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed);
                 scene.add(monstersCubes[id].cube);
             } else {
                 //monstersCubes[id].updatePosition(data.pos);
-                monstersCubes[id].startLerpToPosition(data.position);
-                monstersCubes[id].updateRotation(data.rotation);
+                monstersCubes[id].startLerpToPosition(data.pos);
+                monstersCubes[id].updateRotation(data.rot);
                 if (data.hp != monstersCubes[id].hp) {
                     const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
                     setInterval(() => {

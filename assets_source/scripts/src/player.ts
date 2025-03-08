@@ -6,8 +6,8 @@ export interface SockerPlayer {
     username: string;
     hp: number;
     totalhp: number;
-    position: {x: number, y: number, z: number};
-    rotation: {xr: number, yr: number, zr: number};
+    pos: {x: number, y: number, z: number};
+    rot: {xr: number, yr: number, zr: number};
 } 
 
 export class PlayerCube {
