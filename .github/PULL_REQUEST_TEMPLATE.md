@@ -4,6 +4,7 @@ Provide a brief description of the changes included in this pull request. Mentio
 ## Changes Made
 - List the changes made in this pull request.
 - Bullet points are encouraged for clarity.
+- For specific changes, please include the file name and purpose.
 
 ## Related Issues
 - Use the `fixes #` keyword to link this pull request to an issue. For example:
