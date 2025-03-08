@@ -1,4 +1,24 @@
-class PlayerCube {
+import * as THREE from 'three';
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+
+export interface SockerPlayer {
+    id: string;
+    username: string;
+    hp: number;
+    totalhp: number;
+    position: {x: number, y: number, z: number};
+    rotation: {xr: number, yr: number, zr: number};
+} 
+
+export class PlayerCube {
+    type: string;
+    id: any;
+    totalhp: any;
+    hp: any;
+    username: any;
+    cube: any;
+    label: any;
+    hpbar: any;
     constructor(id, position, rotation, hp, username, totalhp) {
         this.type = "player";
         this.id = id;

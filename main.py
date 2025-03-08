@@ -3,6 +3,7 @@ from flask_socketio import SocketIO
 from socket_events import *
 from player import Player
 from monster import Monster
+from assets_blueprint import assets_blueprint
 import json, os, time, math
 
 if os.getenv("ENABLE_DEBUG") == "true":
@@ -12,8 +13,17 @@ if os.getenv("ENABLE_DEBUG") == "true":
     print("Debugpy is waiting for the debugger to attach...") 
     debugpy.wait_for_client()
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_url_path="/",
+    static_folder="static",
+    template_folder="templates",
+)
 app.config['SECRET_KEY'] = 'secret!'
+
+# Provide Vite context processors and static assets directory.
+app.register_blueprint(assets_blueprint)
+
 socketio = SocketIO(app, cors_allowed_origins=["http://45.90.12.32:6052", "http://localhost:6052", "http://127.0.0.1:6052"])
 
 players = {}
