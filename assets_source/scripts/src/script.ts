@@ -16,7 +16,6 @@ function dir(t) {if ("object" != typeof t || null === t) {console.log("Input is 
 function deffunc(n) {if ("function" != typeof n) {console.log("Input is not a valid function.");return;}let t = n.toString();console.log("Function Definition:");console.log(t);}
 
 export function scriptPage () { 
-// document.addEventListener("DOMContentLoaded", (event) => {
     globalThis.playersCubes = {};
     globalThis.monstersCubes = {};
     globalThis.my_id = (document.getElementById('session_id') as HTMLInputElement).value;
@@ -451,5 +450,4 @@ export function scriptPage () {
         }
     }
     animate();
-// });
 }
