@@ -18,7 +18,7 @@ def on_connect(socketio, player_id, players, mons):
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
     socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in mons.items()})
 
-def on_offline(player_id, players, socketio, client_id, client_ids):
+def on_offline(player_id, players, socketio, client_id, client_ids, monsters):
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
@@ -35,6 +35,9 @@ def on_offline(player_id, players, socketio, client_id, client_ids):
         del players[player_id]
     if client_id in client_ids:
         client_ids.remove(client_id)
+    for monster in monsters.values():
+        if player_id in monster.threats:
+            del monster.threats[player_id]
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
 
 def on_player_move(data, players, socketio):
@@ -85,6 +88,9 @@ def on_player_hit(htype, player_id, players, socketio, hitter_id, monsters, type
                     socketio.emit("refresh_spell", [hitter_id, 1])
         elif typet == "monster":
             if str(player_id) in monsters and int(hitter_id) in players:
+                if int(hitter_id) in monsters[str(player_id)].threats:
+                    monsters[str(player_id)].threats[int(hitter_id)][0] += 2
+                    monsters[str(player_id)].threats[int(hitter_id)][1] = time.time()
                 d = datetime.now()
                 if (players[int(hitter_id)].last_hit):
                     if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):

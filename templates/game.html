@@ -4,12 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NextRealm - Game</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script type="application/javascript" src="{{ url_for('static', filename='socket.io.js') }}"></script>
+    <!--  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+    {%- if not is_production %}
+    <script type="module" src="{{ asset('@vite/client') }}"></script>
+    {%- endif %}
+    <!-- <script type="application/javascript" src="{{ url_for('static', filename='socket.io.js') }}"></script>
     <script type="application/javascript" src="{{ url_for('static', filename='three.js') }}"></script>
     <script type="application/javascript" src="{{ url_for('static', filename='css2d.js') }}"></script>
-    <script type="application/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='player.js') }}"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='monster.js') }}"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='damagenumber.js') }}"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='script.js') }}"></script> -->
     <link rel="icon" href="{{ url_for('static', filename='NextRealm.jpg') }}">
+    <link rel="stylesheet" href="{{ asset('styles/app.scss') }}" />
 </head>
 <body>
     <input type="hidden" id="session_id" value="{{ session['id'] }}">
@@ -18,5 +25,6 @@
     <div id="chat"></div>
     <input type="text" id="chatInput"/>
     <div id="ui"><img id="spellone" src="{{ url_for('static', filename='catpic.png') }}"></div></div>
+    <script type="module" src="{{ asset('scripts/app.ts') }}"></script>
 </body>
 </html>
