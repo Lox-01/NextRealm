@@ -1,3 +1,8 @@
+## Version number
+- Provide the version number of your branch, which would be the new master version number. Version numbers are structured like so:
+- Major update : Minor update : Patch
+- 3.2.1 is the 1st patch of the 2nd minor update of the 3rd major update.
+
 ## Description
 Provide a brief description of the changes included in this pull request. Mention the purpose of the changes, the issues it addresses (if any), and any additional context.
 
