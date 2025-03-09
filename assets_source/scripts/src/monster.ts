@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export interface SocketMonster {
     name : string;
@@ -31,8 +32,8 @@ export class MonsterCube {
     followrange: any;
     speed: any;
     cube: any;
-    label: CSS2DObject;
-    hpbar: CSS2DObject;
+    label: CSS2DObject | null;
+    hpbar: CSS2DObject | null;
     threats: {};
     lerpStart: any;
     lerpTarget: any;
@@ -51,26 +52,33 @@ export class MonsterCube {
         this.aggrorange = aggrorange;
         this.followrange = followrange;
         this.speed = speed;
-        this.cube = this.createCube();
-        this.label = this.createLabel();
-        this.hpbar = this.createHpBar();
-        this.updatePosition(origin);
-        this.updateRotation(rotation);
+        this.cube = null; // Placeholder for the sprite
         this.threats = {};
+        this.label = null;
+        this.hpbar = null;
+        
+        // Start loading the sprite asynchronously
+        this.loadSprite("/sprites/enimy.glb").then((sprite) => {
+            this.cube = sprite;
+            this.label = this.createLabel();
+            this.hpbar = this.createHpBar();
+            this.updatePosition(origin);
+            this.updateRotation(rotation);
+            globalThis.scene.Add(this.cube);
+        });
     }
-    createCube() {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = [
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0x0000ff }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-        ];
-        const cubeMesh = new THREE.Mesh(geometry, material);
-        cubeMesh.name = this.id;
-        return cubeMesh;
+
+         // Asynchronous method to load the GLTF model
+    async loadSprite(modelPath: string): Promise<THREE.Group> {
+        const loader = new GLTFLoader();
+        return new Promise((resolve, reject) => {
+            loader.load(
+                modelPath,
+                (gltf) => resolve(gltf.scene),
+                undefined,
+                (error) => reject(error)
+            );
+        });
     }
 
     createLabel() {
@@ -119,33 +127,35 @@ export class MonsterCube {
     updateHp(hp) {
         this.hp = hp;
         let percentageHp = this.hp/this.totalhp*100;
-        (this.hpbar.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
+        (this.hpbar?.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
     }
 
     updateLabel(distance) {
         if (distance > 70) {
-            if (this.hpbar.element.classList.contains("hpback")) {
+            if (this.hpbar?.element.classList.contains("hpback")) {
                 this.hpbar.element.classList.remove("hpback");
                 this.hpbar.element.classList.add("nodisp");
             }
-            if (this.label.element.classList.contains("label")) {
+            if (this.label?.element.classList.contains("label")) {
                 this.label.element.classList.remove("label");
                 this.label.element.classList.add("nodisp");
             }
         } else {
             const scaleFactor = 1/(1+0.07*distance);
-            this.label.element.style.fontSize = `${scaleFactor*30}px`;
-            this.hpbar.element.style.width = `${200 * scaleFactor}px`;
-            this.hpbar.element.style.height = `${20 * scaleFactor}px`;
-            this.label.center.set(0.5,4.5-distance*0.04);
-            this.hpbar.center.set(0.5,6.5-distance*0.05);
-            if (this.hpbar.element.classList.contains("nodisp")) {
-                this.hpbar.element.classList.remove("nodisp");
-                this.hpbar.element.classList.add("hpback");
-            }
-            if (this.label.element.classList.contains("nodisp")) {
-                this.label.element.classList.remove("nodisp");
-                this.label.element.classList.add("label");
+            if(this.label && this.hpbar)    {
+                this.label.element.style.fontSize = `${scaleFactor*30}px`;
+                this.hpbar.element.style.width = `${200 * scaleFactor}px`;
+                this.hpbar.element.style.height = `${20 * scaleFactor}px`;
+                this.label.center.set(0.5,4.5-distance*0.04);
+                this.hpbar.center.set(0.5,6.5-distance*0.05);
+                if (this.hpbar.element.classList.contains("nodisp")) {
+                    this.hpbar.element.classList.remove("nodisp");
+                    this.hpbar.element.classList.add("hpback");
+                }
+                if (this.label.element.classList.contains("nodisp")) {
+                    this.label.element.classList.remove("nodisp");
+                    this.label.element.classList.add("label");
+                }
             }
         }
     }
