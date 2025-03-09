@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "watch": "cross-env NODE_ENV=development run-p \"build -- --watch --mode development\" --",
+    "watch": "cross-env NODE_ENV=development && npm run build -- --watch --mode development",
     "preview": "vite preview"
   },
   "devDependencies": {
