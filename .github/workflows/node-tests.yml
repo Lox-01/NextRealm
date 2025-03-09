@@ -1,0 +1,31 @@
+name: Vite Test Coverage
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20' # Adjust the Node.js version as needed
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run test coverage
+      run: npm run test:coverage
+
+    - name: Upload Coverage Report
+      if: success() # Upload only if tests pass
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage/ # Adjust the coverage report folder path if needed

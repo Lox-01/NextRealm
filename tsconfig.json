@@ -20,7 +20,8 @@
       "strict": true,
       "noUnusedLocals": false,        // Ignore unused variables at the local scope
       "noUnusedParameters": false,    // Ignore unused function parameters
-      "noFallthroughCasesInSwitch": true
+      "noFallthroughCasesInSwitch": true,
+      "types": ["jsdom", "vitest/globals"]
     },
     "include": ["assets_source"]
   }
