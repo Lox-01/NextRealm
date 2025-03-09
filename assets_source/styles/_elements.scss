@@ -1,0 +1,23 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+.nodisp {
+  display: none;
+}
+
+.dark {
+  filter: brightness(50%);
+}
+
+.label {
+  color: #FFF;
+  font-family: sans-serif;
+  padding: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: block;
+}

@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NextRealm - Login</title>
-    <script type="module" src="{{ url_for('static', filename='signscript.js') }}"></script>
+    {%- if not is_production %}
+    <script type="module" src="{{ asset('@vite/client') }}"></script>
+    {%- endif %}
+    <!-- <script type="module" src="{{ url_for('static', filename='signscript.js') }}"></script> -->
     <link rel="icon" href="{{ url_for('static', filename='NextRealm.jpg') }}">
 </head>
 <body>
@@ -29,5 +32,6 @@
             </ul>
         {% endif %}
     {% endwith %}
+    <script type="module" src="{{ asset('scripts/app.ts') }}"></script>
 </body>
 </html>
