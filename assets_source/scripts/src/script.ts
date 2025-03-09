@@ -9,12 +9,6 @@ import { PlayerCube, SockerPlayer as SocketPlayer } from "./player";
 import { MonsterCube, SocketMonster } from "./monster";
 import { tri } from "./shared";
 
-function gri(min, max) {const minCeiled = Math.ceil(min);const maxFloored = Math.floor(max);return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);}
-function rtd(r) {return r * 180 / Math.PI;}
-function dtr(d) {return d / 180 * Math.PI;}
-function dir(t) {if ("object" != typeof t || null === t) {console.log("Input is not a valid object.");return;}let e = Object.getOwnPropertyNames(t);e.forEach(t => {console.log(`Property - ${t}`)});let o = Object.getPrototypeOf(t);for (; o;) {let r = Object.getOwnPropertyNames(o);r.forEach(t => {console.log(`Method - ${t}`)}), o = Object.getPrototypeOf(o)}}
-function deffunc(n) {if ("function" != typeof n) {console.log("Input is not a valid function.");return;}let t = n.toString();console.log("Function Definition:");console.log(t);}
-
 export function scriptPage () { 
     globalThis.playersCubes = {};
     globalThis.monstersCubes = {};
@@ -46,6 +40,7 @@ export function scriptPage () {
     labelRenderer.setSize( window.innerWidth, window.innerHeight );
     labelRenderer.domElement.style.position = 'absolute';
     labelRenderer.domElement.style.top = '0px';
+    labelRenderer.domElement.style.zIndex = '101';
     document.body.appendChild(labelRenderer.domElement);
     let player:null | PlayerCube = null;
     
