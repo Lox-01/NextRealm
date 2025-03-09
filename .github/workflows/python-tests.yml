@@ -1,13 +1,8 @@
 name: Python Unit Tests and Coverage
 
 on:
-  push:
-    branches:
-    # normally this should be master, main, or dev
-      -  0.0.0-Fantastical-Foundations
   pull_request:
-    branches:
-      -  0.0.0-Fantastical-Foundations
+    types: [opened, synchronize, reopened]
 
 jobs:
   test:

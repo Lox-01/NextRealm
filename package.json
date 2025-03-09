@@ -1,0 +1,26 @@
+{
+  "name": "vite-with-flask-backend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "watch": "cross-env NODE_ENV=development && npm run build -- --watch --mode development",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/socket.io-client": "^3.0.0",
+    "cross-env": "^7.0.3",
+    "npm-run-all2": "^6.1.1",
+    "sass": "^1.70.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  },
+  "dependencies": {
+    "@types/three": "^0.174.0",
+    "socket.io-client": "^4.8.1",
+    "three": "^0.174.0",
+    "vite-with-flask-backend": "file:"
+  }
+}

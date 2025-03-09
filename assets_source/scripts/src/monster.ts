@@ -1,4 +1,43 @@
-class MonsterCube {
+import * as THREE from 'three';
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+
+export interface SocketMonster {
+    name : string;
+    hp : number;
+    totalhp : number;
+    attack : number;
+    arange : number;
+    cooldown : number;
+    origin : {x: number, y: number, z: number};
+    pos : {x: number, y: number, z: number};
+    rot : {xr: number, yr: number, zr: number};
+    aggrorange : number;
+    followrange : number;
+    speed : number;
+    id : string;
+}
+
+export class MonsterCube {
+    type: string;
+    id: any;
+    name: any;
+    hp: any;
+    totalhp: any;
+    attack: any;
+    arange: any;
+    cooldown: any;
+    origin: any;
+    aggrorange: any;
+    followrange: any;
+    speed: any;
+    cube: any;
+    label: CSS2DObject;
+    hpbar: CSS2DObject;
+    threats: {};
+    lerpStart: any;
+    lerpTarget: any;
+    lerpStartTime: number | undefined;
+    lerpDuration: number | undefined;
     constructor(id, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed) {
         this.type = "monster";
         this.id = id;
@@ -80,7 +119,7 @@ class MonsterCube {
     updateHp(hp) {
         this.hp = hp;
         let percentageHp = this.hp/this.totalhp*100;
-        this.hpbar.element.getElementsByClassName("hpfront")[0].style.width = `${percentageHp}%`;
+        (this.hpbar.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
     }
 
     updateLabel(distance) {
