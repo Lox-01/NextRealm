@@ -99,7 +99,7 @@ export function scriptPage () {
             playersCubes[player.id].handleDeath();
         }
         if (player.id == my_id) {
-            playersCubes[player.id].showDeathMessage();
+            playersCubes[player.id].showDeathMessage(socket);
         }
     });
 
@@ -152,7 +152,6 @@ export function scriptPage () {
 
     socket.on("monster_position_update", (mon) => {
         if (monstersCubes[mon.id]) {
-            //monstersCubes[mon.id].updatePosition(mon.pos);
             monstersCubes[mon.id].startLerpToPosition(mon.pos);
             monstersCubes[mon.id].updateRotation(mon.rot);
         }

@@ -124,3 +124,10 @@ def on_player_hit(hittertype, player_id, players, socketio, hitter_id, monsters,
             hit = players[int(player_id)]
             hitter = monsters[str(hitter_id)]
             process_hit(hit, hitter, socketio, "player", players)
+
+def on_respawn(players, id, socketio):
+    if int(id) in players:
+        players[int(id)].position = {"x":0,"y":0,"z":0}
+        players[int(id)].rotation = {"xr":0,"yr":0,"zr":0}
+        players[int(id)].hp = players[int(id)].totalhp
+        socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})

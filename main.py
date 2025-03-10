@@ -131,6 +131,10 @@ def debug(data):
 def player_hit(ids):
     on_player_hit("player", ids[0], players, socketio, ids[1], monsters, ids[2])
 
+@socketio.on("respawn")
+def respawn(id):
+    on_respawn(players, id, socketio)
+
 def monster_to_origin(monster):
     monster.move_to_origin()
     socketio.emit('monster_position_update', monster.to_dict())

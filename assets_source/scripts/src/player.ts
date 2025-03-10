@@ -69,7 +69,7 @@ export class PlayerCube {
 		return cubeMesh;
 	}
 
-	createLabel() {
+	createLabel(): CSS2DObject {
 		const playerDiv = document.createElement("div");
 		playerDiv.className = "label";
 		playerDiv.textContent = `${this.username}`;
@@ -155,7 +155,7 @@ export class PlayerCube {
 		}
 	}
 
-	handleDeath() {
+	handleDeath(): void {
 		if (this.cube.parent === null) return;
 		if (this.cube.parent) {
 			this.cube.parent.remove(this.cube);
@@ -169,7 +169,7 @@ export class PlayerCube {
 		this.isalive = false;
 	}
 
-	showDeathMessage() {
+	showDeathMessage(socket): void {
 		let existingDeathMessage = document.getElementById("death-message");
 		if (existingDeathMessage) {
 			existingDeathMessage.remove();
@@ -182,32 +182,23 @@ export class PlayerCube {
 			const respawnBtn = document.getElementById("respawn-btn");
 			if (respawnBtn) {
 				respawnBtn.addEventListener("click", () => {
-					this.respawn({ x: 0, y: 0, z: 0 }, { xr: 0, yr: 0, zr: 0 });
+					socket.emit("respawn", this.id);
 					document.body.removeChild(deathMessage);
+					this.respawn();
 				});
 			} else {
 				console.error("Respawn button not found.");
 			}
 		}, 0);
 	}
-
-	respawn(position, rotation) {
-		this.hp = this.totalhp;
-		this.updateHp(this.totalhp);
+	respawn(): void {
 		this.isalive = true;
-
-		const safeY = position.y + 0.5;
-		this.updatePosition({ x: position.x, y: safeY, z: position.z });
-		this.updateRotation(rotation);
-
 		if (!this.cube.parent) {
 			scene?.add(this.cube);
 		}
-
 		if (!this.hpbar.parent) {
 			this.cube.add(this.hpbar);
 		}
-
 		if (!this.label.parent) {
 			this.cube.add(this.label);
 		}
