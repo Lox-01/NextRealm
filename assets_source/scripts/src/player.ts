@@ -96,6 +96,11 @@ export class PlayerCube {
 		playerBar.center.set(0.5, 6.5);
 		this.cube.add(playerBar);
 		playerBar.layers.set(0);
+		const percentageHp = (this.hp / this.totalhp) * 100;
+		const hpFrontElement = playerBar.element.getElementsByClassName(
+			"hpfront"
+		)[0] as HTMLElement;
+		hpFrontElement.style.width = `${percentageHp}%`;
 		return playerBar;
 	}
 
