@@ -141,13 +141,13 @@ def monster_to_origin(monster):
 
 def monster_threats(monster):
     for player_id, player in players.items():
-        if monster.is_in_aggrorange(player):
-            if player_id not in monster.threats:
+        if player.alive:
+            if monster.is_in_aggrorange(player):
                 monster.threats[player_id] = [1, time.time()]
-            else:
-                monster.threats[player_id][1] = time.time()
+            elif player_id in monster.threats:
+                monster.decay_threat(player)
         elif player_id in monster.threats:
-            monster.decay_threat(player)
+            del monster.threats[player_id]
 
 def monster_behavior(monster, monster_id):
     if not monster.threats:

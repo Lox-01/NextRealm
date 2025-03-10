@@ -113,6 +113,12 @@ export function scriptPage () {
             if (!playersCubes[id]) {
                 playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
                 scene.add(playersCubes[id].cube);
+                if (!playersCubes[id].isalive) {
+                    playersCubes[id].handleDeath();
+                    if (id == my_id) {
+                        playersCubes[id].showDeathMessage(socket);
+                    }
+                }
             } else {
                 playersCubes[id].updatePosition(data.pos);
                 playersCubes[id].updateRotation(data.rot);
