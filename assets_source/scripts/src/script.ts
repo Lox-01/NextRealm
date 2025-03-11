@@ -30,7 +30,7 @@ export function scriptPage () {
             }
         });
     }
-    const scene = new THREE.Scene();
+    globalThis.scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.layers.enableAll();
     const canvas = document.getElementById('gamecanvas') as HTMLCanvasElement;
@@ -48,7 +48,7 @@ export function scriptPage () {
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
-    plane.position.y = 0;
+    plane.position.y = -0.5;
     scene.add(plane);
     
     const raycaster = new THREE.Raycaster();
@@ -94,11 +94,31 @@ export function scriptPage () {
         }
     });
 
+    socket.on("player_dead", (player) => {
+        if (playersCubes[player.id]) {
+            playersCubes[player.id].handleDeath();
+        }
+        if (player.id == my_id) {
+            playersCubes[player.id].showDeathMessage(socket);
+        }
+    });
+
+    socket.on("monster_dead", (monster) => {
+        console.log(monster.id);
+        console.log(monstersCubes);
+    });
+
     socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
         for (const [id, data] of Object.entries(players)) {
             if (!playersCubes[id]) {
                 playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
                 scene.add(playersCubes[id].cube);
+                if (!playersCubes[id].isalive) {
+                    playersCubes[id].handleDeath();
+                    if (id == my_id) {
+                        playersCubes[id].showDeathMessage(socket);
+                    }
+                }
             } else {
                 playersCubes[id].updatePosition(data.pos);
                 playersCubes[id].updateRotation(data.rot);
@@ -138,7 +158,6 @@ export function scriptPage () {
 
     socket.on("monster_position_update", (mon) => {
         if (monstersCubes[mon.id]) {
-            //monstersCubes[mon.id].updatePosition(mon.pos);
             monstersCubes[mon.id].startLerpToPosition(mon.pos);
             monstersCubes[mon.id].updateRotation(mon.rot);
         }
@@ -273,29 +292,31 @@ export function scriptPage () {
         if (player) {
             if (!chatopen) {
                 let moved = false;
-                if (pressed.includes('w')) {
-                    let a = player.cube.rotation.y;
-                    let b = Math.sin(a) / 20;
-                    let c = Math.cos(a) / 20;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('s')) {
-                    let a = player.cube.rotation.y;
-                    let b = -Math.sin(a) / 40;
-                    let c = -Math.cos(a) / 40;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('a')) {
-                    player.cube.rotation.y += Math.PI / 150;
-                    moved = true;
-                }
-                if (pressed.includes('d')) {
-                    player.cube.rotation.y -= Math.PI / 150;
-                    moved = true;
+                if (playersCubes[my_id].isalive) {
+                    if (pressed.includes('w')) {
+                        let a = player.cube.rotation.y;
+                        let b = Math.sin(a) / 20;
+                        let c = Math.cos(a) / 20;
+                        player.cube.position.z += c;
+                        player.cube.position.x += b;
+                        moved = true;
+                    }
+                    if (pressed.includes('s')) {
+                        let a = player.cube.rotation.y;
+                        let b = -Math.sin(a) / 40;
+                        let c = -Math.cos(a) / 40;
+                        player.cube.position.z += c;
+                        player.cube.position.x += b;
+                        moved = true;
+                    }
+                    if (pressed.includes('a')) {
+                        player.cube.rotation.y += Math.PI / 150;
+                        moved = true;
+                    }
+                    if (pressed.includes('d')) {
+                        player.cube.rotation.y -= Math.PI / 150;
+                        moved = true;
+                    }
                 }
                 if (moved === true) {
                     let data = { "id": my_id, "pos": { "x": player.cube.position.x, "y": player.cube.position.y, "z": player.cube.position.z }, "rot": { "xr": player.cube.rotation.x, "yr": player.cube.rotation.y, "zr": player.cube.rotation.z } };
@@ -388,7 +409,7 @@ export function scriptPage () {
                 }
             }
         }
-        if (event.key === "1" && !chatopen) {
+        if (event.key === "1" && !chatopen && playersCubes[my_id].isalive) {
             if (spellcools["1"] == true) {
                 if (selected) {
                     if (selected.id != my_id) {
@@ -435,7 +456,6 @@ export function scriptPage () {
     });
     
     function sendMessage() {
-        
         if (enterInput) {
             const message = (enterInput as HTMLInputElement).value.trim();
             if (message) {

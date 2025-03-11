@@ -68,52 +68,70 @@ def on_new_msg(vals, players, socketio):
 def on_debug(data):
     print(data)
 
-def on_player_hit(htype, player_id, players, socketio, hitter_id, monsters, typet):
-    if htype == "player":
-        if typet == "player":
+def process_hit(hit, hitter, socketio, entity_type, entity_dict):
+    d = datetime.now()
+    if hitter.last_hit:
+        if d - hitter.last_hit >= timedelta(seconds=1):
+            hit.decrease_hp(2)
+            hitter.last_hit = d
+            if hit.hp <= 0 and hit.alive:
+                if entity_type == "player":
+                    socketio.emit("render_players", {pid: player.to_dict() for pid, player in entity_dict.items()})
+                    socketio.emit("player_dead", hit.to_dict())
+                else:
+                    socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in entity_dict.items()})
+                    socketio.emit("monster_dead", hit.to_dict())
+                hit.alive = False
+            else:
+                if entity_type == "player":
+                    socketio.emit("render_players", {pid: player.to_dict() for pid, player in entity_dict.items()})
+                else:
+                    socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in entity_dict.items()})
+            time.sleep(1)
+            socketio.emit("refresh_spell", [hitter.id, 1])
+    else:
+        hit.decrease_hp(2)
+        hitter.last_hit = d
+        if hit.hp <= 0 and hit.alive:
+            if entity_type == "player":
+                socketio.emit("render_players", {pid: player.to_dict() for pid, player in entity_dict.items()})
+                socketio.emit("player_dead", hit.to_dict())
+            else:
+                socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in entity_dict.items()})
+                socketio.emit("monster_dead", hit.to_dict())
+            hit.alive = False
+        else:
+            if entity_type == "player":
+                socketio.emit("render_players", {pid: player.to_dict() for pid, player in entity_dict.items()})
+            else:
+                socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in entity_dict.items()})
+        time.sleep(1)
+        socketio.emit("refresh_spell", [hitter.id, 1])
+
+def on_player_hit(hittertype, player_id, players, socketio, hitter_id, monsters, targettype):
+    if hittertype == "player":
+        if targettype == "player":
             if int(player_id) in players and int(hitter_id) in players:
-                d = datetime.now()
-                if (players[int(hitter_id)].last_hit):
-                    if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):
-                        players[int(player_id)].decrease_hp(2)
-                        socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-                        players[int(hitter_id)].last_hit=d
-                        time.sleep(1)
-                        socketio.emit("refresh_spell", [hitter_id, 1])
-                else:
-                    players[int(player_id)].decrease_hp(2)
-                    socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-                    players[int(hitter_id)].last_hit=d
-                    time.sleep(1)
-                    socketio.emit("refresh_spell", [hitter_id, 1])
-        elif typet == "monster":
+                hit = players[int(player_id)]
+                hitter = players[int(hitter_id)]
+                process_hit(hit, hitter, socketio, "player", players)
+        elif targettype == "monster":
             if str(player_id) in monsters and int(hitter_id) in players:
-                if int(hitter_id) in monsters[str(player_id)].threats:
-                    monsters[str(player_id)].threats[int(hitter_id)][0] += 2
-                    monsters[str(player_id)].threats[int(hitter_id)][1] = time.time()
-                d = datetime.now()
-                if (players[int(hitter_id)].last_hit):
-                    if d-players[int(hitter_id)].last_hit>=timedelta(seconds=1):
-                        monsters[str(player_id)].decrease_hp(2)
-                        socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in monsters.items()})
-                        players[int(hitter_id)].last_hit=d
-                        time.sleep(1)
-                        socketio.emit("refresh_spell", [hitter_id, 1])
-                else:
-                    monsters[str(player_id)].decrease_hp(2)
-                    socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in monsters.items()})
-                    players[int(hitter_id)].last_hit=d
-                    time.sleep(1)
-                    socketio.emit("refresh_spell", [hitter_id, 1])
+                hit = monsters[str(player_id)]
+                hitter = players[int(hitter_id)]
+                if int(hitter_id) in hit.threats:
+                    hit.threats[int(hitter_id)][0] += 2
+                    hit.threats[int(hitter_id)][1] = time.time()
+                process_hit(hit, hitter, socketio, "monster", monsters)
     else:
         if int(player_id) in players and str(hitter_id) in monsters:
-            d = datetime.now()
-            if (monsters[str(hitter_id)].last_hit):
-                if d-monsters[str(hitter_id)].last_hit>=timedelta(seconds=1):
-                    players[int(player_id)].decrease_hp(2)
-                    socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-                    monsters[str(hitter_id)].last_hit=d
-            else:
-                players[int(player_id)].decrease_hp(2)
-                socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-                monsters[str(hitter_id)].last_hit=d
+            hit = players[int(player_id)]
+            hitter = monsters[str(hitter_id)]
+            process_hit(hit, hitter, socketio, "player", players)
+
+def on_respawn(players, id, socketio):
+    if int(id) in players:
+        players[int(id)].position = {"x":0,"y":0,"z":0}
+        players[int(id)].rotation = {"xr":0,"yr":0,"zr":0}
+        players[int(id)].hp = players[int(id)].totalhp
+        socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})

@@ -8,7 +8,7 @@
         "cooldown": 1,
         "origin": {
             "x": 10,
-            "y": 0.5,
+            "y": 0,
             "z": 20
         },
         "rotation": {

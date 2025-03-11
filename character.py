@@ -5,6 +5,7 @@ class Character:
         self.totalhp = totalhp
         self.position = position
         self.rotation = rotation
+        self.alive = True if self.hp > 0 else False
 
     def update_position(self, pos):
         self.position.update(pos)
