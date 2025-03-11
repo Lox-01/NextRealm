@@ -169,3 +169,4 @@ static/manifest.json
 json-report.json
 junit.xml
 coverage
+test-report.txt

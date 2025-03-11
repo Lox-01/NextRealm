@@ -24,7 +24,7 @@ Provide a brief description of the changes included in this pull request. Mentio
 ## Checklist
 Please ensure the following requirements are met before merging:
 - [ ] All unit tests have passed. (Wait for the unit test status check to pass.)
-- [ ] At least one reviewer has approved the changes.
+- [ ] At least one reviewer has approved the changes, if it is a large change. Otherwise, an approval is unnecessary.
 - [ ] All conversations in the review process have been resolved.
 - [ ] Code adheres to the project's coding standards and guidelines.
 
@@ -35,7 +35,7 @@ Please ensure the following requirements are met before merging:
 
 ### Contribution Guidelines Reminder:
 1. **Wait for unit test status check**: Ensure all unit tests pass before merging the pull request.
-2. **Approval requirement**: A minimum of **one approver** is needed to approve this pull request before it can be merged.
+2. **Approval requirement**: A minimum of **one approver** is needed to approve this pull request before it can be merged, if it is a large change.
 3. **Follow general project guidelines**: Ensure code quality and maintainability throughout.
 
 Thank you for your contribution!

@@ -1,7 +1,8 @@
 // globals.d.ts
+import { PlayerCube } from "./playerCube";
 import * as THREE from 'three';
 declare global {
-  var playersCubes: object; // Declare the global variable and its type
+  var playersCubes: Record<string, PlayerCube>;
   var monstersCubes: object; 
   var my_id: string; 
   var my_username: string; 
