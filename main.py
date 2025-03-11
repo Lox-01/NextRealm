@@ -131,23 +131,19 @@ def debug(data):
 def player_hit(ids):
     on_player_hit("player", ids[0], players, socketio, ids[1], monsters, ids[2])
 
-@socketio.on("respawn")
-def respawn(id):
-    on_respawn(players, id, socketio)
-
 def monster_to_origin(monster):
     monster.move_to_origin()
     socketio.emit('monster_position_update', monster.to_dict())
 
 def monster_threats(monster):
     for player_id, player in players.items():
-        if player.alive:
-            if monster.is_in_aggrorange(player):
+        if monster.is_in_aggrorange(player):
+            if player_id not in monster.threats:
                 monster.threats[player_id] = [1, time.time()]
-            elif player_id in monster.threats:
-                monster.decay_threat(player)
+            else:
+                monster.threats[player_id][1] = time.time()
         elif player_id in monster.threats:
-            del monster.threats[player_id]
+            monster.decay_threat(player)
 
 def monster_behavior(monster, monster_id):
     if not monster.threats:
