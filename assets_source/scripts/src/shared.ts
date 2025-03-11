@@ -16,7 +16,7 @@ export function dtr(d: number): number {
     return d / 180 * Math.PI;
 }
 
-export function dir(t: object | number): void {
+export function dir(t: object): void {
     if (typeof t !== "object" || t === null) {
         console.log("Input is not a valid object.");
         return;
