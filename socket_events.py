@@ -76,8 +76,10 @@ def process_hit(hit, hitter, socketio, entity_type, entity_dict):
             hitter.last_hit = d
             if hit.hp <= 0 and hit.alive:
                 if entity_type == "player":
+                    socketio.emit("render_players", {pid: player.to_dict() for pid, player in entity_dict.items()})
                     socketio.emit("player_dead", hit.to_dict())
                 else:
+                    socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in entity_dict.items()})
                     socketio.emit("monster_dead", hit.to_dict())
                 hit.alive = False
             else:
@@ -92,8 +94,10 @@ def process_hit(hit, hitter, socketio, entity_type, entity_dict):
         hitter.last_hit = d
         if hit.hp <= 0 and hit.alive:
             if entity_type == "player":
+                socketio.emit("render_players", {pid: player.to_dict() for pid, player in entity_dict.items()})
                 socketio.emit("player_dead", hit.to_dict())
             else:
+                socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in entity_dict.items()})
                 socketio.emit("monster_dead", hit.to_dict())
             hit.alive = False
         else:
