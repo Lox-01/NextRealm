@@ -26,7 +26,6 @@ export class MonsterCube extends CharacterCube {
     aggrorange: any;
     followrange: any;
     speed: any;
-    cube: any;
     label: CSS2DObject;
     hpbar: CSS2DObject;
     threats: {};
@@ -56,7 +55,6 @@ export class MonsterCube extends CharacterCube {
         this.aggrorange = aggrorange;
         this.followrange = followrange;
         this.speed = speed;
-        this.cube = this.createCube();
         this.label = this.createLabel();
         this.hpbar = this.createHpBar();
         this.updatePosition(origin);
