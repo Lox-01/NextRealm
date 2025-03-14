@@ -1,6 +1,18 @@
 import * as THREE from 'three';
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
+export interface Position {
+    x: number;
+    y: number;
+    z: number;
+}
+
+export interface Rotation {
+    xr: number;
+    yr: number;
+    zr: number;
+}
+
 export interface SocketMonster {
     name : string;
     hp : number;
@@ -8,9 +20,9 @@ export interface SocketMonster {
     attack : number;
     arange : number;
     cooldown : number;
-    origin : {x: number, y: number, z: number};
-    pos : {x: number, y: number, z: number};
-    rot : {xr: number, yr: number, zr: number};
+    origin : Position;
+    pos : Position;
+    rot : Rotation;
     aggrorange : number;
     followrange : number;
     speed : number;
