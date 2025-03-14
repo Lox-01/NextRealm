@@ -1,40 +1,24 @@
 import * as THREE from 'three';
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-
-export interface Position {
-    x: number;
-    y: number;
-    z: number;
-}
-
-export interface Rotation {
-    xr: number;
-    yr: number;
-    zr: number;
-}
+import { Position, Rotation, CharacterCube } from "./character";
 
 export interface SocketMonster {
-    name : string;
-    hp : number;
-    totalhp : number;
-    attack : number;
-    arange : number;
-    cooldown : number;
-    origin : Position;
-    pos : Position;
-    rot : Rotation;
-    aggrorange : number;
-    followrange : number;
-    speed : number;
-    id : string;
+    name: string;
+    hp: number;
+    totalhp: number;
+    attack: number;
+    arange: number;
+    cooldown: number;
+    origin: Position;
+    pos: Position;
+    rot: Rotation;
+    aggrorange: number;
+    followrange: number;
+    speed: number;
+    id: string;
 }
 
-export class MonsterCube {
-    type: string;
-    id: any;
-    name: any;
-    hp: any;
-    totalhp: any;
+export class MonsterCube extends CharacterCube {
     attack: any;
     arange: any;
     cooldown: any;
@@ -50,12 +34,21 @@ export class MonsterCube {
     lerpTarget: any;
     lerpStartTime: number | undefined;
     lerpDuration: number | undefined;
-    constructor(id, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed) {
-        this.type = "monster";
-        this.id = id;
-        this.name = name;
-        this.hp = hp;
-        this.totalhp = totalhp;
+    constructor(
+        id: string,
+        username: string,
+        hp: number,
+        totalhp: number,
+        attack,
+        arange,
+        cooldown,
+        origin,
+        rotation,
+        aggrorange,
+        followrange,
+        speed
+    ) {
+        super("monster", id, username, hp, totalhp);
         this.attack = attack;
         this.arange = arange;
         this.cooldown = cooldown;
@@ -88,14 +81,14 @@ export class MonsterCube {
     createLabel() {
         const monsterDiv = document.createElement('div');
         monsterDiv.className = 'label';
-        monsterDiv.textContent = `${this.name}`;
+        monsterDiv.textContent = `${this.username}`;
         monsterDiv.style.backgroundColor = 'transparent';
-        const monsterLabel = new CSS2DObject( monsterDiv );
-        monsterLabel.position.set( 0, 0, 0 );
-        monsterLabel.center.set( 0.5, 4.5 );
-        this.cube.add( monsterLabel );
-        monsterLabel.layers.set( 0 );
-        monsterLabel.element.style.fontSize="30px";
+        const monsterLabel = new CSS2DObject(monsterDiv);
+        monsterLabel.position.set(0, 0, 0);
+        monsterLabel.center.set(0.5, 4.5);
+        this.cube.add(monsterLabel);
+        monsterLabel.layers.set(0);
+        monsterLabel.element.style.fontSize = "30px";
         return monsterLabel;
     }
 
@@ -105,13 +98,13 @@ export class MonsterCube {
         monsterHpBarBack.className = 'hpback';
         monsterHpBarFront.className = 'hpfront';
         monsterHpBarBack.appendChild(monsterHpBarFront);
-        const monsterBar = new CSS2DObject( monsterHpBarBack );
+        const monsterBar = new CSS2DObject(monsterHpBarBack);
         monsterHpBarBack.style.width = '200px';
         monsterHpBarBack.style.height = '20px';
-        monsterBar.position.set( 0, 0, 0 );
-        monsterBar.center.set( 0.5, 6.5 );
-        this.cube.add( monsterBar );
-        monsterBar.layers.set( 0 );
+        monsterBar.position.set(0, 0, 0);
+        monsterBar.center.set(0.5, 6.5);
+        this.cube.add(monsterBar);
+        monsterBar.layers.set(0);
         return monsterBar;
     }
 
@@ -130,7 +123,7 @@ export class MonsterCube {
 
     updateHp(hp) {
         this.hp = hp;
-        let percentageHp = this.hp/this.totalhp*100;
+        let percentageHp = this.hp / this.totalhp * 100;
         (this.hpbar.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
     }
 
@@ -145,12 +138,12 @@ export class MonsterCube {
                 this.label.element.classList.add("nodisp");
             }
         } else {
-            const scaleFactor = 1/(1+0.07*distance);
-            this.label.element.style.fontSize = `${scaleFactor*30}px`;
+            const scaleFactor = 1 / (1 + 0.07 * distance);
+            this.label.element.style.fontSize = `${scaleFactor * 30}px`;
             this.hpbar.element.style.width = `${200 * scaleFactor}px`;
             this.hpbar.element.style.height = `${20 * scaleFactor}px`;
-            this.label.center.set(0.5,4.5-distance*0.04);
-            this.hpbar.center.set(0.5,6.5-distance*0.05);
+            this.label.center.set(0.5, 4.5 - distance * 0.04);
+            this.hpbar.center.set(0.5, 6.5 - distance * 0.05);
             if (this.hpbar.element.classList.contains("nodisp")) {
                 this.hpbar.element.classList.remove("nodisp");
                 this.hpbar.element.classList.add("hpback");
