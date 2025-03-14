@@ -61,21 +61,7 @@ export class MonsterCube extends CharacterCube {
         this.updateRotation(rotation);
         this.threats = {};
     }
-    createCube() {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = [
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0x0000ff }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-        ];
-        const cubeMesh = new THREE.Mesh(geometry, material);
-        cubeMesh.name = this.id;
-        return cubeMesh;
-    }
-
+    
     createLabel() {
         const monsterDiv = document.createElement('div');
         monsterDiv.className = 'label';
