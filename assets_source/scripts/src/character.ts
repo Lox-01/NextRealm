@@ -19,6 +19,7 @@ export abstract class CharacterCube {
     username: string;
     hp: number;
     totalhp: number;
+    cube: THREE.Mesh;
 
     constructor(
         type: string,
@@ -32,5 +33,21 @@ export abstract class CharacterCube {
         this.username = username;
         this.hp = hp;
         this.totalhp = totalhp;
+        this.cube = this.createCube();
+    }
+
+    createCube(): THREE.Mesh {
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = [
+            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
+            new THREE.MeshBasicMaterial({ color: 0x0000ff }),
+        ];
+        const cubeMesh = new THREE.Mesh(geometry, material);
+        cubeMesh.name = this.id;
+        return cubeMesh;
     }
 }
