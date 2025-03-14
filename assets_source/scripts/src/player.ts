@@ -12,7 +12,6 @@ export interface SockerPlayer {
 }
 
 export class PlayerCube extends CharacterCube {
-    cube: THREE.Mesh;
     label: CSS2DObject;
     hpbar: CSS2DObject;
 
@@ -25,28 +24,12 @@ export class PlayerCube extends CharacterCube {
         totalhp: number
     ) {
         super("player", id, username, hp, totalhp);
-        this.cube = this.createCube();
         this.label = this.createLabel();
         this.hpbar = this.createHpBar();
         this.updatePosition(position);
         this.updateRotation(rotation);
     }
-
-    createCube(): THREE.Mesh {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = [
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0x0000ff }),
-        ];
-        const cubeMesh = new THREE.Mesh(geometry, material);
-        cubeMesh.name = this.id;
-        return cubeMesh;
-    }
-
+    
     createLabel() {
         const playerDiv = document.createElement("div");
         playerDiv.className = "label";
