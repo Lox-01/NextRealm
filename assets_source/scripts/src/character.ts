@@ -35,6 +35,7 @@ export abstract class CharacterCube {
         this.totalhp = totalhp;
         this.cube = this.createCube();
         this.label = this.createLabel();
+        this.hpbar = this.createHpBar();
     }
 
     createCube(): THREE.Mesh {
@@ -64,5 +65,21 @@ export abstract class CharacterCube {
         charLabel.layers.set(0);
         charLabel.element.style.fontSize = "30px";
         return charLabel;
+    }
+
+    createHpBar() {
+        const charHpBarBack = document.createElement('div');
+        const charHpBarFront = document.createElement('div');
+        charHpBarBack.className = 'hpback';
+        charHpBarFront.className = 'hpfront';
+        charHpBarBack.appendChild(charHpBarFront);
+        const monsterBar = new CSS2DObject(charHpBarBack);
+        charHpBarBack.style.width = '200px';
+        charHpBarBack.style.height = '20px';
+        charBar.position.set(0, 0, 0);
+        charBar.center.set(0.5, 6.5);
+        this.cube.add(charBar);
+        charBar.layers.set(0);
+        return charBar;
     }
 }
