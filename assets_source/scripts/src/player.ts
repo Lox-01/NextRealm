@@ -24,24 +24,9 @@ export class PlayerCube extends CharacterCube {
         totalhp: number
     ) {
         super("player", id, username, hp, totalhp);
-        this.label = this.createLabel();
         this.hpbar = this.createHpBar();
         this.updatePosition(position);
         this.updateRotation(rotation);
-    }
-    
-    createLabel() {
-        const playerDiv = document.createElement("div");
-        playerDiv.className = "label";
-        playerDiv.textContent = `${this.username}`;
-        playerDiv.style.backgroundColor = "transparent";
-        const playerLabel = new CSS2DObject(playerDiv);
-        playerLabel.position.set(0, 0, 0);
-        playerLabel.center.set(0.5, 4.5);
-        this.cube.add(playerLabel);
-        playerLabel.layers.set(0);
-        playerLabel.element.style.fontSize = "30px";
-        return playerLabel;
     }
 
     createHpBar(): CSS2DObject {
