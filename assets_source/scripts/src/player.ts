@@ -24,6 +24,8 @@ export class PlayerCube extends CharacterCube {
         totalhp: number
     ) {
         super("player", id, username, hp, totalhp);
+        this.updatePosition(position);
+        this.updateRotation(rotation);
     }
 
     cleanup(): void {
