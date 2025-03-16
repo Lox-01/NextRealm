@@ -34,6 +34,7 @@ export abstract class CharacterCube {
         this.hp = hp;
         this.totalhp = totalhp;
         this.cube = this.createCube();
+        this.label = this.createLabel();
     }
 
     createCube(): THREE.Mesh {
@@ -49,5 +50,19 @@ export abstract class CharacterCube {
         const cubeMesh = new THREE.Mesh(geometry, material);
         cubeMesh.name = this.id;
         return cubeMesh;
+    }
+
+    createLabel(): CSS2DObject {
+        const charDiv = document.createElement('div');
+        charDiv.className = 'label';
+        charDiv.textContent = `${this.username}`;
+        charDiv.style.backgroundColor = 'transparent';
+        const charLabel = new CSS2DObject(charDiv);
+        charLabel.position.set(0, 0, 0);
+        charLabel.center.set(0.5, 4.5);
+        this.cube.add(charLabel);
+        charLabel.layers.set(0);
+        charLabel.element.style.fontSize = "30px";
+        return charLabel;
     }
 }
