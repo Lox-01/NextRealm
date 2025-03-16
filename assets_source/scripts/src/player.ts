@@ -24,8 +24,6 @@ export class PlayerCube extends CharacterCube {
         totalhp: number
     ) {
         super("player", id, username, hp, totalhp);
-        this.updatePosition(position);
-        this.updateRotation(rotation);
     }
 
     cleanup(): void {
@@ -37,14 +35,6 @@ export class PlayerCube extends CharacterCube {
         }
         this.cube.remove(this.label);
         this.cube.remove(this.hpbar);
-    }
-
-    updatePosition(position: Position): void {
-        this.cube.position.set(position.x, position.y, position.z);
-    }
-
-    updateRotation(rotation: Rotation): void {
-        this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
     }
 
     updateHp(hp: number): void {
