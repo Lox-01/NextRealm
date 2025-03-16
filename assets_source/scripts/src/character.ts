@@ -36,6 +36,7 @@ export abstract class CharacterCube {
         this.cube = this.createCube();
         this.label = this.createLabel();
         this.hpbar = this.createHpBar();
+        
     }
 
     createCube(): THREE.Mesh {
@@ -81,5 +82,13 @@ export abstract class CharacterCube {
         this.cube.add(charBar);
         charBar.layers.set(0);
         return charBar;
+    }
+    
+    updatePosition(position: Position): void {
+        this.cube.position.set(position.x, position.y, position.z);
+    }
+
+    updateRotation(rotation: Rotation): void {
+        this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
     }
 }
