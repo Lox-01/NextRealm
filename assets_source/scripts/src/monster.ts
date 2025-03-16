@@ -55,25 +55,10 @@ export class MonsterCube extends CharacterCube {
         this.aggrorange = aggrorange;
         this.followrange = followrange;
         this.speed = speed;
-        this.label = this.createLabel();
         this.hpbar = this.createHpBar();
         this.updatePosition(origin);
         this.updateRotation(rotation);
         this.threats = {};
-    }
-    
-    createLabel() {
-        const monsterDiv = document.createElement('div');
-        monsterDiv.className = 'label';
-        monsterDiv.textContent = `${this.username}`;
-        monsterDiv.style.backgroundColor = 'transparent';
-        const monsterLabel = new CSS2DObject(monsterDiv);
-        monsterLabel.position.set(0, 0, 0);
-        monsterLabel.center.set(0.5, 4.5);
-        this.cube.add(monsterLabel);
-        monsterLabel.layers.set(0);
-        monsterLabel.element.style.fontSize = "30px";
-        return monsterLabel;
     }
 
     createHpBar() {
