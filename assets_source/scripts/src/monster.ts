@@ -55,17 +55,9 @@ export class MonsterCube extends CharacterCube {
         this.aggrorange = aggrorange;
         this.followrange = followrange;
         this.speed = speed;
-        this.updatePosition(origin);
-        this.updateRotation(rotation);
         this.threats = {};
     }
 
-    updatePosition(position) {
-        this.cube.position.set(position.x, position.y, position.z);
-    }
-    updateRotation(rotation) {
-        this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
-    }
     startLerpToPosition(targetPos) {
         this.lerpStart = this.cube.position.clone();
         this.lerpTarget = new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z);
