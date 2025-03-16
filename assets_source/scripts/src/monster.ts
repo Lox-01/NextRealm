@@ -55,26 +55,9 @@ export class MonsterCube extends CharacterCube {
         this.aggrorange = aggrorange;
         this.followrange = followrange;
         this.speed = speed;
-        this.hpbar = this.createHpBar();
         this.updatePosition(origin);
         this.updateRotation(rotation);
         this.threats = {};
-    }
-
-    createHpBar() {
-        const monsterHpBarBack = document.createElement('div');
-        const monsterHpBarFront = document.createElement('div');
-        monsterHpBarBack.className = 'hpback';
-        monsterHpBarFront.className = 'hpfront';
-        monsterHpBarBack.appendChild(monsterHpBarFront);
-        const monsterBar = new CSS2DObject(monsterHpBarBack);
-        monsterHpBarBack.style.width = '200px';
-        monsterHpBarBack.style.height = '20px';
-        monsterBar.position.set(0, 0, 0);
-        monsterBar.center.set(0.5, 6.5);
-        this.cube.add(monsterBar);
-        monsterBar.layers.set(0);
-        return monsterBar;
     }
 
     updatePosition(position) {
