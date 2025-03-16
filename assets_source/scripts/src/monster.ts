@@ -55,6 +55,8 @@ export class MonsterCube extends CharacterCube {
         this.aggrorange = aggrorange;
         this.followrange = followrange;
         this.speed = speed;
+        this.updatePosition(origin);
+        this.updateRotation(rotation);
         this.threats = {};
     }
 
