@@ -26,8 +26,6 @@ export class MonsterCube extends CharacterCube {
     aggrorange: any;
     followrange: any;
     speed: any;
-    label: CSS2DObject;
-    hpbar: CSS2DObject;
     threats: {};
     lerpStart: any;
     lerpTarget: any;

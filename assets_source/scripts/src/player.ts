@@ -12,9 +12,6 @@ export interface SockerPlayer {
 }
 
 export class PlayerCube extends CharacterCube {
-    label: CSS2DObject;
-    hpbar: CSS2DObject;
-
     constructor(
         id: string,
         position: Position,

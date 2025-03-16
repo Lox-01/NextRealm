@@ -20,6 +20,8 @@ export abstract class CharacterCube {
     hp: number;
     totalhp: number;
     cube: THREE.Mesh;
+    label: CSS2DObject;
+    hpbar: CSS2DObject;
 
     constructor(
         type: string,
@@ -73,7 +75,7 @@ export abstract class CharacterCube {
         charHpBarBack.className = 'hpback';
         charHpBarFront.className = 'hpfront';
         charHpBarBack.appendChild(charHpBarFront);
-        const monsterBar = new CSS2DObject(charHpBarBack);
+        const charBar = new CSS2DObject(charHpBarBack);
         charHpBarBack.style.width = '200px';
         charHpBarBack.style.height = '20px';
         charBar.position.set(0, 0, 0);

@@ -37,7 +37,7 @@ describe('MonsterCube', () => {
 
   it('should initialize with the correct properties', () => {
     expect(monster.id).toBe(mockId);
-    expect(monster.name).toBe(mockName);
+    expect(monster.username).toBe(mockName);
     expect(monster.hp).toBe(mockHp);
     expect(monster.totalhp).toBe(mockTotalHp);
     expect(monster.attack).toBe(mockAttack);
