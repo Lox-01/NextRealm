@@ -36,7 +36,6 @@ export abstract class CharacterCube {
         this.cube = this.createCube();
         this.label = this.createLabel();
         this.hpbar = this.createHpBar();
-        
     }
 
     createCube(): THREE.Mesh {
