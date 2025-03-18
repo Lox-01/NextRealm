@@ -64,38 +64,4 @@ export class MonsterCube extends CharacterCube {
         this.lerpStartTime = performance.now();
         this.lerpDuration = 100;
     }
-
-    updateHp(hp) {
-        this.hp = hp;
-        let percentageHp = this.hp / this.totalhp * 100;
-        (this.hpbar.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
-    }
-
-    updateLabel(distance) {
-        if (distance > 70) {
-            if (this.hpbar.element.classList.contains("hpback")) {
-                this.hpbar.element.classList.remove("hpback");
-                this.hpbar.element.classList.add("nodisp");
-            }
-            if (this.label.element.classList.contains("label")) {
-                this.label.element.classList.remove("label");
-                this.label.element.classList.add("nodisp");
-            }
-        } else {
-            const scaleFactor = 1 / (1 + 0.07 * distance);
-            this.label.element.style.fontSize = `${scaleFactor * 30}px`;
-            this.hpbar.element.style.width = `${200 * scaleFactor}px`;
-            this.hpbar.element.style.height = `${20 * scaleFactor}px`;
-            this.label.center.set(0.5, 4.5 - distance * 0.04);
-            this.hpbar.center.set(0.5, 6.5 - distance * 0.05);
-            if (this.hpbar.element.classList.contains("nodisp")) {
-                this.hpbar.element.classList.remove("nodisp");
-                this.hpbar.element.classList.add("hpback");
-            }
-            if (this.label.element.classList.contains("nodisp")) {
-                this.label.element.classList.remove("nodisp");
-                this.label.element.classList.add("label");
-            }
-        }
-    }
 }
