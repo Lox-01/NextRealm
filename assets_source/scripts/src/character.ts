@@ -22,6 +22,7 @@ export abstract class CharacterCube {
     cube: THREE.Mesh;
     label: CSS2DObject;
     hpbar: CSS2DObject;
+    isalive: boolean;
 
     constructor(
         type: string,
@@ -38,6 +39,7 @@ export abstract class CharacterCube {
         this.cube = this.createCube();
         this.label = this.createLabel();
         this.hpbar = this.createHpBar();
+        this.isalive = hp <= 0 ? false : true;
     }
 
     createCube(): THREE.Mesh {
@@ -82,6 +84,8 @@ export abstract class CharacterCube {
         charBar.center.set(0.5, 6.5);
         this.cube.add(charBar);
         charBar.layers.set(0);
+        const percentageHp = (this.hp / this.totalhp) * 100;
+        (charBar.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
         return charBar;
     }
     

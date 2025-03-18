@@ -31,6 +31,7 @@ export function scriptPage () {
         });
     }
     const scene = new THREE.Scene();
+    globalThis.scene = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.layers.enableAll();
     const canvas = document.getElementById('gamecanvas') as HTMLCanvasElement;
@@ -48,7 +49,7 @@ export function scriptPage () {
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
-    plane.position.y = 0;
+    plane.position.y = -0.5;
     scene.add(plane);
     
     const raycaster = new THREE.Raycaster();
@@ -138,10 +139,23 @@ export function scriptPage () {
 
     socket.on("monster_position_update", (mon) => {
         if (monstersCubes[mon.id]) {
-            //monstersCubes[mon.id].updatePosition(mon.pos);
             monstersCubes[mon.id].startLerpToPosition(mon.pos);
             monstersCubes[mon.id].updateRotation(mon.rot);
         }
+    });
+
+    socket.on("player_dead", (player) => {
+        if (playersCubes[player.id]) {
+            playersCubes[player.id].handleDeath();
+        }
+        if (player.id == my_id) {
+            playersCubes[player.id].showDeathMessage(socket);
+        }
+    });
+
+    socket.on("monster_dead", (monster) => {
+        console.log(monster.id);
+        console.log(monstersCubes);
     });
 
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
