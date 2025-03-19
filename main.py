@@ -172,8 +172,12 @@ def distance(monster, player):
     return math.sqrt((monster.position["x"] - player.position["x"]) ** 2 +(monster.position["y"] - player.position["y"]) ** 2 +(monster.position["z"] - player.position["z"]) ** 2)
 
 def game_loop():
+    global printed
     while True:
         for monster_id, monster in monsters.items():
+            if not monster.alive:
+                monster.try_respawn(socketio)
+                continue
             if not monster.is_in_followrange():
                 monster_to_origin(monster)
                 continue

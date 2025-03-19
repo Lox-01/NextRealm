@@ -57,7 +57,7 @@ def on_new_msg(vals, players, socketio):
             socketio.emit("pm_fail", vals[1])
         else:
             usern = splitted[1]
-            if str(usern) in [player.username for player in players.values()]:
+            if str(usern) in [player.name for player in players.values()]:
                 newvals = [" ".join(splitted[2:]), usern, vals[1]]
                 socketio.emit("private_msg", newvals)
             else:
@@ -81,6 +81,7 @@ def process_hit(hit, hitter, socketio, entity_type, entity_dict):
                 else:
                     socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in entity_dict.items()})
                     socketio.emit("monster_dead", hit.to_dict())
+                    hit.dead_at = round(time.time())
                 hit.alive = False
             else:
                 if entity_type == "player":
@@ -99,6 +100,7 @@ def process_hit(hit, hitter, socketio, entity_type, entity_dict):
             else:
                 socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in entity_dict.items()})
                 socketio.emit("monster_dead", hit.to_dict())
+                hit.dead_at = round(time.time())
             hit.alive = False
         else:
             if entity_type == "player":

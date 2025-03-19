@@ -1,11 +1,13 @@
 class Character:
-    def __init__(self, id, position, rotation, hp, totalhp):
+    def __init__(self, id, position, rotation, hp, totalhp, name):
         self.id = id
         self.hp = hp
         self.totalhp = totalhp
         self.position = position
         self.rotation = rotation
         self.alive = False if hp <= 0 else True
+        self.name = name
+        self.last_hit = None
 
     def update_position(self, pos):
         self.position.update(pos)
@@ -23,5 +25,6 @@ class Character:
             "totalhp": self.totalhp,
             "pos": self.position,
             "rot": self.rotation,
-            "alive": self.alive
+            "alive": self.alive,
+            "name": self.name
         }

@@ -16,7 +16,7 @@ export interface Rotation {
 export abstract class CharacterCube {
     type: string;
     id: string;
-    username: string;
+    name: string;
     hp: number;
     totalhp: number;
     cube: THREE.Mesh;
@@ -27,13 +27,13 @@ export abstract class CharacterCube {
     constructor(
         type: string,
         id: string,
-        username: string,
+        name: string,
         hp: number,
         totalhp: number
     ) {
         this.type = type;
         this.id = id;
-        this.username = username;
+        this.name = name;
         this.hp = hp;
         this.totalhp = totalhp;
         this.cube = this.createCube();
@@ -60,7 +60,7 @@ export abstract class CharacterCube {
     createLabel(): CSS2DObject {
         const charDiv = document.createElement('div');
         charDiv.className = 'label';
-        charDiv.textContent = `${this.username}`;
+        charDiv.textContent = `${this.name}`;
         charDiv.style.backgroundColor = 'transparent';
         const charLabel = new CSS2DObject(charDiv);
         charLabel.position.set(0, 0, 0);
@@ -131,6 +131,19 @@ export abstract class CharacterCube {
         }
     }
 
+    handleDeath(): void {
+		if (this.cube.parent === null) return;
+		if (this.cube.parent) {
+			this.cube.parent.remove(this.cube);
+		}
+		if (this.label.parent) {
+			this.label.parent.remove(this.label);
+		}
+		if (this.hpbar.parent) {
+			this.hpbar.parent.remove(this.hpbar);
+		}
+		this.isalive = false;
+	}
     
     cleanup(): void {
         if (this.label && this.label.element && this.label.element.parentNode) {
@@ -142,4 +155,17 @@ export abstract class CharacterCube {
         this.cube.remove(this.label);
         this.cube.remove(this.hpbar);
     }
+
+    respawn(): void {
+		this.isalive = true;
+		if (!this.cube.parent) {
+			scene?.add(this.cube);
+		}
+		if (!this.hpbar.parent) {
+			this.cube.add(this.hpbar);
+		}
+		if (!this.label.parent) {
+			this.cube.add(this.label);
+		}
+	}
 }

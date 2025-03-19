@@ -4,7 +4,7 @@ import { Position, Rotation, CharacterCube } from "./character";
 
 export interface SockerPlayer {
     id: string;
-    username: string;
+    name: string;
     hp: number;
     totalhp: number;
     pos: Position;
@@ -17,27 +17,13 @@ export class PlayerCube extends CharacterCube {
         position: Position,
         rotation: Rotation,
         hp: number,
-        username: string,
+        name: string,
         totalhp: number
     ) {
-        super("player", id, username, hp, totalhp);
+        super("player", id, name, hp, totalhp);
         this.updatePosition(position);
         this.updateRotation(rotation);
     }
-
-    handleDeath(): void {
-		if (this.cube.parent === null) return;
-		if (this.cube.parent) {
-			this.cube.parent.remove(this.cube);
-		}
-		if (this.label.parent) {
-			this.label.parent.remove(this.label);
-		}
-		if (this.hpbar.parent) {
-			this.hpbar.parent.remove(this.hpbar);
-		}
-		this.isalive = false;
-	}
 
 	showDeathMessage(socket): void {
 		let existingDeathMessage = document.getElementById("death-message");
@@ -60,19 +46,5 @@ export class PlayerCube extends CharacterCube {
 				console.error("Respawn button not found.");
 			}
 		}, 0);
-	}
-
-	respawn(): void {
-		this.isalive = true;
-		if (!this.cube.parent) {
-			scene?.add(this.cube);
-		}
-		if (!this.hpbar.parent) {
-			this.cube.add(this.hpbar);
-		}
-		if (!this.label.parent) {
-			this.cube.add(this.label);
-		}
-        console.log("Respawned");
 	}
 }

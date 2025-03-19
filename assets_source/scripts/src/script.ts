@@ -98,7 +98,7 @@ export function scriptPage () {
     socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
         for (const [id, data] of Object.entries(players)) {
             if (!playersCubes[id]) {
-                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
+                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.name, data.totalhp);
                 scene.add(playersCubes[id].cube);
             } else {
                 playersCubes[id].updatePosition(data.pos);
@@ -139,8 +139,12 @@ export function scriptPage () {
 
     socket.on("monster_position_update", (mon) => {
         if (monstersCubes[mon.id]) {
-            monstersCubes[mon.id].startLerpToPosition(mon.pos);
-            monstersCubes[mon.id].updateRotation(mon.rot);
+            if (monstersCubes[mon.id].isalive == true) {
+                monstersCubes[mon.id].startLerpToPosition(mon.pos);
+                monstersCubes[mon.id].updateRotation(mon.rot);
+            } else {
+                monstersCubes[mon.id].respawn();
+            }
         }
     });
 
@@ -154,8 +158,9 @@ export function scriptPage () {
     });
 
     socket.on("monster_dead", (monster) => {
-        console.log(monster.id);
-        console.log(monstersCubes);
+        if (monstersCubes[monster.id]) {
+            monstersCubes[monster.id].handleDeath();
+        }
     });
 
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {

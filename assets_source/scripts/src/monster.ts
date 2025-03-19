@@ -33,7 +33,7 @@ export class MonsterCube extends CharacterCube {
     lerpDuration: number | undefined;
     constructor(
         id: string,
-        username: string,
+        name: string,
         hp: number,
         totalhp: number,
         attack,
@@ -45,7 +45,7 @@ export class MonsterCube extends CharacterCube {
         followrange,
         speed
     ) {
-        super("monster", id, username, hp, totalhp);
+        super("monster", id, name, hp, totalhp);
         this.attack = attack;
         this.arange = arange;
         this.cooldown = cooldown;

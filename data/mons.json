@@ -1,7 +1,7 @@
 {
     "testboi": {
         "name": "testyboi",
-        "totalhp": 50,
+        "totalhp": 10,
         "attack": 2,
         "arange": 2,
         "cooldown": 1,

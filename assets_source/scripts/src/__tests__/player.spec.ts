@@ -8,7 +8,7 @@ describe('PlayerCube', () => {
   const mockRotation = { xr: 0, yr: 0, zr: 0 };
   const mockHp = 100;
   const mockTotalHp = 150;
-  const mockUsername = 'TestPlayer';
+  const mockName = 'TestPlayer';
 
   let player: PlayerCube;
 
@@ -18,7 +18,7 @@ describe('PlayerCube', () => {
       mockPosition,
       mockRotation,
       mockHp,
-      mockUsername,
+      mockName,
       mockTotalHp
     );
   });
@@ -28,7 +28,7 @@ describe('PlayerCube', () => {
     expect(player.type).toBe('player');
     expect(player.hp).toBe(mockHp);
     expect(player.totalhp).toBe(mockTotalHp);
-    expect(player.username).toBe(mockUsername);
+    expect(player.name).toBe(mockName);
   });
 
   it('should create a cube', () => {
@@ -38,7 +38,7 @@ describe('PlayerCube', () => {
 
   it('should create a label', () => {
     expect(player.label).toBeInstanceOf(CSS2DObject);
-    expect(player.label.element.textContent).toBe(mockUsername);
+    expect(player.label.element.textContent).toBe(mockName);
   });
 
   it('should create a health bar', () => {
