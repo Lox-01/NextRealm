@@ -155,17 +155,4 @@ export abstract class CharacterCube {
         this.cube.remove(this.label);
         this.cube.remove(this.hpbar);
     }
-
-    respawn(): void {
-		this.isalive = true;
-		if (!this.cube.parent) {
-			scene?.add(this.cube);
-		}
-		if (!this.hpbar.parent) {
-			this.cube.add(this.hpbar);
-		}
-		if (!this.label.parent) {
-			this.cube.add(this.label);
-		}
-	}
 }

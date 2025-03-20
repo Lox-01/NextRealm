@@ -47,4 +47,17 @@ export class PlayerCube extends CharacterCube {
 			}
 		}, 0);
 	}
+
+	respawn(): void {
+		this.isalive = true;
+		if (!this.cube.parent) {
+			scene?.add(this.cube);
+		}
+		if (!this.hpbar.parent) {
+			this.cube.add(this.hpbar);
+		}
+		if (!this.label.parent) {
+			this.cube.add(this.label);
+		}
+	}
 }
