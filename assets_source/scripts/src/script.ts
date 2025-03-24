@@ -138,7 +138,6 @@ export function scriptPage () {
     });
 
     socket.on("monster_position_update", (mon) => {
-        console.log(monstersCubes);
         if (monstersCubes[mon.id]) {
             if (monstersCubes[mon.id].isalive == true) {
                 monstersCubes[mon.id].startLerpToPosition(mon.pos);

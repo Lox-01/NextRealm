@@ -65,14 +65,14 @@ export class MonsterCube extends CharacterCube {
         this.lerpDuration = 100;
     }
 
-    respawn(mon): void {
+    respawn(mon: Record<string, any>): void {
         this.updatePosition(mon.pos);
         this.updateRotation(mon.rot);
         this.updateHp(mon.hp);
 		this.isalive = true;
-		if (!this.cube.parent) {
-			scene?.add(this.cube);
-		}
+        if (!this.cube.parent) {
+		    scene?.add(this.cube);
+        }
 		if (!this.hpbar.parent) {
 			this.cube.add(this.hpbar);
 		}
