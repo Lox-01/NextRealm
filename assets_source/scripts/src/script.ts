@@ -147,7 +147,6 @@ export function scriptPage () {
             }
         }
     });
-
     socket.on("player_dead", (player) => {
         if (playersCubes[player.id]) {
             playersCubes[player.id].handleDeath();
@@ -160,26 +159,27 @@ export function scriptPage () {
     socket.on("monster_dead", (monster) => {
         if (monstersCubes[monster.id]) {
             monstersCubes[monster.id].handleDeath();
+            monstersCubes[monster.id].handleDeathTwo();
         }
     });
-
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
                 monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed);
                 scene.add(monstersCubes[id].cube);
             } else {
-                //monstersCubes[id].updatePosition(data.pos);
-                monstersCubes[id].startLerpToPosition(data.pos);
-                monstersCubes[id].updateRotation(data.rot);
-                if (data.hp != monstersCubes[id].hp) {
-                    const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
-                    setInterval(() => {
-                        damageNumber.update();
-                    }, 250);
+                if (monstersCubes[id].isalive) {
+                    monstersCubes[id].startLerpToPosition(data.pos);
+                    monstersCubes[id].updateRotation(data.rot);
+                    if (data.hp != monstersCubes[id].hp) {
+                        const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
+                        setInterval(() => {
+                            damageNumber.update();
+                        }, 250);
 
+                    }
+                    monstersCubes[id].updateHp(data.hp);
                 }
-                monstersCubes[id].updateHp(data.hp);
             }
         }
     });
@@ -332,14 +332,16 @@ export function scriptPage () {
             }
             if (Object.keys(monstersCubes).length > 0 && monstersCubes != null) {
                 for (const [id, omonster] of Object.entries(monstersCubes)) {
-                    omonster.updateLabel(tri(player.cube.position,omonster.cube.position));
-                    if (omonster.lerpStart && omonster.lerpTarget) {
-                        const now = performance.now();
-                        const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);
-                        omonster.cube.position.lerpVectors(omonster.lerpStart, omonster.lerpTarget, t);
-                        if (t === 1) {
-                            omonster.lerpStart = null;
-                            omonster.lerpTarget = null;
+                    if (omonster.isalive) {
+                        omonster.updateLabel(tri(player.cube.position,omonster.cube.position));
+                        if (omonster.lerpStart && omonster.lerpTarget) {
+                            const now = performance.now();
+                            const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);
+                            omonster.cube.position.lerpVectors(omonster.lerpStart, omonster.lerpTarget, t);
+                            if (t === 1) {
+                                omonster.lerpStart = null;
+                                omonster.lerpTarget = null;
+                            }
                         }
                     }
                 }
@@ -454,7 +456,6 @@ export function scriptPage () {
     });
     
     function sendMessage() {
-        
         if (enterInput) {
             const message = (enterInput as HTMLInputElement).value.trim();
             if (message) {

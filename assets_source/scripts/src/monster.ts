@@ -65,6 +65,13 @@ export class MonsterCube extends CharacterCube {
         this.lerpDuration = 100;
     }
 
+    handleDeathTwo(): void {
+        this.lerpStart = null;
+        this.lerpTarget = null;
+        this.lerpStartTime = undefined;
+        this.lerpDuration = undefined;
+    }
+
     respawn(mon: Record<string, any>): void {
         this.updatePosition(mon.pos);
         this.updateRotation(mon.rot);
