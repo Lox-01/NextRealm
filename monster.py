@@ -72,7 +72,8 @@ class Monster(Character):
                 self.dead_at = None
                 self.hp = self.totalhp
                 self.alive = True
-                self.position = self.origin
+                self.position = self.origin.copy()
+                self.rotation = self.orotation.copy()
                 socketio.emit('monster_position_update', self.to_dict())
 
     def to_dict(self):
