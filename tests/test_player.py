@@ -11,13 +11,13 @@ class TestPlayer(unittest.TestCase):
         self.assertEqual(player.position, (10, 20))
         self.assertEqual(player.rotation, 90)
         self.assertEqual(player.hp, 100)
-        self.assertEqual(player.username, "player_one")
+        self.assertEqual(player.name, "player_one")
         self.assertEqual(player.totalhp, 200)
         self.assertIsNone(player.last_hit)
 
     def test_player_dict_representation(self):
         player = Player(2, (15, 25), 45, 120, "player_two", 240)
-        expected_dict = {'id': 2, 'hp': 120, 'totalhp': 240, 'pos': (15, 25), 'rot': 45, 'username': 'player_two'}
+        expected_dict = {'id': 2, 'hp': 120, 'totalhp': 240, 'pos': (15, 25), 'rot': 45, 'name': 'player_two'}
         self.assertEqual(player.to_dict(), expected_dict)
 
     # def test_invalid_id_type(self):
