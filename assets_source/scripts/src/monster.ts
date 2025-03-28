@@ -65,7 +65,8 @@ export class MonsterCube extends CharacterCube {
         this.lerpDuration = 100;
     }
 
-    handleDeathTwo(): void {
+    handleDeath(): void {
+        super.handleDeath();
         this.lerpStart = null;
         this.lerpTarget = null;
         this.lerpStartTime = undefined;

@@ -151,6 +151,9 @@ export function scriptPage () {
         if (playersCubes[player.id]) {
             playersCubes[player.id].handleDeath();
         }
+        if (selected && selected.id == player.id) {
+            selected = null;
+        }
         if (player.id == my_id) {
             playersCubes[player.id].showDeathMessage(socket);
         }
@@ -160,6 +163,9 @@ export function scriptPage () {
         if (monstersCubes[monster.id]) {
             monstersCubes[monster.id].handleDeath();
             monstersCubes[monster.id].handleDeathTwo();
+        }
+        if (selected && selected.id == monster.id) {
+            selected = null;
         }
     });
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
