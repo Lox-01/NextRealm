@@ -17,7 +17,7 @@ class TestPlayer(unittest.TestCase):
 
     def test_player_dict_representation(self):
         player = Player(2, (15, 25), 45, 120, "player_two", 240)
-        expected_dict = {'id': 2, 'alive': True, 'hp': 120, 'totalhp': 240, 'pos': (15, 25), 'rot': 45, 'name': 'player_two'}
+        expected_dict = {'id': 2, 'hp': 120, 'totalhp': 240, 'pos': (15, 25), 'rot': 45, 'alive': True, 'name': 'player_two'}
         self.assertEqual(player.to_dict(), expected_dict)
 
     # def test_invalid_id_type(self):
@@ -58,12 +58,12 @@ class TestPlayer(unittest.TestCase):
         updated_dict = player.to_dict()
         expected_dict = {
             'id': 1,
-            'pos': (10, 20),
-            'rot': 90,
             'hp': 50,
             'totalhp': 200,
-            'username': 'player_one',
-            'alive': True
+            'pos': (10, 20),
+            'rot': 90,
+            'alive': True,
+            'name': 'player_one'
         }
         self.assertEqual(updated_dict, expected_dict)
 
