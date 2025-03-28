@@ -43,7 +43,8 @@ class TestCharacter(unittest.TestCase):
             "hp": 100,
             "totalhp": 150,
             "pos": {"x": 0, "y": 0, "z": 0},
-            "rot": {"xr": 0, "yr": 0, "zr": 0}
+            "rot": {"xr": 0, "yr": 0, "zr": 0},
+            "name": "TestCharacter"
         }
         self.assertEqual(character_dict, expected_dict)
 

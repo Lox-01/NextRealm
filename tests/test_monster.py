@@ -28,7 +28,8 @@ class TestMonster(unittest.TestCase):
             position={'x': 10, 'y': 10, 'z': 10},
             rotation={'yr': 90, 'xr': 0},
             hp=80,
-            totalhp=80
+            totalhp=80,
+            name="TestPlayer"
         )
 
     def test_is_in_arange_true(self):
