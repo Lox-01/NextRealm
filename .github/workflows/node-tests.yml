@@ -18,7 +18,7 @@ jobs:
         node-version: '20' # Adjust the Node.js version as needed
 
     - name: Install dependencies
-      run: npm install
+      run: yarn install
 
     - name: Run test coverage
       run: npm run test:coverage

@@ -4,8 +4,7 @@ from character import Character
 
 class Monster(Character):
     def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed, id):
-        super().__init__(id, origin.copy(), rotation.copy(), hp, totalhp)
-        self.name = name
+        super().__init__(id, origin.copy(), rotation.copy(), hp, totalhp, name)
         self.attack = attack
         self.arange = arange
         self.cooldown = cooldown
@@ -14,9 +13,9 @@ class Monster(Character):
         self.aggrorange = aggrorange
         self.followrange = followrange
         self.speed = speed
-        self.last_hit = None
         self.target = None
         self.threats = {}
+        self.dead_at = None
 
     def is_in_arange(self, player):
         return self.arange >= math.sqrt((self.position["x"] - player.position["x"])**2 + (self.position["y"] - player.position["y"])**2 + (self.position["z"] - player.position["z"])**2)
@@ -67,10 +66,19 @@ class Monster(Character):
                 self.position = player.position.copy()
                 self.rotation = player.rotation.copy()
 
+    def try_respawn(self, socketio):
+        if self.dead_at:
+            if round(time.time())-self.dead_at >= 15:
+                self.dead_at = None
+                self.hp = self.totalhp
+                self.alive = True
+                self.position = self.origin.copy()
+                self.rotation = self.orotation.copy()
+                socketio.emit('monster_position_update', self.to_dict())
+
     def to_dict(self):
         base_dict = super().to_dict()
         base_dict.update({
-            "name": self.name,
             "attack": self.attack,
             "arange": self.arange,
             "cooldown": self.cooldown,
