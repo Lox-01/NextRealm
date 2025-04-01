@@ -34,12 +34,12 @@ if os.path.exists("./data/mons.json"):
     tempmons = json.load(open('./data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
+        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
 elif os.path.exists("./NextRealm/data/mons.json"):
     tempmons = json.load(open('./NextRealm/data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        monsters[mon] = Monster(tm["name"], tm["hp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
+        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
 
 @app.route('/')
 def index():
@@ -131,6 +131,10 @@ def debug(data):
 def player_hit(ids):
     on_player_hit("player", ids[0], players, socketio, ids[1], monsters, ids[2])
 
+@socketio.on("respawn")
+def respawn(id):
+    on_respawn(players, id, socketio)
+
 def monster_to_origin(monster):
     monster.move_to_origin()
     socketio.emit('monster_position_update', monster.to_dict())
@@ -168,8 +172,12 @@ def distance(monster, player):
     return math.sqrt((monster.position["x"] - player.position["x"]) ** 2 +(monster.position["y"] - player.position["y"]) ** 2 +(monster.position["z"] - player.position["z"]) ** 2)
 
 def game_loop():
+    global printed
     while True:
         for monster_id, monster in monsters.items():
+            if not monster.alive:
+                monster.try_respawn(socketio)
+                continue
             if not monster.is_in_followrange():
                 monster_to_origin(monster)
                 continue

@@ -1,14 +1,13 @@
 {
     "testboi": {
         "name": "testyboi",
-        "hp": 50,
-        "totalhp": 50,
+        "totalhp": 10,
         "attack": 2,
         "arange": 2,
         "cooldown": 1,
         "origin": {
             "x": 10,
-            "y": 0.5,
+            "y": 0,
             "z": 20
         },
         "rotation": {

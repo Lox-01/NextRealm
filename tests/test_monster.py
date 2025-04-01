@@ -28,7 +28,8 @@ class TestMonster(unittest.TestCase):
             position={'x': 10, 'y': 10, 'z': 10},
             rotation={'yr': 90, 'xr': 0},
             hp=80,
-            totalhp=80
+            totalhp=80,
+            name="TestPlayer"
         )
 
     def test_is_in_arange_true(self):
@@ -75,7 +76,7 @@ class TestMonster(unittest.TestCase):
         # self.assertEqual(self.monster.rotation, self.player.rotation)
         
     def test_to_dict(self):
-        result = {'id': 123, 'hp': 100, 'totalhp': 150, 'pos': {'x': 0, 'y': 0, 'z': 0}, 'rot': {'yr': 0, 'xr': 0}, 'name': 'Goblin', 'attack': 15, 'arange': 20, 'cooldown': 3, 'origin': {'x': 0, 'y': 0, 'z': 0}, 'aggrorange': 30, 'followrange': 50, 'speed': 5, 'threats': {}}
+        result = {'id': 123, "alive": True, 'hp': 100, 'totalhp': 150, 'pos': {'x': 0, 'y': 0, 'z': 0}, 'rot': {'yr': 0, 'xr': 0}, 'name': 'Goblin', 'attack': 15, 'arange': 20, 'cooldown': 3, 'origin': {'x': 0, 'y': 0, 'z': 0}, 'aggrorange': 30, 'followrange': 50, 'speed': 5, 'threats': {}}
         self.assertEqual(self.monster.to_dict(), result)
 
 if __name__ == '__main__':

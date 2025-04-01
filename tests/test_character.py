@@ -10,7 +10,8 @@ class TestCharacter(unittest.TestCase):
             position={"x": 0, "y": 0, "z": 0},
             rotation={"xr": 0, "yr": 0, "zr": 0},
             hp=100,
-            totalhp=150
+            totalhp=150,
+            name="TestCharacter"
         )
 
     def test_update_position(self):
@@ -42,7 +43,9 @@ class TestCharacter(unittest.TestCase):
             "hp": 100,
             "totalhp": 150,
             "pos": {"x": 0, "y": 0, "z": 0},
-            "rot": {"xr": 0, "yr": 0, "zr": 0}
+            "rot": {"xr": 0, "yr": 0, "zr": 0},
+            "alive": True,
+            "name": "TestCharacter"
         }
         self.assertEqual(character_dict, expected_dict)
 

@@ -31,6 +31,7 @@ export function scriptPage () {
         });
     }
     const scene = new THREE.Scene();
+    globalThis.scene = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.layers.enableAll();
     const canvas = document.getElementById('gamecanvas') as HTMLCanvasElement;
@@ -48,7 +49,7 @@ export function scriptPage () {
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
-    plane.position.y = 0;
+    plane.position.y = -0.5;
     scene.add(plane);
     
     const raycaster = new THREE.Raycaster();
@@ -97,7 +98,7 @@ export function scriptPage () {
     socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
         for (const [id, data] of Object.entries(players)) {
             if (!playersCubes[id]) {
-                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.username, data.totalhp);
+                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.name, data.totalhp);
                 scene.add(playersCubes[id].cube);
             } else {
                 playersCubes[id].updatePosition(data.pos);
@@ -138,29 +139,53 @@ export function scriptPage () {
 
     socket.on("monster_position_update", (mon) => {
         if (monstersCubes[mon.id]) {
-            //monstersCubes[mon.id].updatePosition(mon.pos);
-            monstersCubes[mon.id].startLerpToPosition(mon.pos);
-            monstersCubes[mon.id].updateRotation(mon.rot);
+            if (monstersCubes[mon.id].isalive == true) {
+                monstersCubes[mon.id].startLerpToPosition(mon.pos);
+                monstersCubes[mon.id].updateRotation(mon.rot);
+            } else {
+                monstersCubes[mon.id].respawn(mon);
+            }
+        }
+    });
+    socket.on("player_dead", (player) => {
+        if (playersCubes[player.id]) {
+            playersCubes[player.id].handleDeath();
+        }
+        if (selected && selected.id == player.id) {
+            selected = null;
+        }
+        if (player.id == my_id) {
+            playersCubes[player.id].showDeathMessage(socket);
         }
     });
 
+    socket.on("monster_dead", (monster) => {
+        if (monstersCubes[monster.id]) {
+            monstersCubes[monster.id].handleDeath();
+            monstersCubes[monster.id].handleDeathTwo();
+        }
+        if (selected && selected.id == monster.id) {
+            selected = null;
+        }
+    });
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
                 monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed);
                 // scene.add(monstersCubes[id].cube);
             } else {
-                //monstersCubes[id].updatePosition(data.pos);
-                monstersCubes[id].startLerpToPosition(data.pos);
-                monstersCubes[id].updateRotation(data.rot);
-                if (data.hp != monstersCubes[id].hp) {
-                    const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
-                    setInterval(() => {
-                        damageNumber.update();
-                    }, 250);
+                if (monstersCubes[id].isalive) {
+                    monstersCubes[id].startLerpToPosition(data.pos);
+                    monstersCubes[id].updateRotation(data.rot);
+                    if (data.hp != monstersCubes[id].hp) {
+                        const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
+                        setInterval(() => {
+                            damageNumber.update();
+                        }, 250);
 
+                    }
+                    monstersCubes[id].updateHp(data.hp);
                 }
-                monstersCubes[id].updateHp(data.hp);
             }
         }
     });
@@ -313,14 +338,16 @@ export function scriptPage () {
             }
             if (Object.keys(monstersCubes).length > 0 && monstersCubes != null) {
                 for (const [id, omonster] of Object.entries(monstersCubes)) {
-                    omonster.updateLabel(tri(player.cube.position,omonster.cube.position));
-                    if (omonster.lerpStart && omonster.lerpTarget) {
-                        const now = performance.now();
-                        const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);
-                        omonster.cube.position.lerpVectors(omonster.lerpStart, omonster.lerpTarget, t);
-                        if (t === 1) {
-                            omonster.lerpStart = null;
-                            omonster.lerpTarget = null;
+                    if (omonster.isalive) {
+                        omonster.updateLabel(tri(player.cube.position,omonster.cube.position));
+                        if (omonster.lerpStart && omonster.lerpTarget) {
+                            const now = performance.now();
+                            const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);
+                            omonster.cube.position.lerpVectors(omonster.lerpStart, omonster.lerpTarget, t);
+                            if (t === 1) {
+                                omonster.lerpStart = null;
+                                omonster.lerpTarget = null;
+                            }
                         }
                     }
                 }
@@ -435,7 +462,6 @@ export function scriptPage () {
     });
     
     function sendMessage() {
-        
         if (enterInput) {
             const message = (enterInput as HTMLInputElement).value.trim();
             if (message) {

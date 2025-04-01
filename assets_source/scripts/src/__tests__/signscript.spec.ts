@@ -2,7 +2,7 @@ import { Mock } from 'vitest';
 import { signscriptPage } from '../signscript';
 
 describe('signscriptPage', () => {
-    
+
   const clientId = 'client-njlxmlu92zo';
   beforeEach(() => {
     // Set up the DOM structure needed for testing
