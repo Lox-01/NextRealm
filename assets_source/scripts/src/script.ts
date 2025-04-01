@@ -5,7 +5,7 @@ import { io } from "socket.io-client"; // For client-side
 // import { Server } from "socket.io"; // For server-side
 
 import { DamageNumber } from "./damagenumber";
-import { PlayerCube, SockerPlayer as SocketPlayer } from "./player";
+import { PlayerCube, SocketPlayer as SocketPlayer } from "./player";
 import { MonsterCube, SocketMonster } from "./monster";
 import { tri } from "./shared";
 
@@ -98,7 +98,7 @@ export function scriptPage () {
     socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
         for (const [id, data] of Object.entries(players)) {
             if (!playersCubes[id]) {
-                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.name, data.totalhp);
+                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.name, data.totalhp, data.modelpath);
                 scene.add(playersCubes[id].cube);
             } else {
                 playersCubes[id].updatePosition(data.pos);
@@ -171,7 +171,7 @@ export function scriptPage () {
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
-                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed);
+                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed, data.modelpath);
                 // scene.add(monstersCubes[id].cube);
             } else {
                 if (monstersCubes[id].isalive) {

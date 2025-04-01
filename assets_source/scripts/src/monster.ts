@@ -16,6 +16,7 @@ export interface SocketMonster {
     followrange: number;
     speed: number;
     id: string;
+    modelpath: string;
 }
 
 export class MonsterCube extends CharacterCube {
@@ -36,16 +37,17 @@ export class MonsterCube extends CharacterCube {
         name: string,
         hp: number,
         totalhp: number,
-        attack,
-        arange,
-        cooldown,
+        attack: number,
+        arange: number,
+        cooldown: number,
         origin,
         rotation,
-        aggrorange,
-        followrange,
-        speed
+        aggrorange: number,
+        followrange: number,
+        speed: number,
+        modelpath: string
     ) {
-        super("monster", id, name, hp, totalhp);
+        super("monster", id, name, hp, totalhp, modelpath);
         this.attack = attack;
         this.arange = arange;
         this.cooldown = cooldown;

@@ -3,8 +3,8 @@ import time
 from character import Character
 
 class Monster(Character):
-    def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed, id):
-        super().__init__(id, origin.copy(), rotation.copy(), hp, totalhp, name)
+    def __init__(self, name, hp, totalhp, attack, arange, cooldown, origin, rotation, aggrorange, followrange, speed, id, modelpath):
+        super().__init__(id, origin.copy(), rotation.copy(), hp, totalhp, name, modelpath)
         self.attack = attack
         self.arange = arange
         self.cooldown = cooldown

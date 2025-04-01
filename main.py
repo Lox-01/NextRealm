@@ -34,12 +34,12 @@ if os.path.exists("./data/mons.json"):
     tempmons = json.load(open('./data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
+        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon, tm["modelpath"])
 elif os.path.exists("./NextRealm/data/mons.json"):
     tempmons = json.load(open('./NextRealm/data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
+        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon, tm["modelpath"])
 
 @app.route('/')
 def index():

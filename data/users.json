@@ -12,7 +12,8 @@
       "zr": 0
     },
     "hp": 10,
-    "totalhp": 10
+    "totalhp": 10,
+    "modelpath": "/static/models/player.glb"
   },
   "test2": {
     "id": 1,
@@ -27,6 +28,7 @@
       "zr": 0
     },
     "hp": 10,
-    "totalhp": 10
+    "totalhp": 10,
+    "modelpath": "/static/models/player.glb"
   }
 }
