@@ -4,6 +4,8 @@
 * ui layer
   * install nodejs
   * `npm install`
+  * Use `yarn install` if `npm install` does not work
+  * If `npm install` doesn't work and yarn is not found, run `npm install -g yarn` then run `yarn install`
   * `npm run watch`
 * python
   * docker: 
