@@ -43,37 +43,25 @@ export abstract class CharacterCube {
         this.label = null;
         this.hpbar = null;
         this.modelpath = modelpath;
-        this.loadModel(modelpath).then((model) => {
-            this.cube = model;
-            this.label = this.createLabel();
-            this.hpbar = this.createHpBar();
-            globalThis.scene.add(this.cube);
-        });
-        this.label = this.createLabel();
-        this.hpbar = this.createHpBar();
-        this.isalive = hp <= 0 ? false : true;
+        this.isalive = hp > 0;
+        this.initCharacter(modelpath);
     }
 
-    /*
-    createCube(): THREE.Mesh {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = [
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0x0000ff }),
-        ];
-        const cubeMesh = new THREE.Mesh(geometry, material);
-        cubeMesh.name = this.id;
-        return cubeMesh;
+    private async initCharacter(modelpath: string): Promise<void> {
+        try {
+            const model = await this.loadModel(modelpath);
+            this.cube = model;
+            globalThis.scene.add(this.cube);
+            this.label = this.createLabel();
+            this.hpbar = this.createHpBar();
+        } catch (error) {
+            console.error(`Failed to load model for character ${this.id}:`, error);
+        }
     }
-    */
 
     async loadModel(modelPath: string): Promise<THREE.Group> {
         const loader = new GLTFLoader();
-        const baseUrl = window.location.origin; // Base URL of the Flask app
+        const baseUrl = window.location.origin;
         const fullPath = `${baseUrl}/${modelPath}`;
         return new Promise((resolve, reject) => {
             loader.load(
