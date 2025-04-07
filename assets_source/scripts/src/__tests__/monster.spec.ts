@@ -61,13 +61,16 @@ describe('MonsterCube', () => {
   });
 
   it('should create a health bar', () => {
-    expect(monster.hpbar).toBeInstanceOf(CSS2DObject);
+    expect(monster.hpbar).toBeDefined();
+    if (monster.hpbar) {
+      expect(monster.hpbar).toBeInstanceOf(CSS2DObject);
+    }
   });
 
   it('should update position', () => {
+    expect(monster.cube).toBeDefined();
     const newPosition = { x: 1, y: 2, z: 3 };
     monster.updatePosition(newPosition);
-    expect(monster.cube).toBeDefined();
     if (monster.cube) {
       expect(monster.cube.position.x).toBe(newPosition.x);
       expect(monster.cube.position.y).toBe(newPosition.y);
@@ -76,9 +79,9 @@ describe('MonsterCube', () => {
   });
 
   it('should update rotation', () => {
+    expect(monster.cube).toBeDefined();
     const newRotation = { xr: Math.PI, yr: Math.PI / 2, zr: 0 };
     monster.updateRotation(newRotation);
-    expect(monster.cube).toBeDefined();
     if (monster.cube) {
       expect(monster.cube.rotation.x).toBe(newRotation.xr);
       expect(monster.cube.rotation.y).toBe(newRotation.yr);
