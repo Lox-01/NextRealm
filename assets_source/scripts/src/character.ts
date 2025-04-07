@@ -20,9 +20,9 @@ export abstract class CharacterCube {
     name: string;
     hp: number;
     totalhp: number;
-    cube: THREE.Mesh;
-    label: CSS2DObject;
-    hpbar: CSS2DObject;
+    cube: THREE.Mesh | null;
+    label: CSS2DObject | null;
+    hpbar: CSS2DObject | null;
     isalive: boolean;
     modelpath: string;
 

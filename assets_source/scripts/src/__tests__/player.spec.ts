@@ -9,6 +9,7 @@ describe('PlayerCube', () => {
   const mockHp = 100;
   const mockTotalHp = 150;
   const mockName = 'TestPlayer';
+  const mockModel = '/static/models/player.glb';
 
   let player: PlayerCube;
 
@@ -19,7 +20,8 @@ describe('PlayerCube', () => {
       mockRotation,
       mockHp,
       mockName,
-      mockTotalHp
+      mockTotalHp,
+      mockModel
     );
   });
 
@@ -29,11 +31,7 @@ describe('PlayerCube', () => {
     expect(player.hp).toBe(mockHp);
     expect(player.totalhp).toBe(mockTotalHp);
     expect(player.name).toBe(mockName);
-  });
-
-  it('should create a cube', () => {
-    expect(player.cube).toBeInstanceOf(THREE.Mesh);
-    expect(player.cube.name).toBe(mockId);
+    expect(player.modelpath).toBe(mockModel);
   });
 
   it('should create a label', () => {
