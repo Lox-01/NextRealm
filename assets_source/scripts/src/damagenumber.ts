@@ -9,6 +9,7 @@ export class DamageNumber {
     css2dObject: any;
 
     constructor(scene: any, player: any, damage: number) {
+        console.log("Creating DamageNumber:", { playerId: player.id, damage, sceneType: typeof scene });
         this.scene = scene;
         this.player = player;
         this.damage = damage;
@@ -24,6 +25,7 @@ export class DamageNumber {
         this.css2dObject = new CSS2DObject(this.element);
         this.css2dObject.position.copy(player.cube.position);
         this.css2dObject.position.y += 1;
+        console.log("Adding DamageNumber CSS2DObject to scene:", { playerId: player.id, css2dObjectType: this.css2dObject?.constructor.name });
         this.scene.add(this.css2dObject);
     }
     update() {
