@@ -20,7 +20,7 @@ export abstract class CharacterCube {
     name: string;
     hp: number;
     totalhp: number;
-    cube: THREE.Mesh | null;
+    cube: THREE.Mesh | null | any;
     label: CSS2DObject | null;
     hpbar: CSS2DObject | null;
     isalive: boolean;
@@ -47,7 +47,7 @@ export abstract class CharacterCube {
             this.cube = model;
             this.label = this.createLabel();
             this.hpbar = this.createHpBar();
-            globalThis.scene.Add(this.cube);
+            globalThis.scene.add(this.cube);
         });
         this.label = this.createLabel();
         this.hpbar = this.createHpBar();
@@ -73,9 +73,11 @@ export abstract class CharacterCube {
 
     async loadModel(modelPath: string): Promise<THREE.Group> {
         const loader = new GLTFLoader();
+        const baseUrl = window.location.origin; // Base URL of the Flask app
+        const fullPath = `${baseUrl}/${modelPath}`;
         return new Promise((resolve, reject) => {
             loader.load(
-                modelPath,
+                fullPath,
                 (gltf) => resolve(gltf.scene),
                 undefined,
                 (error) => reject(error)
@@ -91,7 +93,9 @@ export abstract class CharacterCube {
         const charLabel = new CSS2DObject(charDiv);
         charLabel.position.set(0, 0, 0);
         charLabel.center.set(0.5, 4.5);
-        this.cube.add(charLabel);
+        if (this.cube) {
+            this.cube.add(charLabel);
+        }
         charLabel.layers.set(0);
         charLabel.element.style.fontSize = "30px";
         return charLabel;
@@ -108,19 +112,25 @@ export abstract class CharacterCube {
         charHpBarBack.style.height = '20px';
         charBar.position.set(0, 0, 0);
         charBar.center.set(0.5, 6.5);
-        this.cube.add(charBar);
+        if (this.cube) {
+            this.cube.add(charBar);
+        }
         charBar.layers.set(0);
         const percentageHp = (this.hp / this.totalhp) * 100;
         (charBar?.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
         return charBar;
     }
-    
+
     updatePosition(position: Position): void {
-        this.cube.position.set(position.x, position.y, position.z);
+        if (this.cube) {
+            this.cube.position.set(position.x, position.y, position.z);
+        }
     }
 
     updateRotation(rotation: Rotation): void {
-        this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
+        if (this.cube) {
+            this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
+        }
     }
 
     updateHp(hp: number): void {
@@ -141,11 +151,13 @@ export abstract class CharacterCube {
             }
         } else {
             const scaleFactor = 1 / (1 + 0.07 * distance);
-            this.label.element.style.fontSize = `${scaleFactor * 30}px`;
-            this.hpbar.element.style.width = `${200 * scaleFactor}px`;
-            this.hpbar.element.style.height = `${20 * scaleFactor}px`;
-            this.label.center.set(0.5, 4.5 - distance * 0.04);
-            this.hpbar.center.set(0.5, 6.5 - distance * 0.05);
+            if (this.label && this.hpbar) {
+                this.label.element.style.fontSize = `${scaleFactor * 30}px`;
+                this.hpbar.element.style.width = `${200 * scaleFactor}px`;
+                this.hpbar.element.style.height = `${20 * scaleFactor}px`;
+                this.label.center.set(0.5, 4.5 - distance * 0.04);
+                this.hpbar.center.set(0.5, 6.5 - distance * 0.05);
+            }
             if (this.hpbar?.element.classList.contains("nodisp")) {
                 this.hpbar?.element.classList.remove("nodisp");
                 this.hpbar?.element.classList.add("hpback");
@@ -158,27 +170,31 @@ export abstract class CharacterCube {
     }
 
     handleDeath(): void {
-		if (this.cube.parent === null) return;
-		if (this.cube.parent) {
-			this.cube.parent.remove(this.cube);
-		}
-		if (this.label.parent) {
-			this.label.parent.remove(this.label);
-		}
-		if (this.hpbar.parent) {
-			this.hpbar.parent.remove(this.hpbar);
-		}
-		this.isalive = false;
-	}
-    
+        if (this.cube && this.label && this.hpbar) {
+            if (this.cube.parent === null) return;
+            if (this.cube.parent) {
+                this.cube.parent.remove(this.cube);
+            }
+            if (this.label.parent) {
+                this.label.parent.remove(this.label);
+            }
+            if (this.hpbar.parent) {
+                this.hpbar.parent.remove(this.hpbar);
+            }
+            this.isalive = false;
+        }
+    }
+
     cleanup(): void {
-        if (this.label && this.label?.element && this.label?.element.parentNode) {
-            this.label?.element.parentNode.removeChild(this.label?.element);
+        if (this.cube && this.label && this.hpbar) {
+            if (this.label && this.label?.element && this.label?.element.parentNode) {
+                this.label?.element.parentNode.removeChild(this.label?.element);
+            }
+            if (this.hpbar && this.hpbar?.element && this.hpbar?.element.parentNode) {
+                this.hpbar?.element.parentNode.removeChild(this.hpbar?.element);
+            }
+            this.cube.remove(this.label);
+            this.cube.remove(this.hpbar);
         }
-        if (this.hpbar && this.hpbar?.element && this.hpbar?.element.parentNode) {
-            this.hpbar?.element.parentNode.removeChild(this.hpbar?.element);
-        }
-        this.cube.remove(this.label);
-        this.cube.remove(this.hpbar);
     }
 }

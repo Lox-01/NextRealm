@@ -61,10 +61,12 @@ export class MonsterCube extends CharacterCube {
     }
 
     startLerpToPosition(targetPos) {
-        this.lerpStart = this.cube.position.clone();
-        this.lerpTarget = new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z);
-        this.lerpStartTime = performance.now();
-        this.lerpDuration = 100;
+        if (this.cube) {
+            this.lerpStart = this.cube.position.clone();
+            this.lerpTarget = new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z);
+            this.lerpStartTime = performance.now();
+            this.lerpDuration = 100;
+        }
     }
 
     handleDeath(): void {
@@ -76,18 +78,20 @@ export class MonsterCube extends CharacterCube {
     }
 
     respawn(mon: Record<string, any>): void {
-        this.updatePosition(mon.pos);
-        this.updateRotation(mon.rot);
-        this.updateHp(mon.hp);
-		this.isalive = true;
-        if (!this.cube.parent) {
-		    scene?.add(this.cube);
+        if (this.cube && this.hpbar && this.label) {
+            this.updatePosition(mon.pos);
+            this.updateRotation(mon.rot);
+            this.updateHp(mon.hp);
+            this.isalive = true;
+            if (!this.cube.parent) {
+                scene?.add(this.cube);
+            }
+            if (!this.hpbar.parent) {
+                this.cube.add(this.hpbar);
+            }
+            if (!this.label.parent) {
+                this.cube.add(this.label);
+            }
         }
-		if (!this.hpbar.parent) {
-			this.cube.add(this.hpbar);
-		}
-		if (!this.label.parent) {
-			this.cube.add(this.label);
-		}
 	}
 }
