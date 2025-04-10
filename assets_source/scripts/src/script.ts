@@ -32,6 +32,8 @@ export function scriptPage() {
     }
     const scene = new THREE.Scene();
     globalThis.scene = scene;
+    const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+    scene.add(ambientLight);
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.layers.enableAll();
     const canvas = document.getElementById('gamecanvas') as HTMLCanvasElement;
@@ -49,7 +51,7 @@ export function scriptPage() {
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -0.5;
+    plane.position.y = -1;
     scene.add(plane);
 
     const raycaster = new THREE.Raycaster();

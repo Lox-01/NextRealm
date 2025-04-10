@@ -49,16 +49,12 @@ export abstract class CharacterCube {
 
     private async initCharacter(modelpath: string): Promise<void> {
         try {
-            console.log("Initializing character:", { modelpath, id: this.id, type: typeof modelpath });
             const model = await this.loadModel(modelpath);
             this.cube = model;
-            console.log("Model loaded and assigned to cube:", { id: this.id, cubeType: this.cube?.constructor.name });
+            this.cube.scale.set(2, 2, 2);
             globalThis.scene.add(this.cube);
-            console.log("Cube added to scene:", { id: this.id, cubeType: this.cube?.constructor.name });
             this.label = this.createLabel();
-            console.log("Label created:", { id: this.id, labelType: this.label?.constructor.name });
             this.hpbar = this.createHpBar();
-            console.log("HP bar created:", { id: this.id, hpbarType: this.hpbar?.constructor.name });
         } catch (error) {
             console.error(`Failed to load model for character ${this.id}:`, error);
         }
@@ -79,7 +75,6 @@ export abstract class CharacterCube {
     }
 
     createLabel(): CSS2DObject {
-        console.log("Creating label:", { id: this.id, name: this.name });
         const charDiv = document.createElement('div');
         charDiv.className = 'label';
         charDiv.textContent = `${this.name}`;
@@ -88,7 +83,6 @@ export abstract class CharacterCube {
         charLabel.position.set(0, 0, 0);
         charLabel.center.set(0.5, 4.5);
         if (this.cube) {
-            console.log("Adding label to cube:", { id: this.id, cubeType: this.cube?.constructor.name });
             this.cube.add(charLabel);
         } else {
             console.error("Cube is null when adding label:", { id: this.id });
@@ -99,7 +93,6 @@ export abstract class CharacterCube {
     }
 
     createHpBar() {
-        console.log("Creating HP bar:", { id: this.id, hp: this.hp, totalhp: this.totalhp });
         const charHpBarBack = document.createElement('div');
         const charHpBarFront = document.createElement('div');
         charHpBarBack.className = 'hpback';
@@ -111,7 +104,6 @@ export abstract class CharacterCube {
         charBar.position.set(0, 0, 0);
         charBar.center.set(0.5, 6.5);
         if (this.cube) {
-            console.log("Adding HP bar to cube:", { id: this.id, cubeType: this.cube?.constructor.name });
             this.cube.add(charBar);
         } else {
             console.error("Cube is null when adding HP bar:", { id: this.id });

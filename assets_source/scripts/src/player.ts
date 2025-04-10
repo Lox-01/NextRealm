@@ -23,7 +23,6 @@ export class PlayerCube extends CharacterCube {
 		modelpath: string
     ) {
         super("player", id, name, hp, totalhp, modelpath);
-        console.log("PlayerCube created:", { id, name, hp, totalhp, modelpath, type: typeof id });
         this.updatePosition(position);
         this.updateRotation(rotation);
     }
@@ -52,20 +51,15 @@ export class PlayerCube extends CharacterCube {
 	}
 
 	respawn(): void {
-		console.log("Respawning player:", { id: this.id, cubeType: this.cube?.constructor.name, hpbarType: this.hpbar?.constructor.name, labelType: this.label?.constructor.name });
 		if (this.cube && this.hpbar && this.label) {
-			console.log("Cube, hpbar, and label are valid for player:", this.id);
 			this.isalive = true;
 			if (!this.cube.parent) {
-				console.log("Adding cube to scene for player:", this.id);
 				scene?.add(this.cube);
 			}
 			if (!this.hpbar.parent) {
-				console.log("Adding hpbar to cube for player:", this.id);
 				this.cube.add(this.hpbar);
 			}
 			if (!this.label.parent) {
-				console.log("Adding label to cube for player:", this.id);
 				this.cube.add(this.label);
 			}
 		} else {
