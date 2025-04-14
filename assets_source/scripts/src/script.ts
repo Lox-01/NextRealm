@@ -341,7 +341,9 @@ export function scriptPage() {
             if (Object.keys(monstersCubes).length > 0 && monstersCubes != null) {
                 for (const [id, omonster] of Object.entries(monstersCubes)) {
                     if (omonster.isalive) {
-                        omonster.updateLabel(tri(player.cube.position, omonster.cube.position));
+                        if (player.cube && omonster.cube) {
+                            omonster.updateLabel(tri(player.cube.position, omonster.cube.position));
+                        }
                         if (omonster.lerpStart && omonster.lerpTarget) {
                             const now = performance.now();
                             const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);

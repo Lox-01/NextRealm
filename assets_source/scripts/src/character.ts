@@ -129,7 +129,9 @@ export abstract class CharacterCube {
     updateHp(hp: number): void {
         this.hp = hp;
         const percentageHp = (this.hp / this.totalhp) * 100;
-        (this.hpbar?.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
+        if (this.hpbar) {
+            (this.hpbar?.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
+        }
     }
 
     updateLabel(distance: number): void {
