@@ -14,7 +14,7 @@ def on_connect(socketio, player_id, players, mons):
         if users[username]['id'] == int(player_id):
             user = users[username]
             username_save = username
-    players[int(player_id)] = Player(int(player_id), user['pos'], user['rot'], user['hp'], str(username_save), user['totalhp'], user['modelpath'], user['modelpath'])
+    players[int(player_id)] = Player(int(player_id), user['pos'], user['rot'], user['hp'], str(username_save), user['totalhp'], user['modelpath'])
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
     socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in mons.items()})
 
