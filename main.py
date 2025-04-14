@@ -183,6 +183,7 @@ def game_loop():
                 continue
             monster_threats(monster)
             monster_behavior(monster, monster_id)
+        socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in monsters.items()})
         time.sleep(0.1)
 
 if __name__ == '__main__':
