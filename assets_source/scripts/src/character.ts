@@ -52,6 +52,11 @@ export abstract class CharacterCube {
             const model = await this.loadModel(modelpath);
             this.cube = model;
             this.cube.scale.set(2, 2, 2);
+            const box = new THREE.Box3().setFromObject(this.cube);
+            const center = box.getCenter(new THREE.Vector3());
+            this.cube.position.x += (this.cube.position.x - center.x);
+            this.cube.position.y += (this.cube.position.y - center.y);
+            this.cube.position.z += (this.cube.position.z - center.z);
             globalThis.scene.add(this.cube);
             this.label = this.createLabel();
             this.hpbar = this.createHpBar();

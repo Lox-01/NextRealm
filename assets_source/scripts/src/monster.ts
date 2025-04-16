@@ -29,7 +29,9 @@ export class MonsterCube extends CharacterCube {
     speed: any;
     threats: {};
     lerpStart: any;
+    lerpStartR: any;
     lerpTarget: any;
+    lerpTargetR: any;
     lerpStartTime: number | undefined;
     lerpDuration: number | undefined;
     constructor(
@@ -60,10 +62,12 @@ export class MonsterCube extends CharacterCube {
         this.threats = {};
     }
 
-    startLerpToPosition(targetPos) {
+    startLerp(targetPos, targetRot) {
         if (this.cube) {
             this.lerpStart = this.cube.position.clone();
             this.lerpTarget = new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z);
+            this.lerpStartR = this.cube.quaternion.clone();
+            this.lerpTargetR = new THREE.Quaternion().setFromEuler(new THREE.Euler(targetRot.xr, targetRot.yr, targetRot.zr));
             this.lerpStartTime = performance.now();
             this.lerpDuration = 100;
         }

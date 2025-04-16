@@ -61,23 +61,31 @@ export function scriptPage() {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(pointer, camera);
-        const cubes = Object.values(playersCubes).map(player => player.cube).concat(Object.values(monstersCubes).map(monster => monster.cube));
+        const cubes = Object.values(playersCubes)
+            .map(player => player.cube)
+            .concat(Object.values(monstersCubes).map(monster => monster.cube))
+            .filter(cube => cube !== null && cube !== undefined)
+            .flatMap(cube => {
+                const meshes: THREE.Mesh[] = [];
+                cube.traverse((child) => {
+                    if (child.isMesh) {
+                        meshes.push(child as THREE.Mesh);
+                    }
+                });
+                return meshes;
+            })
         const intersects = raycaster.intersectObjects(cubes, false);
         if (intersects.length > 0) {
             const intersectedCube = intersects[0].object;
             for (const oplayer of Object.values(playersCubes)) {
-                if (player && oplayer.cube == intersectedCube && player.cube) {
-                    if (tri(player.cube.position, oplayer.cube.position)) {
-                        hovered = oplayer;
-                    }
+                if (oplayer.cube && oplayer.cube === intersectedCube.parent) {
+                    hovered = oplayer;
                     break;
                 }
             }
             for (const omonster of Object.values(monstersCubes)) {
-                if (player && omonster.cube == intersectedCube && player.cube) {
-                    if (tri(player.cube.position, omonster.cube.position)) {
-                        hovered = omonster;
-                    }
+                if (omonster.cube && omonster.cube === intersectedCube.parent) {
+                    hovered = omonster;
                     break;
                 }
             }
@@ -142,8 +150,7 @@ export function scriptPage() {
     socket.on("monster_position_update", (mon) => {
         if (monstersCubes[mon.id]) {
             if (monstersCubes[mon.id].isalive == true) {
-                monstersCubes[mon.id].startLerpToPosition(mon.pos);
-                monstersCubes[mon.id].updateRotation(mon.rot);
+                monstersCubes[mon.id].startLerp(mon.pos, mon.rot);
             } else {
                 monstersCubes[mon.id].respawn(mon);
             }
@@ -174,11 +181,9 @@ export function scriptPage() {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
                 monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed, data.modelpath);
-                // scene.add(monstersCubes[id].cube);
             } else {
                 if (monstersCubes[id].isalive) {
-                    monstersCubes[id].startLerpToPosition(data.pos);
-                    monstersCubes[id].updateRotation(data.rot);
+                    monstersCubes[id].startLerp(data.pos, data.rot);
                     if (data.hp != monstersCubes[id].hp) {
                         const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
                         setInterval(() => {
@@ -334,12 +339,12 @@ export function scriptPage() {
             camera.position.y = player.cube.position.y + 1.7;
             camera.lookAt(player.cube.position);
             if (Object.keys(playersCubes).length > 0) {
-                for (const [id, oplayer] of Object.entries(playersCubes)) {
+                for (const oplayer of Object.values(playersCubes)) {
                     oplayer.updateLabel(tri(player.cube.position, oplayer.cube.position));
                 }
             }
             if (Object.keys(monstersCubes).length > 0 && monstersCubes != null) {
-                for (const [id, omonster] of Object.entries(monstersCubes)) {
+                for (const omonster of Object.values(monstersCubes)) {
                     if (omonster.isalive) {
                         if (player.cube && omonster.cube) {
                             omonster.updateLabel(tri(player.cube.position, omonster.cube.position));
@@ -348,9 +353,12 @@ export function scriptPage() {
                             const now = performance.now();
                             const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);
                             omonster.cube.position.lerpVectors(omonster.lerpStart, omonster.lerpTarget, t);
+                            omonster.cube.quaternion.slerp(omonster.lerpTargetR, t);
                             if (t === 1) {
                                 omonster.lerpStart = null;
                                 omonster.lerpTarget = null;
+                                omonster.lerpStartR = null;
+                                omonster.lerpTargetR = null;
                             }
                         }
                     }
