@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@types/three": "^0.174.0",
+    "esbuild": "0.25.0",
     "nextrealm-ui": "file:",
     "socket.io-client": "^4.8.1",
     "three": "^0.174.0"
