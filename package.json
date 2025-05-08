@@ -18,15 +18,23 @@
     "cross-env": "^7.0.3",
     "jsdom": "^24.0.0",
     "npm-run-all2": "^6.1.1",
+    "rollup-plugin-visualizer": "^5.14.0",
     "sass": "^1.70.0",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8",
+    "vite": "^6.3.4",
     "vitest": "^1.4.0"
   },
   "dependencies": {
     "@types/three": "^0.174.0",
+    "esbuild": "0.25.0",
     "nextrealm-ui": "file:",
     "socket.io-client": "^4.8.1",
     "three": "^0.174.0"
+  },
+  "resolutions": {
+    "esbuild": "0.25.0"
+  },
+  "overrides": {
+    "esbuild": "0.25.0"
   }
 }
