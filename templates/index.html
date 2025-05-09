@@ -7,8 +7,7 @@
     {%- if not is_production %}
     <script type="module" src="{{ asset('@vite/client') }}"></script>
     {%- endif %}
-    <!-- <script type="module" src="{{ url_for('static', filename='signscript.js') }}"></script> -->
-    <link rel="icon" href="{{ url_for('static', filename='NextRealm.jpg') }}">
+    <link rel="icon" href="/static/NextRealm.jpg">
 </head>
 <body>
     <form action="{{ url_for('signup') }}" method="POST">

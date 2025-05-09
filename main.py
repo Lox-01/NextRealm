@@ -15,7 +15,7 @@ if os.getenv("ENABLE_DEBUG") == "true":
 
 app = Flask(
     __name__,
-    static_url_path="/",
+    static_url_path="/static",
     static_folder="static",
     template_folder="templates",
 )
@@ -34,12 +34,12 @@ if os.path.exists("./data/mons.json"):
     tempmons = json.load(open('./data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
+        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon, tm["modelpath"])
 elif os.path.exists("./NextRealm/data/mons.json"):
     tempmons = json.load(open('./NextRealm/data/mons.json'))
     for mon in tempmons:
         tm = tempmons[mon]
-        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon)
+        monsters[mon] = Monster(tm["name"], tm["totalhp"], tm["totalhp"], tm["attack"], tm["arange"], tm["cooldown"], tm["origin"], tm["rotation"], tm["aggrorange"], tm["followrange"], tm["speed"], mon, tm["modelpath"])
 
 @app.route('/')
 def index():
@@ -183,6 +183,8 @@ def game_loop():
                 continue
             monster_threats(monster)
             monster_behavior(monster, monster_id)
+        socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in monsters.items()})
+        socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
         time.sleep(0.1)
 
 if __name__ == '__main__':

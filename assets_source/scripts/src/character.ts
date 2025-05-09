@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export interface Position {
     x: number;
@@ -19,42 +20,63 @@ export abstract class CharacterCube {
     name: string;
     hp: number;
     totalhp: number;
-    cube: THREE.Mesh;
-    label: CSS2DObject;
-    hpbar: CSS2DObject;
+    cube: THREE.Mesh | null | any;
+    label: CSS2DObject | null;
+    hpbar: CSS2DObject | null;
     isalive: boolean;
+    modelpath: string;
 
     constructor(
         type: string,
         id: string,
         name: string,
         hp: number,
-        totalhp: number
+        totalhp: number,
+        modelpath: string
     ) {
         this.type = type;
         this.id = id;
         this.name = name;
         this.hp = hp;
         this.totalhp = totalhp;
-        this.cube = this.createCube();
-        this.label = this.createLabel();
-        this.hpbar = this.createHpBar();
-        this.isalive = hp <= 0 ? false : true;
+        this.cube = null;
+        this.label = null;
+        this.hpbar = null;
+        this.modelpath = modelpath;
+        this.isalive = hp > 0;
+        this.initCharacter(modelpath);
     }
 
-    createCube(): THREE.Mesh {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = [
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-            new THREE.MeshBasicMaterial({ color: 0x0000ff }),
-        ];
-        const cubeMesh = new THREE.Mesh(geometry, material);
-        cubeMesh.name = this.id;
-        return cubeMesh;
+    private async initCharacter(modelpath: string): Promise<void> {
+        try {
+            const model = await this.loadModel(modelpath);
+            this.cube = model;
+            this.cube.scale.set(2, 2, 2);
+            const box = new THREE.Box3().setFromObject(this.cube);
+            const center = box.getCenter(new THREE.Vector3());
+            this.cube.position.x += (this.cube.position.x - center.x);
+            this.cube.position.y += (this.cube.position.y - center.y);
+            this.cube.position.z += (this.cube.position.z - center.z);
+            globalThis.scene.add(this.cube);
+            this.label = this.createLabel();
+            this.hpbar = this.createHpBar();
+        } catch (error) {
+            console.error(`Failed to load model for character ${this.id}:`, error);
+        }
+    }
+
+    async loadModel(modelPath: string): Promise<THREE.Group> {
+        const loader = new GLTFLoader();
+        const baseUrl = window.location.origin;
+        const fullPath = `${baseUrl}/${modelPath}`;
+        return new Promise((resolve, reject) => {
+            loader.load(
+                fullPath,
+                (gltf) => resolve(gltf.scene),
+                undefined,
+                (error) => reject(error)
+            );
+        });
     }
 
     createLabel(): CSS2DObject {
@@ -65,7 +87,11 @@ export abstract class CharacterCube {
         const charLabel = new CSS2DObject(charDiv);
         charLabel.position.set(0, 0, 0);
         charLabel.center.set(0.5, 4.5);
-        this.cube.add(charLabel);
+        if (this.cube) {
+            this.cube.add(charLabel);
+        } else {
+            console.error("Cube is null when adding label:", { id: this.id });
+        }
         charLabel.layers.set(0);
         charLabel.element.style.fontSize = "30px";
         return charLabel;
@@ -82,77 +108,93 @@ export abstract class CharacterCube {
         charHpBarBack.style.height = '20px';
         charBar.position.set(0, 0, 0);
         charBar.center.set(0.5, 6.5);
-        this.cube.add(charBar);
+        if (this.cube) {
+            this.cube.add(charBar);
+        } else {
+            console.error("Cube is null when adding HP bar:", { id: this.id });
+        }
         charBar.layers.set(0);
         const percentageHp = (this.hp / this.totalhp) * 100;
-        (charBar.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
+        (charBar?.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
         return charBar;
     }
-    
+
     updatePosition(position: Position): void {
-        this.cube.position.set(position.x, position.y, position.z);
+        if (this.cube) {
+            this.cube.position.set(position.x, position.y, position.z);
+        }
     }
 
     updateRotation(rotation: Rotation): void {
-        this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
+        if (this.cube) {
+            this.cube.rotation.set(rotation.xr, rotation.yr, rotation.zr);
+        }
     }
 
     updateHp(hp: number): void {
         this.hp = hp;
         const percentageHp = (this.hp / this.totalhp) * 100;
-        (this.hpbar.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
+        if (this.hpbar) {
+            (this.hpbar?.element.getElementsByClassName("hpfront")[0] as HTMLElement).style.width = `${percentageHp}%`;
+        }
     }
 
     updateLabel(distance: number): void {
         if (distance > 70) {
-            if (this.hpbar.element.classList.contains("hpback")) {
-                this.hpbar.element.classList.remove("hpback");
-                this.hpbar.element.classList.add("nodisp");
+            if (this.hpbar?.element.classList.contains("hpback")) {
+                this.hpbar?.element.classList.remove("hpback");
+                this.hpbar?.element.classList.add("nodisp");
             }
-            if (this.label.element.classList.contains("label")) {
-                this.label.element.classList.remove("label");
-                this.label.element.classList.add("nodisp");
+            if (this.label?.element.classList.contains("label")) {
+                this.label?.element.classList.remove("label");
+                this.label?.element.classList.add("nodisp");
             }
         } else {
             const scaleFactor = 1 / (1 + 0.07 * distance);
-            this.label.element.style.fontSize = `${scaleFactor * 30}px`;
-            this.hpbar.element.style.width = `${200 * scaleFactor}px`;
-            this.hpbar.element.style.height = `${20 * scaleFactor}px`;
-            this.label.center.set(0.5, 4.5 - distance * 0.04);
-            this.hpbar.center.set(0.5, 6.5 - distance * 0.05);
-            if (this.hpbar.element.classList.contains("nodisp")) {
-                this.hpbar.element.classList.remove("nodisp");
-                this.hpbar.element.classList.add("hpback");
+            if (this.label && this.hpbar) {
+                this.label.element.style.fontSize = `${scaleFactor * 30}px`;
+                this.hpbar.element.style.width = `${200 * scaleFactor}px`;
+                this.hpbar.element.style.height = `${20 * scaleFactor}px`;
+                this.label.center.set(0.5, 4.5 - distance * 0.04);
+                this.hpbar.center.set(0.5, 6.5 - distance * 0.05);
             }
-            if (this.label.element.classList.contains("nodisp")) {
-                this.label.element.classList.remove("nodisp");
-                this.label.element.classList.add("label");
+            if (this.hpbar?.element.classList.contains("nodisp")) {
+                this.hpbar?.element.classList.remove("nodisp");
+                this.hpbar?.element.classList.add("hpback");
+            }
+            if (this.label?.element.classList.contains("nodisp")) {
+                this.label?.element.classList.remove("nodisp");
+                this.label?.element.classList.add("label");
             }
         }
     }
 
     handleDeath(): void {
-		if (this.cube.parent === null) return;
-		if (this.cube.parent) {
-			this.cube.parent.remove(this.cube);
-		}
-		if (this.label.parent) {
-			this.label.parent.remove(this.label);
-		}
-		if (this.hpbar.parent) {
-			this.hpbar.parent.remove(this.hpbar);
-		}
-		this.isalive = false;
-	}
-    
+        if (this.cube && this.label && this.hpbar) {
+            if (this.cube.parent === null) return;
+            if (this.cube.parent) {
+                this.cube.parent.remove(this.cube);
+            }
+            if (this.label.parent) {
+                this.label.parent.remove(this.label);
+            }
+            if (this.hpbar.parent) {
+                this.hpbar.parent.remove(this.hpbar);
+            }
+            this.isalive = false;
+        }
+    }
+
     cleanup(): void {
-        if (this.label && this.label.element && this.label.element.parentNode) {
-            this.label.element.parentNode.removeChild(this.label.element);
+        if (this.cube && this.label && this.hpbar) {
+            if (this.label && this.label?.element && this.label?.element.parentNode) {
+                this.label?.element.parentNode.removeChild(this.label?.element);
+            }
+            if (this.hpbar && this.hpbar?.element && this.hpbar?.element.parentNode) {
+                this.hpbar?.element.parentNode.removeChild(this.hpbar?.element);
+            }
+            this.cube.remove(this.label);
+            this.cube.remove(this.hpbar);
         }
-        if (this.hpbar && this.hpbar.element && this.hpbar.element.parentNode) {
-            this.hpbar.element.parentNode.removeChild(this.hpbar.element);
-        }
-        this.cube.remove(this.label);
-        this.cube.remove(this.hpbar);
     }
 }

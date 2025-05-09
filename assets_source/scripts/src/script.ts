@@ -5,11 +5,11 @@ import { io } from "socket.io-client"; // For client-side
 // import { Server } from "socket.io"; // For server-side
 
 import { DamageNumber } from "./damagenumber";
-import { PlayerCube, SockerPlayer as SocketPlayer } from "./player";
+import { PlayerCube, SocketPlayer as SocketPlayer } from "./player";
 import { MonsterCube, SocketMonster } from "./monster";
 import { tri } from "./shared";
 
-export function scriptPage () { 
+export function scriptPage() {
     globalThis.playersCubes = {};
     globalThis.monstersCubes = {};
     globalThis.my_id = (document.getElementById('session_id') as HTMLInputElement).value;
@@ -32,50 +32,60 @@ export function scriptPage () {
     }
     const scene = new THREE.Scene();
     globalThis.scene = scene;
+    const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+    scene.add(ambientLight);
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.layers.enableAll();
     const canvas = document.getElementById('gamecanvas') as HTMLCanvasElement;
     const renderer = new THREE.WebGLRenderer({ canvas });
     const labelRenderer = new CSS2DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    labelRenderer.setSize( window.innerWidth, window.innerHeight );
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
     labelRenderer.domElement.style.position = 'absolute';
     labelRenderer.domElement.style.top = '0px';
     labelRenderer.domElement.style.zIndex = '101';
     document.body.appendChild(labelRenderer.domElement);
-    let player:null | PlayerCube = null;
-    
+    let player: null | PlayerCube = null;
+
     const planeGeometry = new THREE.PlaneGeometry(10, 10);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -0.5;
+    plane.position.y = -1;
     scene.add(plane);
-    
+
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
-    
+
     window.addEventListener('mousemove', (event) => {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(pointer, camera);
-        const cubes = Object.values(playersCubes).map(player => player.cube).concat(Object.values(monstersCubes).map(monster => monster.cube));
-        const intersects = raycaster.intersectObjects( cubes, false );
+        const cubes = Object.values(playersCubes)
+            .map(player => player.cube)
+            .concat(Object.values(monstersCubes).map(monster => monster.cube))
+            .filter(cube => cube !== null && cube !== undefined)
+            .flatMap(cube => {
+                const meshes: THREE.Mesh[] = [];
+                cube.traverse((child) => {
+                    if (child.isMesh) {
+                        meshes.push(child as THREE.Mesh);
+                    }
+                });
+                return meshes;
+            })
+        const intersects = raycaster.intersectObjects(cubes, false);
         if (intersects.length > 0) {
             const intersectedCube = intersects[0].object;
             for (const oplayer of Object.values(playersCubes)) {
-                if (player && oplayer.cube == intersectedCube) {
-                    if (tri(player.cube.position,oplayer.cube.position)) {
-                        hovered = oplayer;
-                    }
+                if (oplayer.cube && oplayer.cube === intersectedCube.parent) {
+                    hovered = oplayer;
                     break;
                 }
             }
             for (const omonster of Object.values(monstersCubes)) {
-                if (player &&  omonster.cube == intersectedCube) {
-                    if (tri(player.cube.position,omonster.cube.position)) {
-                        hovered = omonster;
-                    }
+                if (omonster.cube && omonster.cube === intersectedCube.parent) {
+                    hovered = omonster;
                     break;
                 }
             }
@@ -98,7 +108,7 @@ export function scriptPage () {
     socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
         for (const [id, data] of Object.entries(players)) {
             if (!playersCubes[id]) {
-                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.name, data.totalhp);
+                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.name, data.totalhp, data.modelpath);
                 scene.add(playersCubes[id].cube);
             } else {
                 playersCubes[id].updatePosition(data.pos);
@@ -140,8 +150,7 @@ export function scriptPage () {
     socket.on("monster_position_update", (mon) => {
         if (monstersCubes[mon.id]) {
             if (monstersCubes[mon.id].isalive == true) {
-                monstersCubes[mon.id].startLerpToPosition(mon.pos);
-                monstersCubes[mon.id].updateRotation(mon.rot);
+                monstersCubes[mon.id].startLerp(mon.pos, mon.rot);
             } else {
                 monstersCubes[mon.id].respawn(mon);
             }
@@ -171,12 +180,10 @@ export function scriptPage () {
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
-                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed);
-                scene.add(monstersCubes[id].cube);
+                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed, data.modelpath);
             } else {
                 if (monstersCubes[id].isalive) {
-                    monstersCubes[id].startLerpToPosition(data.pos);
-                    monstersCubes[id].updateRotation(data.rot);
+                    monstersCubes[id].startLerp(data.pos, data.rot);
                     if (data.hp != monstersCubes[id].hp) {
                         const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
                         setInterval(() => {
@@ -195,7 +202,7 @@ export function scriptPage () {
         div.textContent = str;
         return div.innerHTML;
     }
-    
+
     function formatMessage(vals, p) {
         if (!p) {
             const sanitizedMessage = escapeHTML(vals[0]);
@@ -205,19 +212,19 @@ export function scriptPage () {
             return `<p class='name'>(PRIVATE) ${vals[1]} -> ${vals[2]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`
         }
     }
-    
+
     socket.on("append_msg", (vals) => {
         const messageElement = document.createElement('div');
         messageElement.innerHTML = formatMessage(vals, false);
         messageElement.classList.add('message-container');
-        if(chatobj){
+        if (chatobj) {
             chatobj.appendChild(messageElement);
-        
+
             const isAtBottom = Math.abs(chatobj.scrollHeight - chatobj.scrollTop - chatobj.clientHeight) < 1;
             if (isAtBottom) {
                 chatobj.scrollTop = chatobj.scrollHeight;
             }
-        
+
             if (chatobj.childElementCount > 60) {
                 const excessMessages = chatobj.childElementCount - 60;
                 for (let i = 0; i < excessMessages; i++) {
@@ -236,7 +243,7 @@ export function scriptPage () {
             const messageElement = document.createElement('div');
             messageElement.innerHTML = formatMessage(vals, true);
             messageElement.classList.add('message-container');
-            if(chatobj){
+            if (chatobj) {
                 chatobj.appendChild(messageElement);
                 const isAtBottom = chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
                 if (isAtBottom) {
@@ -252,12 +259,12 @@ export function scriptPage () {
             }
         }
     });
-    
+
     socket.on("pm_fail", (failid) => {
         if (failid == my_username) {
             const messageElement = document.createElement('div');
             messageElement.textContent = 'The format for a private message is: "/pm target_id message". Please try again.';
-            if(chatobj){
+            if (chatobj) {
                 chatobj.appendChild(messageElement);
                 const isAtBottom = chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
                 if (isAtBottom) {
@@ -273,8 +280,8 @@ export function scriptPage () {
             }
         }
     });
-    let spellconversion = {"1":"one","2":"two","3":"three","4":"four","5":"five","6":"six","7":"seven","8":"eight","9":"nine","10":"ten"};
-    let spellcools = {"1":true,"2":true,"3":true,"4":true,"5":true,"6":true,"7":true,"8":true,"9":true,"10":true};
+    let spellconversion = { "1": "one", "2": "two", "3": "three", "4": "four", "5": "five", "6": "six", "7": "seven", "8": "eight", "9": "nine", "10": "ten" };
+    let spellcools = { "1": true, "2": true, "3": true, "4": true, "5": true, "6": true, "7": true, "8": true, "9": true, "10": true };
     socket.on("refresh_spell", (info) => {
         if (info[0] == my_id) {
             spellcools[`${info[1]}`] = true;
@@ -287,15 +294,15 @@ export function scriptPage () {
             }
         }
     });
-              
-    window.addEventListener("beforeunload", function(e) {
+
+    window.addEventListener("beforeunload", function (e) {
         socket.emit("offline", [my_id, localStorage.getItem('client_id')]);
     });
     let pressed: string[] = [];
-    
+
     function animate() {
         requestAnimationFrame(animate);
-        if (player) {
+        if (player && player.cube) {
             if (!chatopen) {
                 let moved = false;
                 if (pressed.includes('w')) {
@@ -332,21 +339,26 @@ export function scriptPage () {
             camera.position.y = player.cube.position.y + 1.7;
             camera.lookAt(player.cube.position);
             if (Object.keys(playersCubes).length > 0) {
-                for (const [id, oplayer] of Object.entries(playersCubes)) {
-                    oplayer.updateLabel(tri(player.cube.position,oplayer.cube.position));
+                for (const oplayer of Object.values(playersCubes)) {
+                    oplayer.updateLabel(tri(player.cube.position, oplayer.cube.position));
                 }
             }
             if (Object.keys(monstersCubes).length > 0 && monstersCubes != null) {
-                for (const [id, omonster] of Object.entries(monstersCubes)) {
+                for (const omonster of Object.values(monstersCubes)) {
                     if (omonster.isalive) {
-                        omonster.updateLabel(tri(player.cube.position,omonster.cube.position));
+                        if (player.cube && omonster.cube) {
+                            omonster.updateLabel(tri(player.cube.position, omonster.cube.position));
+                        }
                         if (omonster.lerpStart && omonster.lerpTarget) {
                             const now = performance.now();
                             const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);
                             omonster.cube.position.lerpVectors(omonster.lerpStart, omonster.lerpTarget, t);
+                            omonster.cube.quaternion.slerp(omonster.lerpTargetR, t);
                             if (t === 1) {
                                 omonster.lerpStart = null;
                                 omonster.lerpTarget = null;
+                                omonster.lerpStartR = null;
+                                omonster.lerpTargetR = null;
                             }
                         }
                     }
@@ -354,9 +366,9 @@ export function scriptPage () {
             }
         }
         renderer.render(scene, camera);
-        labelRenderer.render( scene, camera );
+        labelRenderer.render(scene, camera);
     }
-    
+
     let repeatInterval;
 
     window.addEventListener('keydown', (event) => {
@@ -392,7 +404,7 @@ export function scriptPage () {
                     enterInput.style.zIndex = '99';
                     enterInput.style.opacity = '0';
                 }
-                if(chatobj){
+                if (chatobj) {
                     chatobj.style.opacity = '0.5';
                 }
                 clearInterval(repeatInterval);
@@ -404,7 +416,7 @@ export function scriptPage () {
                     enterInput.style.opacity = '1';
                     enterInput.focus();
                 }
-                if(chatobj){
+                if (chatobj) {
                     chatobj.style.opacity = '1';
                 }
             }
@@ -432,7 +444,7 @@ export function scriptPage () {
                 }
             }
         }
-    });    
+    });
 
     if (enterInput) {
         enterInput.addEventListener("blur", (_event) => {
@@ -452,7 +464,7 @@ export function scriptPage () {
                     enterInput.style.zIndex = '99';
                     enterInput.style.opacity = '0';
                 }
-                if(chatobj){
+                if (chatobj) {
                     chatobj.style.opacity = '0.5';
                 }
                 clearInterval(repeatInterval);
@@ -460,7 +472,7 @@ export function scriptPage () {
             }
         }
     });
-    
+
     function sendMessage() {
         if (enterInput) {
             const message = (enterInput as HTMLInputElement).value.trim();

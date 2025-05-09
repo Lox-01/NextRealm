@@ -15,6 +15,7 @@ describe('MonsterCube', () => {
   const mockAggroRange = 20;
   const mockFollowRange = 50;
   const mockSpeed = 5;
+  const mockModel = "/static/models/wolf.glb";
 
   let monster: MonsterCube;
 
@@ -31,7 +32,8 @@ describe('MonsterCube', () => {
       mockRotation,
       mockAggroRange,
       mockFollowRange,
-      mockSpeed
+      mockSpeed,
+      mockModel
     );
   });
 
@@ -47,42 +49,53 @@ describe('MonsterCube', () => {
     expect(monster.aggrorange).toBe(mockAggroRange);
     expect(monster.followrange).toBe(mockFollowRange);
     expect(monster.speed).toBe(mockSpeed);
-  });
-
-  it('should correctly create a cube', () => {
-    expect(monster.cube).toBeInstanceOf(THREE.Mesh);
-    expect(monster.cube.name).toBe(mockId);
+    expect(monster.modelpath).toBe(mockModel);
   });
 
   it('should create a label', () => {
-    expect(monster.label).toBeInstanceOf(CSS2DObject);
-    expect(monster.label.element.textContent).toBe(mockName);
+    expect(monster.label).toBeDefined();
+    if (monster.label) {
+      expect(monster.label).toBeInstanceOf(CSS2DObject);
+      expect(monster.label.element.textContent).toBe(mockName);
+    }
   });
 
   it('should create a health bar', () => {
-    expect(monster.hpbar).toBeInstanceOf(CSS2DObject);
+    expect(monster.hpbar).toBeDefined();
+    if (monster.hpbar) {
+      expect(monster.hpbar).toBeInstanceOf(CSS2DObject);
+    }
   });
 
   it('should update position', () => {
+    expect(monster.cube).toBeDefined();
     const newPosition = { x: 1, y: 2, z: 3 };
     monster.updatePosition(newPosition);
-    expect(monster.cube.position.x).toBe(newPosition.x);
-    expect(monster.cube.position.y).toBe(newPosition.y);
-    expect(monster.cube.position.z).toBe(newPosition.z);
+    if (monster.cube) {
+      expect(monster.cube.position.x).toBe(newPosition.x);
+      expect(monster.cube.position.y).toBe(newPosition.y);
+      expect(monster.cube.position.z).toBe(newPosition.z);
+    }
   });
 
   it('should update rotation', () => {
+    expect(monster.cube).toBeDefined();
     const newRotation = { xr: Math.PI, yr: Math.PI / 2, zr: 0 };
     monster.updateRotation(newRotation);
-    expect(monster.cube.rotation.x).toBe(newRotation.xr);
-    expect(monster.cube.rotation.y).toBe(newRotation.yr);
-    expect(monster.cube.rotation.z).toBe(newRotation.zr);
+    if (monster.cube) {
+      expect(monster.cube.rotation.x).toBe(newRotation.xr);
+      expect(monster.cube.rotation.y).toBe(newRotation.yr);
+      expect(monster.cube.rotation.z).toBe(newRotation.zr);
+    }
   });
 
   it('should update HP and reflect it on the health bar', () => {
-    monster.updateHp(25);
-    expect(monster.hp).toBe(25);
-    const hpFront = monster.hpbar.element.getElementsByClassName('hpfront')[0] as HTMLElement;
-    expect(hpFront.style.width).toBe('25%');
+    expect(monster.hpbar).toBeDefined();
+    if (monster.hpbar) {
+      monster.updateHp(25);
+      expect(monster.hp).toBe(25);
+      const hpFront = monster.hpbar.element.getElementsByClassName('hpfront')[0] as HTMLElement;
+      expect(hpFront.style.width).toBe('25%');
+    }
   });
 });

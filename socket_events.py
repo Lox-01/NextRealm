@@ -14,7 +14,7 @@ def on_connect(socketio, player_id, players, mons):
         if users[username]['id'] == int(player_id):
             user = users[username]
             username_save = username
-    players[int(player_id)] = Player(int(player_id), user['pos'], user['rot'], user['hp'], str(username_save), user['totalhp'])
+    players[int(player_id)] = Player(int(player_id), user['pos'], user['rot'], user['hp'], str(username_save), user['totalhp'], user['modelpath'])
     socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
     socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in mons.items()})
 
@@ -26,7 +26,7 @@ def on_offline(player_id, players, socketio, client_id, client_ids, monsters):
     player_id = int(player_id)
     for username in users:
         if users[username]['id'] == player_id:
-            users[username] = {"id": players[player_id].id, "pos": players[player_id].position, "rot": players[player_id].rotation, "hp": players[player_id].hp, "totalhp": players[player_id].totalhp}
+            users[username] = {"id": players[player_id].id, "pos": players[player_id].position, "rot": players[player_id].rotation, "hp": players[player_id].hp, "totalhp": players[player_id].totalhp, "modelpath": players[player_id].modelpath}
     if os.path.exists("./data/users.json"):
         json.dump(users, open("./data/users.json", "w"), indent = 2)
     elif os.path.exists("./NextRealm/data/users.json"):

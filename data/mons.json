@@ -1,6 +1,6 @@
 {
-    "testboi": {
-        "name": "testyboi",
+    "wolf": {
+        "name": "wolf",
         "totalhp": 10,
         "attack": 2,
         "arange": 2,
@@ -17,6 +17,7 @@
         },
         "aggrorange": 10,
         "followrange": 40,
-        "speed": 0.1
+        "speed": 0.1,
+        "modelpath": "/static/models/wolf.glb"
     }
 }

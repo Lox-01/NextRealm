@@ -16,6 +16,7 @@ export interface SocketMonster {
     followrange: number;
     speed: number;
     id: string;
+    modelpath: string;
 }
 
 export class MonsterCube extends CharacterCube {
@@ -28,7 +29,9 @@ export class MonsterCube extends CharacterCube {
     speed: any;
     threats: {};
     lerpStart: any;
+    lerpStartR: any;
     lerpTarget: any;
+    lerpTargetR: any;
     lerpStartTime: number | undefined;
     lerpDuration: number | undefined;
     constructor(
@@ -36,16 +39,17 @@ export class MonsterCube extends CharacterCube {
         name: string,
         hp: number,
         totalhp: number,
-        attack,
-        arange,
-        cooldown,
+        attack: number,
+        arange: number,
+        cooldown: number,
         origin,
         rotation,
-        aggrorange,
-        followrange,
-        speed
+        aggrorange: number,
+        followrange: number,
+        speed: number,
+        modelpath: string
     ) {
-        super("monster", id, name, hp, totalhp);
+        super("monster", id, name, hp, totalhp, modelpath);
         this.attack = attack;
         this.arange = arange;
         this.cooldown = cooldown;
@@ -58,11 +62,15 @@ export class MonsterCube extends CharacterCube {
         this.threats = {};
     }
 
-    startLerpToPosition(targetPos) {
-        this.lerpStart = this.cube.position.clone();
-        this.lerpTarget = new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z);
-        this.lerpStartTime = performance.now();
-        this.lerpDuration = 100;
+    startLerp(targetPos, targetRot) {
+        if (this.cube) {
+            this.lerpStart = this.cube.position.clone();
+            this.lerpTarget = new THREE.Vector3(targetPos.x, targetPos.y, targetPos.z);
+            this.lerpStartR = this.cube.quaternion.clone();
+            this.lerpTargetR = new THREE.Quaternion().setFromEuler(new THREE.Euler(targetRot.xr, targetRot.yr, targetRot.zr));
+            this.lerpStartTime = performance.now();
+            this.lerpDuration = 100;
+        }
     }
 
     handleDeath(): void {
@@ -74,18 +82,20 @@ export class MonsterCube extends CharacterCube {
     }
 
     respawn(mon: Record<string, any>): void {
-        this.updatePosition(mon.pos);
-        this.updateRotation(mon.rot);
-        this.updateHp(mon.hp);
-		this.isalive = true;
-        if (!this.cube.parent) {
-		    scene?.add(this.cube);
+        if (this.cube && this.hpbar && this.label) {
+            this.updatePosition(mon.pos);
+            this.updateRotation(mon.rot);
+            this.updateHp(mon.hp);
+            this.isalive = true;
+            if (!this.cube.parent) {
+                scene?.add(this.cube);
+            }
+            if (!this.hpbar.parent) {
+                this.cube.add(this.hpbar);
+            }
+            if (!this.label.parent) {
+                this.cube.add(this.label);
+            }
         }
-		if (!this.hpbar.parent) {
-			this.cube.add(this.hpbar);
-		}
-		if (!this.label.parent) {
-			this.cube.add(this.label);
-		}
 	}
 }

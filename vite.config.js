@@ -6,6 +6,7 @@ export default defineConfig({
   root: path.join(__dirname, "./assets_source/"),
   base: "/assets/",
   build: {
+    sourcemap: true,
     outDir: path.join(__dirname, "./assets_compiled/"),
     manifest: "manifest.json",
     assetsDir: "bundled",
