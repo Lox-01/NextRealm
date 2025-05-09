@@ -46,11 +46,11 @@ class TestPlayer(unittest.TestCase):
     #         player = Player(1, (10, 20), 90, 100, "player_one", "200")
 
     def test_negative_hp(self):
-        player = Player(1, (10, 20), 90, -50, "player_one", 200)
+        player = Player(1, (10, 20), 90, -50, "player_one", 200, "/static/models/player.glb")
         self.assertEqual(player.hp, -50)
 
     def test_zero_hp(self):
-        player = Player(1, (10, 20), 90, 0, "player_one", 200)
+        player = Player(1, (10, 20), 90, 0, "player_one", 200, "/static/models/player.glb")
         self.assertEqual(player.hp, 0)
 
     def test_to_dict_after_damage(self):
