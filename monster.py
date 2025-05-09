@@ -86,6 +86,7 @@ class Monster(Character):
             "aggrorange": self.aggrorange,
             "followrange": self.followrange,
             "speed": self.speed,
-            "threats": self.threats
+            "threats": self.threats,
+            "modelpath": self.modelpath,
         })
         return base_dict
