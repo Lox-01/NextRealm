@@ -5,10 +5,10 @@ from player import Player
 from monster import Monster
 from assets_blueprint import assets_blueprint
 import json, os, time, math
+import debugpy
 
 if os.getenv("ENABLE_DEBUG") == "true":
     print("debug mode")
-    import debugpy
     debugpy.listen(("0.0.0.0", 5678))
     print("Debugpy is waiting for the debugger to attach...") 
     debugpy.wait_for_client()
@@ -54,22 +54,27 @@ def signup():
     #    flash('You are already logged in somewhere', 'error')
     #    return redirect(url_for('index'))
     client_ids.append(client_id)
+    users = None
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
         users=json.load(open('./NextRealm/data/users.json'))
-    if username not in users:
-        permid = max([user["id"] for user in users.values()])+1
-        users[username] = {"id": permid, "pos": { "x"  : 0, "y"  : 0.5, "z"  : 0 }, "rot": { "xr" : 0, "yr" : 0, "zr" : 0 }, "hp": 50, "totalhp": 50}
-        if os.path.exists("./data/users.json"):
-            json.dump(users, open("./data/users.json", "w"), indent = 2)
-        elif os.path.exists("./NextRealm/data/users.json"):
-            json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
-        session["id"] = users[username]['id']
-        session["username"] = username
-        return redirect(url_for('game'))
+    if users:
+        if username not in users:
+            permid = max([user["id"] for user in users.values()])+1
+            users[username] = {"id": permid, "pos": { "x"  : 0, "y"  : 0.5, "z"  : 0 }, "rot": { "xr" : 0, "yr" : 0, "zr" : 0 }, "hp": 50, "totalhp": 50}
+            if os.path.exists("./data/users.json"):
+                json.dump(users, open("./data/users.json", "w"), indent = 2)
+            elif os.path.exists("./NextRealm/data/users.json"):
+                json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
+            session["id"] = users[username]['id']
+            session["username"] = username
+            return redirect(url_for('game'))
+        else:
+            flash('Username already exists', 'error')
+            return redirect(url_for('index'))
     else:
-        flash('Username already exists', 'error')
+        flash('An error occurred, please try again later', 'error')
         return redirect(url_for('index'))
 
 @app.route('/login', methods=['POST'])
@@ -81,21 +86,26 @@ def login():
     #    flash('You are already logged in somewhere', 'error')
     #    return redirect(url_for('index'))
     client_ids.append(client_id)
+    users = None
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
         users=json.load(open('./NextRealm/data/users.json'))
-    if username not in users:
-        flash('Username does not exist', 'error')
-        return redirect(url_for('index'))
-    else:
-        session["id"] = users[username]['id']
-        session["username"] = username
-        if int(users[username]['id']) in players:
-            flash('You are already logged in somewhere', 'error')
+    if users:
+        if username not in users:
+            flash('Username does not exist', 'error')
             return redirect(url_for('index'))
         else:
-            return redirect(url_for('game'))
+            session["id"] = users[username]['id']
+            session["username"] = username
+            if int(users[username]['id']) in players:
+                flash('You are already logged in somewhere', 'error')
+                return redirect(url_for('index'))
+            else:
+                return redirect(url_for('game'))
+    else:
+        flash('An error occurred, please try again later', 'error')
+        return redirect(url_for('index'))
         
 @app.route('/game')
 def game():

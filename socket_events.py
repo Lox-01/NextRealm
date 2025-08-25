@@ -1,44 +1,52 @@
 from flask_socketio import emit
 from player import Player
-from datetime import datetime, timedelta
-import json, os, time
+from datetime import datetime
+from datetime import timedelta
+import json
+import os
+import time
 
 def on_connect(socketio, player_id, players, mons):
+    users = None
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
         users=json.load(open('./NextRealm/data/users.json'))
     username_save = None
     user = None
-    for username in users:
-        if users[username]['id'] == int(player_id):
-            user = users[username]
-            username_save = username
-    players[int(player_id)] = Player(int(player_id), user['pos'], user['rot'], user['hp'], str(username_save), user['totalhp'], user['modelpath'])
-    socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
-    socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in mons.items()})
+    if users:
+        for username in users:
+            if users[username]['id'] == int(player_id):
+                user = users[username]
+                username_save = username
+        if user:
+            players[int(player_id)] = Player(int(player_id), user['pos'], user['rot'], user['hp'], str(username_save), user['totalhp'], user['modelpath'])
+            socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
+            socketio.emit("render_monsters", {pid: monster.to_dict() for pid, monster in mons.items()})
 
 def on_offline(player_id, players, socketio, client_id, client_ids, monsters):
+    users = None
     if os.path.exists("./data/users.json"):
         users=json.load(open('./data/users.json'))
     elif os.path.exists("./NextRealm/data/users.json"):
         users=json.load(open('./NextRealm/data/users.json'))
     player_id = int(player_id)
-    for username in users:
-        if users[username]['id'] == player_id:
-            users[username] = {"id": players[player_id].id, "pos": players[player_id].position, "rot": players[player_id].rotation, "hp": players[player_id].hp, "totalhp": players[player_id].totalhp, "modelpath": players[player_id].modelpath}
-    if os.path.exists("./data/users.json"):
-        json.dump(users, open("./data/users.json", "w"), indent = 2)
-    elif os.path.exists("./NextRealm/data/users.json"):
-        json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
-    if player_id in players:
-        del players[player_id]
-    if client_id in client_ids:
-        client_ids.remove(client_id)
-    for monster in monsters.values():
-        if player_id in monster.threats:
-            del monster.threats[player_id]
-    socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
+    if users:
+        for username in users:
+            if users[username]['id'] == player_id:
+                users[username] = {"id": players[player_id].id, "pos": players[player_id].position, "rot": players[player_id].rotation, "hp": players[player_id].hp, "totalhp": players[player_id].totalhp, "modelpath": players[player_id].modelpath}
+        if os.path.exists("./data/users.json"):
+            json.dump(users, open("./data/users.json", "w"), indent = 2)
+        elif os.path.exists("./NextRealm/data/users.json"):
+            json.dump(users, open("./NextRealm/data/users.json", "w"), indent = 2)
+        if player_id in players:
+            del players[player_id]
+        if client_id in client_ids:
+            client_ids.remove(client_id)
+        for monster in monsters.values():
+            if player_id in monster.threats:
+                del monster.threats[player_id]
+        socketio.emit("render_players", {pid: player.to_dict() for pid, player in players.items()})
 
 def on_player_move(data, players, socketio):
     player_id = int(data["id"])

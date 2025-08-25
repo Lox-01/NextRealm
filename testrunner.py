@@ -2,9 +2,9 @@
 import unittest
 import os
 from unittest import TextTestRunner
+import debugpy
 
 if os.getenv("ENABLE_DEBUG") == "true":
-    import debugpy
     debugpy.listen(("0.0.0.0", 5679))
     print("Waiting for debugger to attach...")
     debugpy.wait_for_client()
