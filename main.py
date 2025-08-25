@@ -5,7 +5,7 @@ from player import Player
 from monster import Monster
 from assets_blueprint import assets_blueprint
 import json, os, time, math
-import debugpy
+import debugpy # type: ignore
 
 if os.getenv("ENABLE_DEBUG") == "true":
     print("debug mode")

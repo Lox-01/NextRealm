@@ -2,7 +2,7 @@
 import unittest
 import os
 from unittest import TextTestRunner
-import debugpy
+import debugpy # type: ignore
 
 if os.getenv("ENABLE_DEBUG") == "true":
     debugpy.listen(("0.0.0.0", 5679))
