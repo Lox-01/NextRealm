@@ -321,6 +321,22 @@ export function scriptPage() {
                     player.cube.position.x += b;
                     moved = true;
                 }
+                if (pressed.includes('q')) {
+                    let a = player.cube.rotation.y + Math.PI / 2;
+                    let b = Math.sin(a) / 20;
+                    let c = Math.cos(a) / 20;
+                    player.cube.position.z += c;
+                    player.cube.position.x += b;
+                    moved = true;
+                }
+                if (pressed.includes('e')) {
+                    let a = player.cube.rotation.y - Math.PI / 2;
+                    let b = Math.sin(a) / 20;
+                    let c = Math.cos(a) / 20;
+                    player.cube.position.z += c;
+                    player.cube.position.x += b;
+                    moved = true;
+                }
                 if (pressed.includes('a')) {
                     player.cube.rotation.y += Math.PI / 150;
                     moved = true;
