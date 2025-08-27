@@ -10,9 +10,11 @@ from player import Player
 def on_connect(socketio, player_id, players, mons):
     users = None
     if os.path.exists("./data/users.json"):
-        users = json.load(open("./data/users.json"))
+        with open("./data/users.json") as f:
+            users = json.load(f)
     elif os.path.exists("./NextRealm/data/users.json"):
-        users = json.load(open("./NextRealm/data/users.json"))
+        with open("./NextRealm/data/users.json") as f:
+            users = json.load(f)
     username_save = None
     user = None
     if users:
@@ -43,9 +45,11 @@ def on_connect(socketio, player_id, players, mons):
 def on_offline(player_id, players, socketio, client_id, client_ids, monsters):
     users = None
     if os.path.exists("./data/users.json"):
-        users = json.load(open("./data/users.json"))
+        with open("./data/users.json") as f:
+            users = json.load(f)
     elif os.path.exists("./NextRealm/data/users.json"):
-        users = json.load(open("./NextRealm/data/users.json"))
+        with open("./NextRealm/data/users.json") as f:
+            users = json.load(f)
     player_id = int(player_id)
     if users:
         for username in users:
@@ -59,9 +63,11 @@ def on_offline(player_id, players, socketio, client_id, client_ids, monsters):
                     "modelpath": players[player_id].modelpath,
                 }
         if os.path.exists("./data/users.json"):
-            json.dump(users, open("./data/users.json", "w"), indent=2)
+            with open("./data/users.json", "w") as f:
+                json.dump(users, f, indent=2)
         elif os.path.exists("./NextRealm/data/users.json"):
-            json.dump(users, open("./NextRealm/data/users.json", "w"), indent=2)
+            with open("./NextRealm/data/users.json", "w") as f:
+                json.dump(users, f, indent=2)
         if player_id in players:
             del players[player_id]
         if client_id in client_ids:

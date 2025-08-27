@@ -49,43 +49,45 @@ monsters = {}
 client_ids = []
 
 if os.path.exists("./data/mons.json"):
-    tempmons = json.load(open("./data/mons.json"))
-    for mon in tempmons:
-        tm = tempmons[mon]
-        monsters[mon] = Monster(
-            tm["name"],
-            tm["totalhp"],
-            tm["totalhp"],
-            tm["attack"],
-            tm["arange"],
-            tm["cooldown"],
-            tm["origin"],
-            tm["rotation"],
-            tm["aggrorange"],
-            tm["followrange"],
-            tm["speed"],
-            mon,
-            tm["modelpath"],
-        )
+    with open("./data/mons.json") as f:
+        tempmons = json.load(f)
+        for mon in tempmons:
+            tm = tempmons[mon]
+            monsters[mon] = Monster(
+                tm["name"],
+                tm["totalhp"],
+                tm["totalhp"],
+                tm["attack"],
+                tm["arange"],
+                tm["cooldown"],
+                tm["origin"],
+                tm["rotation"],
+                tm["aggrorange"],
+                tm["followrange"],
+                tm["speed"],
+                mon,
+                tm["modelpath"],
+            )
 elif os.path.exists("./NextRealm/data/mons.json"):
-    tempmons = json.load(open("./NextRealm/data/mons.json"))
-    for mon in tempmons:
-        tm = tempmons[mon]
-        monsters[mon] = Monster(
-            tm["name"],
-            tm["totalhp"],
-            tm["totalhp"],
-            tm["attack"],
-            tm["arange"],
-            tm["cooldown"],
-            tm["origin"],
-            tm["rotation"],
-            tm["aggrorange"],
-            tm["followrange"],
-            tm["speed"],
-            mon,
-            tm["modelpath"],
-        )
+    with open("./NextRealm/data/mons.json") as f:
+        tempmons = json.load(f)
+        for mon in tempmons:
+            tm = tempmons[mon]
+            monsters[mon] = Monster(
+                tm["name"],
+                tm["totalhp"],
+                tm["totalhp"],
+                tm["attack"],
+                tm["arange"],
+                tm["cooldown"],
+                tm["origin"],
+                tm["rotation"],
+                tm["aggrorange"],
+                tm["followrange"],
+                tm["speed"],
+                mon,
+                tm["modelpath"],
+            )
 
 
 @app.route("/")
@@ -104,9 +106,11 @@ def signup():
     client_ids.append(client_id)
     users = None
     if os.path.exists("./data/users.json"):
-        users = json.load(open("./data/users.json"))
+        with open("./data/users.json") as f:
+            users = json.load(f)
     elif os.path.exists("./NextRealm/data/users.json"):
-        users = json.load(open("./NextRealm/data/users.json"))
+        with open("./NextRealm/data/users.json") as f:
+            users = json.load(f)
     if users:
         if username not in users:
             permid = max([user["id"] for user in users.values()]) + 1
@@ -118,9 +122,11 @@ def signup():
                 "totalhp": 50,
             }
             if os.path.exists("./data/users.json"):
-                json.dump(users, open("./data/users.json", "w"), indent=2)
+                with open("./data/users.json", "w") as f:
+                    json.dump(users, f, indent=2)
             elif os.path.exists("./NextRealm/data/users.json"):
-                json.dump(users, open("./NextRealm/data/users.json", "w"), indent=2)
+                with open("./NextRealm/data/users.json", "w") as f:
+                    json.dump(users, f, indent=2)
             session["id"] = users[username]["id"]
             session["username"] = username
             return redirect(url_for("game"))
@@ -143,9 +149,11 @@ def login():
     client_ids.append(client_id)
     users = None
     if os.path.exists("./data/users.json"):
-        users = json.load(open("./data/users.json"))
+        with open("./data/users.json") as f:
+            users = json.load(f)
     elif os.path.exists("./NextRealm/data/users.json"):
-        users = json.load(open("./NextRealm/data/users.json"))
+        with open("./NextRealm/data/users.json") as f:
+            users = json.load(f)
     if users:
         if username not in users:
             flash("Username does not exist", "error")
