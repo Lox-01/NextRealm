@@ -1,11 +1,10 @@
-from flask_socketio import emit
-from player import Player
-from datetime import datetime
-from datetime import timedelta
 import json
+import math
 import os
 import time
-import math
+from datetime import datetime, timedelta
+
+from player import Player
 
 
 def on_connect(socketio, player_id, players, mons):
@@ -223,14 +222,17 @@ def on_player_hit(
                 hit = players[int(player_id)]
                 hitter = players[int(hitter_id)]
                 process_hit(hit, hitter, socketio, "player", players)
-        elif targettype == "monster":
-            if str(player_id) in monsters and int(hitter_id) in players:
-                hit = monsters[str(player_id)]
-                hitter = players[int(hitter_id)]
-                if int(hitter_id) in hit.threats:
-                    hit.threats[int(hitter_id)][0] += 2
-                    hit.threats[int(hitter_id)][1] = time.time()
-                process_hit(hit, hitter, socketio, "monster", monsters)
+        elif (
+            targettype == "monster"
+            and str(player_id) in monsters
+            and int(hitter_id) in players
+        ):
+            hit = monsters[str(player_id)]
+            hitter = players[int(hitter_id)]
+            if int(hitter_id) in hit.threats:
+                hit.threats[int(hitter_id)][0] += 2
+                hit.threats[int(hitter_id)][1] = time.time()
+            process_hit(hit, hitter, socketio, "monster", monsters)
     else:
         if int(player_id) in players and str(hitter_id) in monsters:
             hit = players[int(player_id)]
