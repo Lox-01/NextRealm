@@ -125,7 +125,7 @@ def offline(vals):
     player_id, client_id = vals[0], vals[1]
     on_offline(player_id, players, socketio, client_id, client_ids, monsters)
 
-@socketio.on('player_move')
+@socketio.on('player_keys')
 def player_moved(data):
     on_player_move(data, players, socketio)
 

@@ -304,51 +304,7 @@ export function scriptPage() {
         requestAnimationFrame(animate);
         if (player && player.cube) {
             if (!chatopen) {
-                let moved = false;
-                if (pressed.includes('w')) {
-                    let a = player.cube.rotation.y;
-                    let b = Math.sin(a) / 20;
-                    let c = Math.cos(a) / 20;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('s')) {
-                    let a = player.cube.rotation.y;
-                    let b = -Math.sin(a) / 40;
-                    let c = -Math.cos(a) / 40;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('q')) {
-                    let a = player.cube.rotation.y + Math.PI / 2;
-                    let b = Math.sin(a) / 20;
-                    let c = Math.cos(a) / 20;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('e')) {
-                    let a = player.cube.rotation.y - Math.PI / 2;
-                    let b = Math.sin(a) / 20;
-                    let c = Math.cos(a) / 20;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('a')) {
-                    player.cube.rotation.y += Math.PI / 150;
-                    moved = true;
-                }
-                if (pressed.includes('d')) {
-                    player.cube.rotation.y -= Math.PI / 150;
-                    moved = true;
-                }
-                if (moved === true) {
-                    let data = { "id": my_id, "pos": { "x": player.cube.position.x, "y": player.cube.position.y, "z": player.cube.position.z }, "rot": { "xr": player.cube.rotation.x, "yr": player.cube.rotation.y, "zr": player.cube.rotation.z } };
-                    socket.emit('player_move', data);
-                }
+                socket.emit('player_keys', { id: my_id, keys: pressed });
             }
             camera.position.x = player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
             camera.position.z = player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
