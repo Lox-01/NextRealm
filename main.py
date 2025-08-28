@@ -267,9 +267,9 @@ def distance(monster, player):
         + (monster.position["z"] - player.position["z"]) ** 2
     )
 
-
+x = 0
 def game_loop():
-    global printed
+    global x
     while True:
         for monster_id, monster in monsters.items():
             if not monster.alive:
@@ -285,8 +285,13 @@ def game_loop():
             {pid: monster.to_dict() for pid, monster in monsters.items()},
         )
         socketio.emit(
-            "render_players", {pid: player.to_dict() for pid, player in players.items()}
+            "render_players",
+            {pid: player.to_dict() for pid, player in players.items()}
         )
+        x += 1
+        if x % 10 == 0:
+            z = {pid: player.to_dict() for pid, player in players.items()}
+            print(f"Players: {z}")
         time.sleep(0.1)
 
 
