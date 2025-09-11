@@ -57,9 +57,6 @@ class Monster(Character):
             + (self.origin["z"] - self.position["z"]) ** 2
         )
 
-    def attack_player(self, player):
-        player.decrease_hp(self.attack)
-
     def decay_threat(self, player):
         if player.id in self.threats:
             curr = time.time()
@@ -107,6 +104,16 @@ class Monster(Character):
             if distance <= self.speed:
                 self.position = player.position.copy()
                 self.rotation = player.rotation.copy()
+
+    def turn_to_player(self, player):
+        direction = {
+            axis: player.position[axis] - self.position[axis]
+            for axis in ["x", "y", "z"]
+        }
+        self.rotation["yr"] = math.atan2(direction["x"], direction["z"])
+        self.rotation["xr"] = math.atan2(
+            direction["y"], math.hypot(direction["x"], direction["z"])
+        )
 
     def try_respawn(self, socketio):
         if self.dead_at and round(time.time()) - self.dead_at >= 15:

@@ -243,6 +243,7 @@ def monster_behavior(monster, monster_id):
         on_player_hit(
             "monster", maxthreatid, players, socketio, monster_id, monsters, "player"
         )
+        monster.turn_to_player(players[maxthreatid])
     elif monster.is_in_aggrorange(players[maxthreatid]):
         monster.move_to_player(players[maxthreatid])
         socketio.emit("monster_position_update", monster.to_dict())
@@ -267,9 +268,7 @@ def distance(monster, player):
         + (monster.position["z"] - player.position["z"]) ** 2
     )
 
-x = 0
 def game_loop():
-    global x
     while True:
         for monster_id, monster in monsters.items():
             if not monster.alive:
@@ -288,10 +287,6 @@ def game_loop():
             "render_players",
             {pid: player.to_dict() for pid, player in players.items()}
         )
-        x += 1
-        if x % 10 == 0:
-            z = {pid: player.to_dict() for pid, player in players.items()}
-            print(f"Players: {z}")
         time.sleep(0.1)
 
 
