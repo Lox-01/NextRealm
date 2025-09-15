@@ -1,5 +1,6 @@
 import json
 import math
+import mimetypes
 import os
 import time
 
@@ -24,6 +25,7 @@ if os.getenv("ENABLE_DEBUG") == "true":
     print("Debugpy is waiting for the debugger to attach...")
     debugpy.wait_for_client()
 
+mimetypes.add_type("application/javascript", ".js")
 app = Flask(
     __name__,
     static_url_path="/static",
@@ -268,6 +270,7 @@ def distance(monster, player):
         + (monster.position["z"] - player.position["z"]) ** 2
     )
 
+
 def game_loop():
     while True:
         for monster_id, monster in monsters.items():
@@ -284,8 +287,7 @@ def game_loop():
             {pid: monster.to_dict() for pid, monster in monsters.items()},
         )
         socketio.emit(
-            "render_players",
-            {pid: player.to_dict() for pid, player in players.items()}
+            "render_players", {pid: player.to_dict() for pid, player in players.items()}
         )
         time.sleep(0.1)
 
