@@ -14,9 +14,10 @@
     <input type="hidden" id="session_id" value="{{ session['id'] }}">
     <input type="hidden" id="session_username" value="{{ session['username'] }}">
     <canvas id="gamecanvas"></canvas>
+    <div id="minimap" style="z-index:200;"></div>
     <div id="chat"></div>
     <input type="text" id="chatInput"/>
-    <div id="ui"><img id="spellone" src="/static/catpic.png"></div></div>
+    <div id="ui"><img id="spellone" src="/static/catpic.png"></div>
     <script type="module" src="{{ asset('scripts/app.ts') }}"></script>
 </body>
 </html>

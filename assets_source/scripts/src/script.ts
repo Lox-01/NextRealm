@@ -7,6 +7,7 @@ import { io } from "socket.io-client"; // For client-side
 import { DamageNumber } from "./damagenumber";
 import { PlayerCube, SocketPlayer as SocketPlayer } from "./player";
 import { MonsterCube, SocketMonster } from "./monster";
+import { Minimap } from "./minimap";
 import { tri } from "./shared";
 
 export function scriptPage() {
@@ -65,6 +66,9 @@ export function scriptPage() {
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
+
+    // Initialize minimap
+    const minimap = new Minimap("minimap", 200, 100);
 
     window.addEventListener("mousemove", (event) => {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -127,6 +131,12 @@ export function scriptPage() {
                     data.modelpath
                 );
                 scene.add(playersCubes[id].cube);
+
+                // add icon to minimap for this player
+                // if this is the local player use the playerMarker svg and rotatable
+                const iconIsRotatable = id === my_id;
+                const iconSrc = id === my_id ? "/static/playerMarker.svg" : "blue";
+                minimap.addIcon(id, iconSrc, id === my_id ? 20 : 8, iconIsRotatable);
             } else {
                 playersCubes[id].updatePosition(data.pos);
                 playersCubes[id].updateRotation(data.rot);
@@ -161,6 +171,7 @@ export function scriptPage() {
                     cube.cube.material.dispose();
                 }
                 if (playersCubes[id]) {
+                    minimap.removeIcon(id);
                     delete playersCubes[id];
                 }
             }
@@ -196,6 +207,7 @@ export function scriptPage() {
         if (selected && selected.id == monster.id) {
             selected = null;
         }
+        minimap.removeIcon(monster.id);
     });
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
         for (const [id, data] of Object.entries(mons)) {
@@ -215,6 +227,7 @@ export function scriptPage() {
                     data.speed,
                     data.modelpath
                 );
+                minimap.addIcon(id, "red", 8, false);
             } else {
                 if (monstersCubes[id].isalive) {
                     monstersCubes[id].startLerp(data.pos, data.rot);
@@ -409,9 +422,17 @@ export function scriptPage() {
                                 omonster.lerpTargetR = null;
                             }
                         }
+                        // update minimap icon for monster
+                        minimap.updateIcon(omonster.id, omonster.cube.position.x, omonster.cube.position.z);
                     }
                 }
             }
+            // update minimap icon for player
+            const adjustedRotation = -player.cube.rotation.y + Math.PI / 2;
+            minimap.updateIcon(my_id, player.cube.position.x, player.cube.position.z, adjustedRotation);
+
+            // center the minimap so player is always at the center
+            minimap.centerOnPlayer(player.cube.position.x, player.cube.position.z);
         }
         renderer.render(scene, camera);
         labelRenderer.render(scene, camera);
