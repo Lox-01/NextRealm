@@ -148,89 +148,45 @@ def on_debug(data):
 
 
 def process_hit(hit, hitter, socketio, entity_type, entity_dict):
-    if hitter.alive and hit.alive:
-        d = datetime.now()
-        if hitter.last_hit:
-            if d - hitter.last_hit >= timedelta(seconds=1):
-                hit.decrease_hp(2)
-                hitter.last_hit = d
-                if hit.hp <= 0 and hit.alive:
-                    if entity_type == "player":
-                        socketio.emit(
-                            "render_players",
-                            {
-                                pid: player.to_dict()
-                                for pid, player in entity_dict.items()
-                            },
-                        )
-                        socketio.emit("player_dead", hit.to_dict())
-                    else:
-                        socketio.emit(
-                            "render_monsters",
-                            {
-                                pid: monster.to_dict()
-                                for pid, monster in entity_dict.items()
-                            },
-                        )
-                        socketio.emit("monster_dead", hit.to_dict())
-                        hit.dead_at = round(time.time())
-                    hit.alive = False
-                else:
-                    if entity_type == "player":
-                        socketio.emit(
-                            "render_players",
-                            {
-                                pid: player.to_dict()
-                                for pid, player in entity_dict.items()
-                            },
-                        )
-                    else:
-                        socketio.emit(
-                            "render_monsters",
-                            {
-                                pid: monster.to_dict()
-                                for pid, monster in entity_dict.items()
-                            },
-                        )
-                time.sleep(1)
-                socketio.emit("refresh_spell", [hitter.id, 1])
+    now = time.time()
+    if not hasattr(hitter, "spell_cooldowns"):
+        hitter.spell_cooldowns = {}
+    spell_id = "1"
+    cooldown = 2
+    if not (hitter.alive and hit.alive):
+        return
+    d = datetime.now()
+
+    should_hit = False
+    if hitter.last_hit:
+        if d - hitter.last_hit >= timedelta(seconds=1):
+            should_hit = True
+    else:
+        should_hit = True
+
+    if should_hit:
+        hit.decrease_hp(2)
+        hitter.last_hit = d
+        if entity_type == "player":
+            socketio.emit(
+                "render_players",
+                {pid: player.to_dict() for pid, player in entity_dict.items()},
+            )
         else:
-            hit.decrease_hp(2)
-            hitter.last_hit = d
-            if hit.hp <= 0 and hit.alive:
-                if entity_type == "player":
-                    socketio.emit(
-                        "render_players",
-                        {pid: player.to_dict() for pid, player in entity_dict.items()},
-                    )
-                    socketio.emit("player_dead", hit.to_dict())
-                else:
-                    socketio.emit(
-                        "render_monsters",
-                        {
-                            pid: monster.to_dict()
-                            for pid, monster in entity_dict.items()
-                        },
-                    )
-                    socketio.emit("monster_dead", hit.to_dict())
-                    hit.dead_at = round(time.time())
-                hit.alive = False
+            socketio.emit(
+                "render_monsters",
+                {pid: monster.to_dict() for pid, monster in entity_dict.items()},
+            )
+        if hit.hp <= 0 and hit.alive:
+            if entity_type == "player":
+                socketio.emit("player_dead", hit.to_dict())
             else:
-                if entity_type == "player":
-                    socketio.emit(
-                        "render_players",
-                        {pid: player.to_dict() for pid, player in entity_dict.items()},
-                    )
-                else:
-                    socketio.emit(
-                        "render_monsters",
-                        {
-                            pid: monster.to_dict()
-                            for pid, monster in entity_dict.items()
-                        },
-                    )
-            time.sleep(1)
-            socketio.emit("refresh_spell", [hitter.id, 1])
+                socketio.emit("monster_dead", hit.to_dict())
+                hit.dead_at = round(time.time())
+            hit.alive = False
+        def send_spell_ready():
+            socketio.emit("spell_ready", [hitter.id, spell_id])
+        socketio.start_background_task(lambda: (time.sleep(cooldown), send_spell_ready()))
 
 
 def on_player_hit(
@@ -270,4 +226,3 @@ def on_respawn(players, id, socketio):
         socketio.emit(
             "render_players", {pid: player.to_dict() for pid, player in players.items()}
         )
-        socketio.emit("refresh_spell", [id, 1])
