@@ -4,9 +4,8 @@
 
 * ui layer
   * install nodejs
-  * `npm install`
-  * Use `yarn install` if `npm install` does not work
-  * If `npm install` doesn't work and yarn is not found, run `npm install -g yarn` then run `yarn install`
+  * `yar install`
+  * If yarn is not found, run `npm install -g yarn` then run `yarn install`
   * `npm run watch`
 * python
   * docker:
@@ -32,8 +31,6 @@
     * Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P on macOS) and type Python: Select Interpreter
     * vscode debugger "Python Debugger: Current File".
 
-Here’s everything reliant on Python in your workspace that needs to be replaced or rewritten in Rust:
-
 1. Python Code
 Files:
 main.py
@@ -43,7 +40,6 @@ monster.py
 assets_blueprint.py
 testrunner.py
 Purpose: Flask app, WebSocket handling, game logic, and testing.
-Replacement: Use Rust frameworks like Actix Web for HTTP/WebSocket and Tokio for async tasks.
 2. Python Dependencies
 File: requirements.txt
 Dependencies: Flask, Flask-SocketIO, pytest, unittest-xml-reporting, coverage.
@@ -85,4 +81,3 @@ Replacement: Use Rust's strong typing, iterators, and scoped variables.
 10. Debugging
 Current: debugpy for remote debugging.
 Replacement: Use gdb or VSCode Rust debugging.
-This covers all Python dependencies and components in your workspace. Let me know if you need help with specific migrations!
