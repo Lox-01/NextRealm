@@ -5,7 +5,7 @@ class Character:
         self.totalhp = totalhp
         self.position = position
         self.rotation = rotation
-        self.alive = False if hp <= 0 else True
+        self.alive = not hp <= 0
         self.name = name
         self.last_hit = None
         self.modelpath = modelpath

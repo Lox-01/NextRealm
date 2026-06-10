@@ -43,8 +43,8 @@ def add_context():
     def prod_asset(file_path):
         try:
             return f"/assets/{manifest[file_path]['file']}"
-        except:
-            return "asset-not-found"
+        except Exception as e:
+            return "asset-not-found " + str(e)
 
     return {
         "asset": prod_asset if is_production else dev_asset,
