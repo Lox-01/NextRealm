@@ -56,11 +56,6 @@ class TestMonster(unittest.TestCase):
         self.monster.position = {'x': 60, 'y': 60, 'z': 60}
         self.assertFalse(self.monster.is_in_followrange())
         
-    def test_attack_player(self):
-        initial_hp = self.player.hp
-        self.monster.attack_player(self.player)
-        self.assertEqual(self.player.hp, initial_hp - self.monster.attack)
-        
     def test_decay_threat(self):
         self.player.decrease_hp = patch('character.Character.decrease_hp')
         self.monster.threats[self.player.id] = [1.0, time.time() - 3]

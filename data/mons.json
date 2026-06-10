@@ -3,7 +3,7 @@
         "name": "wolf",
         "totalhp": 10,
         "attack": 2,
-        "arange": 2,
+        "arange": 6,
         "cooldown": 1,
         "origin": {
             "x": 10,
@@ -15,7 +15,7 @@
             "yr": 0,
             "zr": 0
         },
-        "aggrorange": 10,
+        "aggrorange": 20,
         "followrange": 40,
         "speed": 0.1,
         "modelpath": "/static/models/wolf.glb"

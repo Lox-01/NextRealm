@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { io } from "socket.io-client"; // For client-side
 // or
@@ -12,38 +12,47 @@ import { tri } from "./shared";
 export function scriptPage() {
     globalThis.playersCubes = {};
     globalThis.monstersCubes = {};
-    globalThis.my_id = (document.getElementById('session_id') as HTMLInputElement).value;
-    globalThis.my_username = (document.getElementById('session_username') as HTMLInputElement).value;
+    globalThis.my_id = (
+        document.getElementById("session_id") as HTMLInputElement
+    ).value;
+    globalThis.my_username = (
+        document.getElementById("session_username") as HTMLInputElement
+    ).value;
     let selected;
     let hovered;
     const url = window.location.href;
-    if (url.includes('localhost:6052') || url.includes('127.0.0.1:6052')) {
-        var socket = io('http://localhost:6052', {
+    if (url.includes("localhost:6052") || url.includes("127.0.0.1:6052")) {
+        var socket = io("http://localhost:6052", {
             query: {
-                player_id: my_id
-            }
+                player_id: my_id,
+            },
         });
     } else {
-        var socket = io('http://45.90.12.32:6052', {
+        var socket = io("http://45.90.12.32:6052", {
             query: {
-                player_id: my_id
-            }
+                player_id: my_id,
+            },
         });
     }
     const scene = new THREE.Scene();
     globalThis.scene = scene;
     const ambientLight = new THREE.AmbientLight(0xffffff, 3);
     scene.add(ambientLight);
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+    );
     camera.layers.enableAll();
-    const canvas = document.getElementById('gamecanvas') as HTMLCanvasElement;
+    const canvas = document.getElementById("gamecanvas") as HTMLCanvasElement;
     const renderer = new THREE.WebGLRenderer({ canvas });
     const labelRenderer = new CSS2DRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    labelRenderer.domElement.style.position = 'absolute';
-    labelRenderer.domElement.style.top = '0px';
-    labelRenderer.domElement.style.zIndex = '101';
+    labelRenderer.domElement.style.position = "absolute";
+    labelRenderer.domElement.style.top = "0px";
+    labelRenderer.domElement.style.zIndex = "101";
     document.body.appendChild(labelRenderer.domElement);
     let player: null | PlayerCube = null;
 
@@ -57,15 +66,15 @@ export function scriptPage() {
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
 
-    window.addEventListener('mousemove', (event) => {
+    window.addEventListener("mousemove", (event) => {
         pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
         pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(pointer, camera);
         const cubes = Object.values(playersCubes)
-            .map(player => player.cube)
-            .concat(Object.values(monstersCubes).map(monster => monster.cube))
-            .filter(cube => cube !== null && cube !== undefined)
-            .flatMap(cube => {
+            .map((player) => player.cube)
+            .concat(Object.values(monstersCubes).map((monster) => monster.cube))
+            .filter((cube) => cube !== null && cube !== undefined)
+            .flatMap((cube) => {
                 const meshes: THREE.Mesh[] = [];
                 cube.traverse((child) => {
                     if (child.isMesh) {
@@ -73,7 +82,7 @@ export function scriptPage() {
                     }
                 });
                 return meshes;
-            })
+            });
         const intersects = raycaster.intersectObjects(cubes, false);
         if (intersects.length > 0) {
             const intersectedCube = intersects[0].object;
@@ -108,23 +117,34 @@ export function scriptPage() {
     socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
         for (const [id, data] of Object.entries(players)) {
             if (!playersCubes[id]) {
-                playersCubes[id] = new PlayerCube(id, data.pos, data.rot, data.hp, data.name, data.totalhp, data.modelpath);
+                playersCubes[id] = new PlayerCube(
+                    id,
+                    data.pos,
+                    data.rot,
+                    data.hp,
+                    data.name,
+                    data.totalhp,
+                    data.modelpath
+                );
                 scene.add(playersCubes[id].cube);
             } else {
                 playersCubes[id].updatePosition(data.pos);
                 playersCubes[id].updateRotation(data.rot);
                 if (data.hp != playersCubes[id].hp) {
-                    const damageNumber = new DamageNumber(scene, playersCubes[id], playersCubes[id].hp - data.hp);
+                    const damageNumber = new DamageNumber(
+                        scene,
+                        playersCubes[id],
+                        playersCubes[id].hp - data.hp
+                    );
                     setInterval(() => {
                         damageNumber.update();
                     }, 250);
-
                 }
                 playersCubes[id].updateHp(data.hp);
             }
             if (!player) {
                 if (my_id == id) {
-                    player = playersCubes[id]
+                    player = playersCubes[id];
                 }
             }
         }
@@ -136,7 +156,7 @@ export function scriptPage() {
                     cube.cube.geometry.dispose();
                 }
                 if (Array.isArray(cube.cube.material)) {
-                    cube.cube.material.forEach(material => material.dispose());
+                    cube.cube.material.forEach((material) => material.dispose());
                 } else if (cube.cube.material) {
                     cube.cube.material.dispose();
                 }
@@ -180,16 +200,33 @@ export function scriptPage() {
     socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
         for (const [id, data] of Object.entries(mons)) {
             if (!monstersCubes[id]) {
-                monstersCubes[id] = new MonsterCube(id, data.name, data.hp, data.totalhp, data.attack, data.arange, data.cooldown, data.pos, data.rot, data.aggrorange, data.followrange, data.speed, data.modelpath);
+                monstersCubes[id] = new MonsterCube(
+                    id,
+                    data.name,
+                    data.hp,
+                    data.totalhp,
+                    data.attack,
+                    data.arange,
+                    data.cooldown,
+                    data.pos,
+                    data.rot,
+                    data.aggrorange,
+                    data.followrange,
+                    data.speed,
+                    data.modelpath
+                );
             } else {
                 if (monstersCubes[id].isalive) {
                     monstersCubes[id].startLerp(data.pos, data.rot);
                     if (data.hp != monstersCubes[id].hp) {
-                        const damageNumber = new DamageNumber(scene, monstersCubes[id], monstersCubes[id].hp - data.hp);
+                        const damageNumber = new DamageNumber(
+                            scene,
+                            monstersCubes[id],
+                            monstersCubes[id].hp - data.hp
+                        );
                         setInterval(() => {
                             damageNumber.update();
                         }, 250);
-
                     }
                     monstersCubes[id].updateHp(data.hp);
                 }
@@ -198,7 +235,7 @@ export function scriptPage() {
     });
 
     function escapeHTML(str) {
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.textContent = str;
         return div.innerHTML;
     }
@@ -209,22 +246,23 @@ export function scriptPage() {
             return `<p class='name'>${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
         } else {
             const sanitizedMessage = escapeHTML(vals[0]);
-            return `<p class='name'>(PRIVATE) ${vals[1]} -> ${vals[2]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`
+            return `<p class='name'>(PRIVATE) ${vals[1]} -> ${vals[2]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
         }
     }
 
     socket.on("append_msg", (vals) => {
-        const messageElement = document.createElement('div');
+        const messageElement = document.createElement("div");
         messageElement.innerHTML = formatMessage(vals, false);
-        messageElement.classList.add('message-container');
+        messageElement.classList.add("message-container");
         if (chatobj) {
+            const isAtBottom =
+                Math.abs(
+                    chatobj.scrollHeight - chatobj.scrollTop - chatobj.clientHeight
+                ) < 1;
             chatobj.appendChild(messageElement);
-
-            const isAtBottom = Math.abs(chatobj.scrollHeight - chatobj.scrollTop - chatobj.clientHeight) < 1;
             if (isAtBottom) {
                 chatobj.scrollTop = chatobj.scrollHeight;
             }
-
             if (chatobj.childElementCount > 60) {
                 const excessMessages = chatobj.childElementCount - 60;
                 for (let i = 0; i < excessMessages; i++) {
@@ -240,12 +278,13 @@ export function scriptPage() {
 
     socket.on("private_msg", (vals) => {
         if (vals[1] == my_username || vals[2] == my_username) {
-            const messageElement = document.createElement('div');
+            const messageElement = document.createElement("div");
             messageElement.innerHTML = formatMessage(vals, true);
-            messageElement.classList.add('message-container');
+            messageElement.classList.add("message-container");
             if (chatobj) {
                 chatobj.appendChild(messageElement);
-                const isAtBottom = chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
+                const isAtBottom =
+                    chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
                 if (isAtBottom) {
                     chatobj.scrollTop = chatobj.scrollHeight;
                 }
@@ -262,11 +301,13 @@ export function scriptPage() {
 
     socket.on("pm_fail", (failid) => {
         if (failid == my_username) {
-            const messageElement = document.createElement('div');
-            messageElement.textContent = 'The format for a private message is: "/pm target_id message". Please try again.';
+            const messageElement = document.createElement("div");
+            messageElement.textContent =
+                'The format for a private message is: "/pm target_id message". Please try again.';
             if (chatobj) {
                 chatobj.appendChild(messageElement);
-                const isAtBottom = chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
+                const isAtBottom =
+                    chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
                 if (isAtBottom) {
                     chatobj.scrollTop = chatobj.scrollHeight;
                 }
@@ -280,14 +321,38 @@ export function scriptPage() {
             }
         }
     });
-    let spellconversion = { "1": "one", "2": "two", "3": "three", "4": "four", "5": "five", "6": "six", "7": "seven", "8": "eight", "9": "nine", "10": "ten" };
-    let spellcools = { "1": true, "2": true, "3": true, "4": true, "5": true, "6": true, "7": true, "8": true, "9": true, "10": true };
-    socket.on("refresh_spell", (info) => {
+    let spellconversion = {
+        "1": "one",
+        "2": "two",
+        "3": "three",
+        "4": "four",
+        "5": "five",
+        "6": "six",
+        "7": "seven",
+        "8": "eight",
+        "9": "nine",
+        "10": "ten",
+    };
+    let spellcools = {
+        "1": true,
+        "2": true,
+        "3": true,
+        "4": true,
+        "5": true,
+        "6": true,
+        "7": true,
+        "8": true,
+        "9": true,
+        "10": true,
+    };
+    socket.on("spell_ready", (info) => {
         if (info[0] == my_id) {
             spellcools[`${info[1]}`] = true;
             const spellElement = document.getElementById("spellone");
             if (spellElement && Array.from(spellElement.classList).includes("dark")) {
-                const spellElement = document.getElementById(`spell${spellconversion[`${info[1]}`]}`);
+                const spellElement = document.getElementById(
+                    `spell${spellconversion[`${info[1]}`]}`
+                );
                 if (spellElement) {
                     spellElement.classList.remove("dark");
                 }
@@ -296,7 +361,7 @@ export function scriptPage() {
     });
 
     window.addEventListener("beforeunload", function (e) {
-        socket.emit("offline", [my_id, localStorage.getItem('client_id')]);
+        socket.emit("offline", [my_id, localStorage.getItem("client_id")]);
     });
     let pressed: string[] = [];
 
@@ -304,54 +369,12 @@ export function scriptPage() {
         requestAnimationFrame(animate);
         if (player && player.cube) {
             if (!chatopen) {
-                let moved = false;
-                if (pressed.includes('w')) {
-                    let a = player.cube.rotation.y;
-                    let b = Math.sin(a) / 20;
-                    let c = Math.cos(a) / 20;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('s')) {
-                    let a = player.cube.rotation.y;
-                    let b = -Math.sin(a) / 40;
-                    let c = -Math.cos(a) / 40;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('q')) {
-                    let a = player.cube.rotation.y + Math.PI / 2;
-                    let b = Math.sin(a) / 20;
-                    let c = Math.cos(a) / 20;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('e')) {
-                    let a = player.cube.rotation.y - Math.PI / 2;
-                    let b = Math.sin(a) / 20;
-                    let c = Math.cos(a) / 20;
-                    player.cube.position.z += c;
-                    player.cube.position.x += b;
-                    moved = true;
-                }
-                if (pressed.includes('a')) {
-                    player.cube.rotation.y += Math.PI / 150;
-                    moved = true;
-                }
-                if (pressed.includes('d')) {
-                    player.cube.rotation.y -= Math.PI / 150;
-                    moved = true;
-                }
-                if (moved === true) {
-                    let data = { "id": my_id, "pos": { "x": player.cube.position.x, "y": player.cube.position.y, "z": player.cube.position.z }, "rot": { "xr": player.cube.rotation.x, "yr": player.cube.rotation.y, "zr": player.cube.rotation.z } };
-                    socket.emit('player_move', data);
-                }
+                socket.emit("player_keys", { id: my_id, keys: pressed });
             }
-            camera.position.x = player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
-            camera.position.z = player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
+            camera.position.x =
+                player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
+            camera.position.z =
+                player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
             camera.position.y = player.cube.position.y + 1.7;
             camera.lookAt(player.cube.position);
             if (Object.keys(playersCubes).length > 0) {
@@ -363,12 +386,21 @@ export function scriptPage() {
                 for (const omonster of Object.values(monstersCubes)) {
                     if (omonster.isalive) {
                         if (player.cube && omonster.cube) {
-                            omonster.updateLabel(tri(player.cube.position, omonster.cube.position));
+                            omonster.updateLabel(
+                                tri(player.cube.position, omonster.cube.position)
+                            );
                         }
                         if (omonster.lerpStart && omonster.lerpTarget) {
                             const now = performance.now();
-                            const t = Math.min(1, (now - omonster.lerpStartTime) / omonster.lerpDuration);
-                            omonster.cube.position.lerpVectors(omonster.lerpStart, omonster.lerpTarget, t);
+                            const t = Math.min(
+                                1,
+                                (now - omonster.lerpStartTime) / omonster.lerpDuration
+                            );
+                            omonster.cube.position.lerpVectors(
+                                omonster.lerpStart,
+                                omonster.lerpTarget,
+                                t
+                            );
                             omonster.cube.quaternion.slerp(omonster.lerpTargetR, t);
                             if (t === 1) {
                                 omonster.lerpStart = null;
@@ -387,7 +419,7 @@ export function scriptPage() {
 
     let repeatInterval;
 
-    window.addEventListener('keydown', (event) => {
+    window.addEventListener("keydown", (event) => {
         if (!pressed.includes(event.key)) {
             pressed.push(event.key);
         }
@@ -406,8 +438,8 @@ export function scriptPage() {
     let chatobj = document.getElementById("chat");
     let enterInput = document.getElementById("chatInput");
     let chatopen = false;
-    window.addEventListener('keyup', (event) => {
-        pressed = pressed.filter(key => key !== event.key);
+    window.addEventListener("keyup", (event) => {
+        pressed = pressed.filter((key) => key !== event.key);
         if (event.key.length === 1 && chatopen) {
             clearInterval(repeatInterval);
             repeatInterval = null;
@@ -417,29 +449,31 @@ export function scriptPage() {
                 sendMessage();
                 chatopen = false;
                 if (enterInput) {
-                    enterInput.style.zIndex = '99';
-                    enterInput.style.opacity = '0';
+                    enterInput.style.zIndex = "99";
+                    enterInput.style.opacity = "0";
                 }
                 if (chatobj) {
-                    chatobj.style.opacity = '0.5';
+                    chatobj.style.opacity = "0.5";
                 }
                 clearInterval(repeatInterval);
                 repeatInterval = null;
             } else {
                 chatopen = true;
                 if (enterInput) {
-                    enterInput.style.zIndex = '101';
-                    enterInput.style.opacity = '1';
+                    enterInput.style.zIndex = "101";
+                    enterInput.style.opacity = "1";
                     enterInput.focus();
                 }
                 if (chatobj) {
-                    chatobj.style.opacity = '1';
+                    chatobj.style.opacity = "1";
                 }
             }
         } else if (chatopen) {
             if (event.key === "Backspace") {
                 if (enterInput) {
-                    (enterInput as HTMLInputElement).value = (enterInput as HTMLInputElement).value.slice(0, -1);
+                    (enterInput as HTMLInputElement).value = (
+                        enterInput as HTMLInputElement
+                    ).value.slice(0, -1);
                 }
             }
         }
@@ -450,7 +484,10 @@ export function scriptPage() {
                         socket.emit("player_hit", [selected.id, my_id, selected.type]);
                         spellcools["1"] = false;
                         const spellOneElement = document.getElementById("spellone");
-                        if (spellOneElement && !Array.from(spellOneElement.classList).includes("dark")) {
+                        if (
+                            spellOneElement &&
+                            !Array.from(spellOneElement.classList).includes("dark")
+                        ) {
                             const spellOneElement = document.getElementById("spellone");
                             if (spellOneElement) {
                                 spellOneElement.classList.add("dark");
@@ -477,11 +514,11 @@ export function scriptPage() {
                 chatopen = false;
                 if (enterInput) {
                     (enterInput as HTMLInputElement).value = "";
-                    enterInput.style.zIndex = '99';
-                    enterInput.style.opacity = '0';
+                    enterInput.style.zIndex = "99";
+                    enterInput.style.opacity = "0";
                 }
                 if (chatobj) {
-                    chatobj.style.opacity = '0.5';
+                    chatobj.style.opacity = "0.5";
                 }
                 clearInterval(repeatInterval);
                 repeatInterval = null;
@@ -493,7 +530,7 @@ export function scriptPage() {
         if (enterInput) {
             const message = (enterInput as HTMLInputElement).value.trim();
             if (message) {
-                socket.emit('new_msg', [message, my_username]);
+                socket.emit("new_msg", [message, my_username]);
                 (enterInput as HTMLInputElement).value = "";
             }
         }
