@@ -358,7 +358,7 @@ export function scriptPage() {
         "9": true,
         "10": true,
     };
-    socket.on("refresh_spell", (info) => {
+    socket.on("spell_ready", (info) => {
         if (info[0] == my_id) {
             spellcools[`${info[1]}`] = true;
             const spellElement = document.getElementById("spellone");
