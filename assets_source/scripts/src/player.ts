@@ -3,29 +3,29 @@ import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { Position, Rotation, CharacterCube } from "./character";
 
 export interface SocketPlayer {
-    id: string;
-    name: string;
-    hp: number;
-    totalhp: number;
-    pos: Position;
-    rot: Rotation;
+	id: string;
+	name: string;
+	hp: number;
+	totalhp: number;
+	pos: Position;
+	rot: Rotation;
 	modelpath: string;
 }
 
 export class PlayerCube extends CharacterCube {
-    constructor(
-        id: string,
-        position: Position,
-        rotation: Rotation,
-        hp: number,
-        name: string,
-        totalhp: number,
+	constructor(
+		id: string,
+		position: Position,
+		rotation: Rotation,
+		hp: number,
+		name: string,
+		totalhp: number,
 		modelpath: string
-    ) {
-        super("player", id, name, hp, totalhp, modelpath);
-        this.updatePosition(position);
-        this.updateRotation(rotation);
-    }
+	) {
+		super("player", id, name, hp, totalhp, modelpath);
+		this.updatePosition(position);
+		this.updateRotation(rotation);
+	}
 
 	showDeathMessage(socket): void {
 		let existingDeathMessage = document.getElementById("death-message");

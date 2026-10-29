@@ -28,5 +28,5 @@ class Character:
             "rot": self.rotation,
             "alive": self.alive,
             "name": self.name,
-            "modelpath": self.modelpath
+            "modelpath": self.modelpath,
         }

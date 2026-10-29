@@ -1,6 +1,7 @@
 import unittest
 from character import Character
 
+
 class TestCharacter(unittest.TestCase):
 
     def setUp(self):
@@ -12,7 +13,7 @@ class TestCharacter(unittest.TestCase):
             hp=100,
             totalhp=150,
             name="TestCharacter",
-            modelpath="/static/models/player.glb"
+            modelpath="/static/models/player.glb",
         )
 
     def test_update_position(self):
@@ -47,7 +48,7 @@ class TestCharacter(unittest.TestCase):
             "rot": {"xr": 0, "yr": 0, "zr": 0},
             "alive": True,
             "name": "TestCharacter",
-            "modelpath": "/static/models/player.glb"
+            "modelpath": "/static/models/player.glb",
         }
         self.assertEqual(character_dict, expected_dict)
 

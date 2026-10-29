@@ -17,7 +17,7 @@ export class DamageNumber {
         this.element.style.position = 'absolute';
         this.element.style.top = '0px';
         this.element.style.left = '0px';
-        this.element.style.fontSize = `${1/(1+0.07*tri(playersCubes[my_id].cube.position,player.cube.position))*30}px`;
+        this.element.style.fontSize = `${1 / (1 + 0.07 * tri(playersCubes[my_id].cube.position, player.cube.position)) * 30}px`;
         this.element.style.color = 'red';
         this.element.style.fontWeight = 'bold';
         this.element.style.opacity = damage < 0 ? '0' : '1';

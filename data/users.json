@@ -11,7 +11,7 @@
       "yr": 0,
       "zr": 0
     },
-    "hp": 10,
+    "hp": 4,
     "totalhp": 10,
     "modelpath": "/static/models/player.glb"
   },

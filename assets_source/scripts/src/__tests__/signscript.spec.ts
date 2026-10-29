@@ -17,7 +17,7 @@ describe('signscriptPage', () => {
       if (key === 'client_id') return null; // Simulate no existing client_id
       return null;
     });
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {});
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { });
 
     // Mock fetch
     global.fetch = vi.fn(() =>

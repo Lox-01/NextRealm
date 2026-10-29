@@ -97,5 +97,5 @@ export class MonsterCube extends CharacterCube {
                 this.cube.add(this.label);
             }
         }
-	}
+    }
 }

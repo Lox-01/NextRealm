@@ -40,7 +40,7 @@ describe('dtr', () => {
 
 describe('dir', () => {
   it('logs property and method names of an object', () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
     const testObj = {
       prop1: 'value1',
       method1: () => 'method1',
@@ -57,7 +57,7 @@ describe('dir', () => {
   });
 
   it('logs an error if the input is not an object', () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
     dir(42);
     expect(consoleSpy).toHaveBeenCalledWith('Input is not a valid object.');
     consoleSpy.mockRestore();
@@ -67,7 +67,7 @@ describe('dir', () => {
 describe('deffunc', () => {
   it('logs the definition of a function', () => {
     const testFunc = () => 'test';
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
     deffunc(testFunc);
     expect(consoleSpy).toHaveBeenCalledWith('Function Definition:');
     expect(consoleSpy).toHaveBeenCalledWith(testFunc.toString());
@@ -75,7 +75,7 @@ describe('deffunc', () => {
   });
 
   it('logs an error if the input is not a function', () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
     deffunc(42 as unknown as Function);
     expect(consoleSpy).toHaveBeenCalledWith('Input is not a valid function.');
     consoleSpy.mockRestore();

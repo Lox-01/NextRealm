@@ -184,9 +184,13 @@ def process_hit(hit, hitter, socketio, entity_type, entity_dict):
                 socketio.emit("monster_dead", hit.to_dict())
                 hit.dead_at = round(time.time())
             hit.alive = False
+
         def send_spell_ready():
             socketio.emit("spell_ready", [hitter.id, spell_id])
-        socketio.start_background_task(lambda: (time.sleep(cooldown), send_spell_ready()))
+
+        socketio.start_background_task(
+            lambda: (time.sleep(cooldown), send_spell_ready())
+        )
 
 
 def on_player_hit(
