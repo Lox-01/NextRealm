@@ -4,7 +4,7 @@
 
 - ui layer
   - install nodejs
-  - `yar install`
+  - `yarn install`
   - If yarn is not found, run `npm install -g yarn` then run `yarn install`
   - `npm run watch`
 - python
