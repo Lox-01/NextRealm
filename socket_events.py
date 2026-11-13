@@ -4,7 +4,7 @@ import os
 import time
 from datetime import datetime, timedelta
 
-from player import Player
+from character import Character
 
 
 def on_connect(socketio, player_id, players, mons):
@@ -23,13 +23,13 @@ def on_connect(socketio, player_id, players, mons):
                 user = users[username]
                 username_save = username
         if user:
-            players[int(player_id)] = Player(
+            players[int(player_id)] = Character(
                 int(player_id),
                 user["pos"],
                 user["rot"],
                 user["hp"],
-                str(username_save),
                 user["totalhp"],
+                str(username_save),
                 user["modelpath"],
             )
             socketio.emit(
