@@ -4,7 +4,6 @@ import mimetypes
 import os
 import time
 
-import debugpy  # type: ignore
 from assets_blueprint import assets_blueprint
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_socketio import SocketIO  # type: ignore
@@ -18,12 +17,6 @@ from socket_events import (
     on_player_move,
     on_respawn,
 )
-
-if os.getenv("ENABLE_DEBUG") == "true":
-    print("debug mode")
-    debugpy.listen(("0.0.0.0", 5678))
-    print("Debugpy is waiting for the debugger to attach...")
-    debugpy.wait_for_client()
 
 mimetypes.add_type("application/javascript", ".js")
 app = Flask(
@@ -293,6 +286,5 @@ def game_loop():
 
 
 if __name__ == "__main__":
-    allow_unsafe = os.getenv("ALLOW_UNSAFE_WERKZEUG", "false").lower() == "true"
     socketio.start_background_task(game_loop)
-    socketio.run(app, host="0.0.0.0", port=6052, allow_unsafe_werkzeug=allow_unsafe)
+    socketio.run(app, host="0.0.0.0", port=6052, allow_unsafe_werkzeug=True)

@@ -1,6 +1,7 @@
 import unittest
 from character import Character
 
+
 class TestCharacter(unittest.TestCase):
 
     def setUp(self):
@@ -12,7 +13,7 @@ class TestCharacter(unittest.TestCase):
             hp=100,
             totalhp=150,
             name="TestCharacter",
-            modelpath="/static/models/player.glb"
+            modelpath="/static/models/player.glb",
         )
 
     def test_update_position(self):
@@ -36,6 +37,23 @@ class TestCharacter(unittest.TestCase):
         self.character.decrease_hp(100)
         self.assertEqual(self.character.hp, 0)
 
+    def test_decrease_hp_marks_character_dead_at_zero(self):
+        """Test that the character is marked as dead when HP reaches zero."""
+        self.character.decrease_hp(150)
+        self.assertEqual(self.character.hp, 0)
+        self.assertFalse(self.character.alive)
+
+    def test_decrease_hp_rejects_negative_amount(self):
+        """Test that decreasing HP by a negative amount raises an error."""
+        with self.assertRaises(ValueError):
+            self.character.decrease_hp(-1)
+        self.assertEqual(self.character.hp, 100)
+
+    def test_initial_hp_at_zero_is_dead(self):
+        """Test that a character with initial HP of zero is dead."""
+        character = Character("dead", {"x": 0, "y": 0, "z": 0}, {"xr": 0, "yr": 0, "zr": 0}, 0, 100, "Dead", "model.glb")
+        self.assertFalse(character.alive)
+
     def test_to_dict(self):
         """Test converting the character to a dictionary."""
         character_dict = self.character.to_dict()
@@ -47,7 +65,7 @@ class TestCharacter(unittest.TestCase):
             "rot": {"xr": 0, "yr": 0, "zr": 0},
             "alive": True,
             "name": "TestCharacter",
-            "modelpath": "/static/models/player.glb"
+            "modelpath": "/static/models/player.glb",
         }
         self.assertEqual(character_dict, expected_dict)
 

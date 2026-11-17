@@ -1,4 +1,3 @@
-import { Mock } from 'vitest';
 import { signscriptPage } from '../signscript';
 
 describe('signscriptPage', () => {
@@ -17,14 +16,15 @@ describe('signscriptPage', () => {
       if (key === 'client_id') return null; // Simulate no existing client_id
       return null;
     });
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {});
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { });
 
     // Mock fetch
     global.fetch = vi.fn(() =>
       Promise.resolve({
+        ok: true,
         json: () => Promise.resolve({}),
-      }),
-    ) as Mock;
+      } as Response),
+    ) as unknown as typeof fetch;
   });
 
   it('generates a client_id if not already present in localStorage', () => {
@@ -55,12 +55,9 @@ describe('signscriptPage', () => {
     expect(global.fetch).toHaveBeenCalledWith('/signup', expect.objectContaining({
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        username: 'test_user',
-        client_id: clientId,
-      }),
+      body: `username=test_user&client_id=${clientId}`,
     }));
   });
 
@@ -75,12 +72,9 @@ describe('signscriptPage', () => {
     expect(global.fetch).toHaveBeenCalledWith('/login', expect.objectContaining({
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        username: 'test_user_login',
-        client_id: clientId,
-      }),
+      body: `username=test_user_login&client_id=${clientId}`,
     }));
   });
 });

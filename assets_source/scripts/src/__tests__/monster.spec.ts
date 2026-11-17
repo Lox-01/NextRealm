@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { MonsterCube } from '../monster';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 

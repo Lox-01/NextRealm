@@ -1,11 +1,9 @@
 import * as THREE from "three";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import { io } from "socket.io-client"; // For client-side
-// or
-// import { Server } from "socket.io"; // For server-side
+import { io } from "socket.io-client";
 
 import { DamageNumber } from "./damagenumber";
-import { PlayerCube, SocketPlayer as SocketPlayer } from "./player";
+import { PlayerCube, SocketPlayer } from "./player";
 import { MonsterCube, SocketMonster } from "./monster";
 import { Minimap } from "./minimap";
 import { tri } from "./shared";
@@ -22,19 +20,12 @@ export function scriptPage() {
     let selected;
     let hovered;
     const url = window.location.href;
-    if (url.includes("localhost:6052") || url.includes("127.0.0.1:6052")) {
-        var socket = io("http://localhost:6052", {
-            query: {
-                player_id: my_id,
-            },
-        });
-    } else {
-        var socket = io("http://45.90.12.32:6052", {
-            query: {
-                player_id: my_id,
-            },
-        });
-    }
+    const socket = io(
+        url.includes("localhost:6052") || url.includes("127.0.0.1:6052")
+            ? "http://localhost:6052"
+            : "http://45.90.12.32:6052",
+        { query: { player_id: my_id } }
+    );
     const scene = new THREE.Scene();
     globalThis.scene = scene;
     const ambientLight = new THREE.AmbientLight(0xffffff, 3);
@@ -202,7 +193,6 @@ export function scriptPage() {
     socket.on("monster_dead", (monster) => {
         if (monstersCubes[monster.id]) {
             monstersCubes[monster.id].handleDeath();
-            monstersCubes[monster.id].handleDeathTwo();
         }
         if (selected && selected.id == monster.id) {
             selected = null;
@@ -280,9 +270,7 @@ export function scriptPage() {
                 const excessMessages = chatobj.childElementCount - 60;
                 for (let i = 0; i < excessMessages; i++) {
                     if (chatobj.firstChild) {
-                        if (chatobj.firstChild) {
-                            chatobj.firstChild.remove();
-                        }
+                        chatobj.firstChild.remove();
                     }
                 }
             }

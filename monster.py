@@ -58,15 +58,16 @@ class Monster(Character):
         )
 
     def decay_threat(self, player):
-        if player.id in self.threats:
-            curr = time.time()
-            for player_id, threat_time in list(self.threats.items()):
-                if curr - threat_time[1] > 2:
-                    self.threats[player_id][0] = round(
-                        self.threats[player_id][0] - 0.2, 2
-                    )
-                if self.threats[player_id][0] <= 0:
-                    del self.threats[player_id]
+        if player.id not in self.threats:
+            return
+
+        curr = time.time()
+        threat = self.threats[player.id]
+        if curr - threat[1] > 2:
+            threat[0] = round(threat[0] - 0.2, 2)
+            threat[1] = curr
+        if threat[0] <= 0:
+            del self.threats[player.id]
 
     def move_to_origin(self):
         direction = {
@@ -75,8 +76,8 @@ class Monster(Character):
         distance = math.sqrt(sum(direction[axis] ** 2 for axis in direction))
         if distance > 0:
             norm = distance
-            for axis in direction:
-                direction[axis] /= norm
+            for axis, value in direction.items():
+                direction[axis] = value / norm
                 self.position[axis] += direction[axis] * self.speed
             self.rotation["yr"] = math.atan2(direction["x"], direction["z"])
             self.rotation["xr"] = math.atan2(
@@ -94,8 +95,8 @@ class Monster(Character):
         distance = math.sqrt(sum(direction[axis] ** 2 for axis in direction))
         if distance > 0:
             norm = distance
-            for axis in direction:
-                direction[axis] /= norm
+            for axis, value in direction.items():
+                direction[axis] = value / norm
                 self.position[axis] += direction[axis] * self.speed
             self.rotation["yr"] = math.atan2(direction["x"], direction["z"])
             self.rotation["xr"] = math.atan2(

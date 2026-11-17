@@ -4,7 +4,7 @@ import os
 import time
 from datetime import datetime, timedelta
 
-from player import Player
+from character import Character
 
 
 def on_connect(socketio, player_id, players, mons):
@@ -23,13 +23,13 @@ def on_connect(socketio, player_id, players, mons):
                 user = users[username]
                 username_save = username
         if user:
-            players[int(player_id)] = Player(
+            players[int(player_id)] = Character(
                 int(player_id),
                 user["pos"],
                 user["rot"],
                 user["hp"],
-                str(username_save),
                 user["totalhp"],
+                str(username_save),
                 user["modelpath"],
             )
             socketio.emit(
@@ -127,18 +127,19 @@ def on_player_move(data, players, socketio):
 
 
 def on_new_msg(vals, players, socketio):
-    msg = vals[0]
-    splitted = msg.split(" ")
-    if splitted[0].lower() == "/pm":
-        if len(splitted) < 3:
+    msg = str(vals[0]).strip()
+    parts = msg.split()
+    if not parts:
+        return
+    if parts[0].lower() == "/pm":
+        if len(parts) < 3:
             socketio.emit("pm_fail", vals[1])
-        else:
-            usern = splitted[1]
-            if str(usern) in [player.name for player in players.values()]:
-                newvals = [" ".join(splitted[2:]), usern, vals[1]]
-                socketio.emit("private_msg", newvals)
-            else:
-                socketio.emit("pm_fail", vals[1])
+            return
+        target_name = parts[1]
+        if target_name not in [player.name for player in players.values()]:
+            socketio.emit("pm_fail", vals[1])
+            return
+        socketio.emit("private_msg", [" ".join(parts[2:]), target_name, vals[1]])
     else:
         socketio.emit("append_msg", vals)
 
@@ -148,9 +149,6 @@ def on_debug(data):
 
 
 def process_hit(hit, hitter, socketio, entity_type, entity_dict):
-    now = time.time()
-    if not hasattr(hitter, "spell_cooldowns"):
-        hitter.spell_cooldowns = {}
     spell_id = "1"
     cooldown = 2
     if not (hitter.alive and hit.alive):
@@ -184,9 +182,13 @@ def process_hit(hit, hitter, socketio, entity_type, entity_dict):
                 socketio.emit("monster_dead", hit.to_dict())
                 hit.dead_at = round(time.time())
             hit.alive = False
+
         def send_spell_ready():
             socketio.emit("spell_ready", [hitter.id, spell_id])
-        socketio.start_background_task(lambda: (time.sleep(cooldown), send_spell_ready()))
+
+        socketio.start_background_task(
+            lambda: (time.sleep(cooldown), send_spell_ready())
+        )
 
 
 def on_player_hit(
