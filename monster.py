@@ -76,8 +76,8 @@ class Monster(Character):
         distance = math.sqrt(sum(direction[axis] ** 2 for axis in direction))
         if distance > 0:
             norm = distance
-            for axis in direction:
-                direction[axis] /= norm
+            for axis, value in direction.items():
+                direction[axis] = value / norm
                 self.position[axis] += direction[axis] * self.speed
             self.rotation["yr"] = math.atan2(direction["x"], direction["z"])
             self.rotation["xr"] = math.atan2(
@@ -95,8 +95,8 @@ class Monster(Character):
         distance = math.sqrt(sum(direction[axis] ** 2 for axis in direction))
         if distance > 0:
             norm = distance
-            for axis in direction:
-                direction[axis] /= norm
+            for axis, value in direction.items():
+                direction[axis] = value / norm
                 self.position[axis] += direction[axis] * self.speed
             self.rotation["yr"] = math.atan2(direction["x"], direction["z"])
             self.rotation["xr"] = math.atan2(
