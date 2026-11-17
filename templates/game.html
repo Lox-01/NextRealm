@@ -1,26 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NextRealm - Game</title>
     {%- if not is_production %}
     <script type="module" src="{{ asset('@vite/client') }}"></script>
     {%- endif %}
-    <link rel="icon" href="/static/NextRealm.jpg">
+    <link rel="icon" href="/static/NextRealm.jpg" />
     <link rel="stylesheet" href="{{ asset('styles/app.scss') }}" />
-</head>
+  </head>
 
-<body>
-    <input type="hidden" id="session_id" value="{{ session['id'] }}">
-    <input type="hidden" id="session_username" value="{{ session['username'] }}">
+  <body>
+    <input type="hidden" id="session_id" value="{{ session['id'] }}" />
+    <input
+      type="hidden"
+      id="session_username"
+      value="{{ session['username'] }}"
+    />
     <canvas id="gamecanvas"></canvas>
-    <div id="minimap" style="z-index:200;"></div>
+    <div id="minimap" style="z-index: 200"></div>
     <div id="chat"></div>
     <input type="text" id="chatInput" />
-    <div id="ui"><img id="spellone" src="/static/catpic.png"></div>
+    <div id="ui"><img id="spellone" src="/static/catpic.png" /></div>
     <script type="module" src="{{ asset('scripts/app.ts') }}"></script>
-</body>
-
+  </body>
 </html>

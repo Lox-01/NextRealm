@@ -9,540 +9,549 @@ import { Minimap } from "./minimap";
 import { tri } from "./shared";
 
 export function scriptPage() {
-    globalThis.playersCubes = {};
-    globalThis.monstersCubes = {};
-    globalThis.my_id = (
-        document.getElementById("session_id") as HTMLInputElement
-    ).value;
-    globalThis.my_username = (
-        document.getElementById("session_username") as HTMLInputElement
-    ).value;
-    let selected;
-    let hovered;
-    const url = window.location.href;
-    const socket = io(
-        url.includes("localhost:6052") || url.includes("127.0.0.1:6052")
-            ? "http://localhost:6052"
-            : "http://45.90.12.32:6052",
-        { query: { player_id: my_id } }
-    );
-    const scene = new THREE.Scene();
-    globalThis.scene = scene;
-    const ambientLight = new THREE.AmbientLight(0xffffff, 3);
-    scene.add(ambientLight);
-    const camera = new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
-    );
-    camera.layers.enableAll();
-    const canvas = document.getElementById("gamecanvas") as HTMLCanvasElement;
-    const renderer = new THREE.WebGLRenderer({ canvas });
-    const labelRenderer = new CSS2DRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    labelRenderer.setSize(window.innerWidth, window.innerHeight);
-    labelRenderer.domElement.style.position = "absolute";
-    labelRenderer.domElement.style.top = "0px";
-    labelRenderer.domElement.style.zIndex = "101";
-    document.body.appendChild(labelRenderer.domElement);
-    let player: null | PlayerCube = null;
+  globalThis.playersCubes = {};
+  globalThis.monstersCubes = {};
+  globalThis.my_id = (
+    document.getElementById("session_id") as HTMLInputElement
+  ).value;
+  globalThis.my_username = (
+    document.getElementById("session_username") as HTMLInputElement
+  ).value;
+  let selected;
+  let hovered;
+  const url = window.location.href;
+  const socket = io(
+    url.includes("localhost:6052") || url.includes("127.0.0.1:6052")
+      ? "http://localhost:6052"
+      : "http://45.90.12.32:6052",
+    { query: { player_id: my_id } },
+  );
+  const scene = new THREE.Scene();
+  globalThis.scene = scene;
+  const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+  scene.add(ambientLight);
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000,
+  );
+  camera.layers.enableAll();
+  const canvas = document.getElementById("gamecanvas") as HTMLCanvasElement;
+  const renderer = new THREE.WebGLRenderer({ canvas });
+  const labelRenderer = new CSS2DRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = "absolute";
+  labelRenderer.domElement.style.top = "0px";
+  labelRenderer.domElement.style.zIndex = "101";
+  document.body.appendChild(labelRenderer.domElement);
+  let player: null | PlayerCube = null;
 
-    const planeGeometry = new THREE.PlaneGeometry(10, 10);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -1;
-    scene.add(plane);
+  const planeGeometry = new THREE.PlaneGeometry(10, 10);
+  const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x14213d });
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.rotation.x = -Math.PI / 2;
+  plane.position.y = -1;
+  scene.add(plane);
 
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
 
-    // Initialize minimap
-    const minimap = new Minimap("minimap", 200, 100);
+  // Initialize minimap
+  const minimap = new Minimap("minimap", 200, 100);
 
-    window.addEventListener("mousemove", (event) => {
-        pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-        pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(pointer, camera);
-        const cubes = Object.values(playersCubes)
-            .map((player) => player.cube)
-            .concat(Object.values(monstersCubes).map((monster) => monster.cube))
-            .filter((cube) => cube !== null && cube !== undefined)
-            .flatMap((cube) => {
-                const meshes: THREE.Mesh[] = [];
-                cube.traverse((child) => {
-                    if (child.isMesh) {
-                        meshes.push(child as THREE.Mesh);
-                    }
-                });
-                return meshes;
-            });
-        const intersects = raycaster.intersectObjects(cubes, false);
-        if (intersects.length > 0) {
-            const intersectedCube = intersects[0].object;
-            for (const oplayer of Object.values(playersCubes)) {
-                if (oplayer.cube && oplayer.cube === intersectedCube.parent) {
-                    hovered = oplayer;
-                    break;
-                }
-            }
-            for (const omonster of Object.values(monstersCubes)) {
-                if (omonster.cube && omonster.cube === intersectedCube.parent) {
-                    hovered = omonster;
-                    break;
-                }
-            }
-        } else {
-            hovered = null;
-        }
-    });
-
-    window.addEventListener("mouseup", (event) => {
-        selected = hovered;
-    });
-
-    socket.on("update_threat", (data) => {
-        const monster = monstersCubes[data.monsterid];
-        if (monster) {
-            monster.threats = data.threats;
-        }
-    });
-
-    socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
-        for (const [id, data] of Object.entries(players)) {
-            if (!playersCubes[id]) {
-                playersCubes[id] = new PlayerCube(
-                    id,
-                    data.pos,
-                    data.rot,
-                    data.hp,
-                    data.name,
-                    data.totalhp,
-                    data.modelpath
-                );
-                scene.add(playersCubes[id].cube);
-
-                // add icon to minimap for this player
-                // if this is the local player use the playerMarker svg and rotatable
-                const iconIsRotatable = id === my_id;
-                const iconSrc = id === my_id ? "/static/playerMarker.svg" : "blue";
-                minimap.addIcon(id, iconSrc, id === my_id ? 20 : 8, iconIsRotatable);
-            } else {
-                playersCubes[id].updatePosition(data.pos);
-                playersCubes[id].updateRotation(data.rot);
-                if (data.hp != playersCubes[id].hp) {
-                    const damageNumber = new DamageNumber(
-                        scene,
-                        playersCubes[id],
-                        playersCubes[id].hp - data.hp
-                    );
-                    setInterval(() => {
-                        damageNumber.update();
-                    }, 250);
-                }
-                playersCubes[id].updateHp(data.hp);
-            }
-            if (!player) {
-                if (my_id == id) {
-                    player = playersCubes[id];
-                }
-            }
-        }
-        for (const [id, cube] of Object.entries(playersCubes)) {
-            if (!players[id]) {
-                cube.cleanup();
-                scene.remove(cube.cube);
-                if (cube.cube.geometry) {
-                    cube.cube.geometry.dispose();
-                }
-                if (Array.isArray(cube.cube.material)) {
-                    cube.cube.material.forEach((material) => material.dispose());
-                } else if (cube.cube.material) {
-                    cube.cube.material.dispose();
-                }
-                if (playersCubes[id]) {
-                    minimap.removeIcon(id);
-                    delete playersCubes[id];
-                }
-            }
-        }
-    });
-
-    socket.on("monster_position_update", (mon) => {
-        if (monstersCubes[mon.id]) {
-            if (monstersCubes[mon.id].isalive == true) {
-                monstersCubes[mon.id].startLerp(mon.pos, mon.rot);
-            } else {
-                monstersCubes[mon.id].respawn(mon);
-            }
-        }
-    });
-    socket.on("player_dead", (player) => {
-        if (playersCubes[player.id]) {
-            playersCubes[player.id].handleDeath();
-        }
-        if (selected && selected.id == player.id) {
-            selected = null;
-        }
-        if (player.id == my_id) {
-            playersCubes[player.id].showDeathMessage(socket);
-        }
-    });
-
-    socket.on("monster_dead", (monster) => {
-        if (monstersCubes[monster.id]) {
-            monstersCubes[monster.id].handleDeath();
-        }
-        if (selected && selected.id == monster.id) {
-            selected = null;
-        }
-        minimap.removeIcon(monster.id);
-    });
-    socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
-        for (const [id, data] of Object.entries(mons)) {
-            if (!monstersCubes[id]) {
-                monstersCubes[id] = new MonsterCube(
-                    id,
-                    data.name,
-                    data.hp,
-                    data.totalhp,
-                    data.attack,
-                    data.arange,
-                    data.cooldown,
-                    data.pos,
-                    data.rot,
-                    data.aggrorange,
-                    data.followrange,
-                    data.speed,
-                    data.modelpath
-                );
-                minimap.addIcon(id, "red", 8, false);
-            } else {
-                if (monstersCubes[id].isalive) {
-                    monstersCubes[id].startLerp(data.pos, data.rot);
-                    if (data.hp != monstersCubes[id].hp) {
-                        const damageNumber = new DamageNumber(
-                            scene,
-                            monstersCubes[id],
-                            monstersCubes[id].hp - data.hp
-                        );
-                        setInterval(() => {
-                            damageNumber.update();
-                        }, 250);
-                    }
-                    monstersCubes[id].updateHp(data.hp);
-                }
-            }
-        }
-    });
-
-    function escapeHTML(str) {
-        const div = document.createElement("div");
-        div.textContent = str;
-        return div.innerHTML;
-    }
-
-    function formatMessage(vals, p) {
-        if (!p) {
-            const sanitizedMessage = escapeHTML(vals[0]);
-            return `<p class='name'>${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
-        } else {
-            const sanitizedMessage = escapeHTML(vals[0]);
-            return `<p class='name'>(PRIVATE) ${vals[1]} -> ${vals[2]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
-        }
-    }
-
-    socket.on("append_msg", (vals) => {
-        const messageElement = document.createElement("div");
-        messageElement.innerHTML = formatMessage(vals, false);
-        messageElement.classList.add("message-container");
-        if (chatobj) {
-            const isAtBottom =
-                Math.abs(
-                    chatobj.scrollHeight - chatobj.scrollTop - chatobj.clientHeight
-                ) < 1;
-            chatobj.appendChild(messageElement);
-            if (isAtBottom) {
-                chatobj.scrollTop = chatobj.scrollHeight;
-            }
-            if (chatobj.childElementCount > 60) {
-                const excessMessages = chatobj.childElementCount - 60;
-                for (let i = 0; i < excessMessages; i++) {
-                    if (chatobj.firstChild) {
-                        chatobj.firstChild.remove();
-                    }
-                }
-            }
-        }
-    });
-
-    socket.on("private_msg", (vals) => {
-        if (vals[1] == my_username || vals[2] == my_username) {
-            const messageElement = document.createElement("div");
-            messageElement.innerHTML = formatMessage(vals, true);
-            messageElement.classList.add("message-container");
-            if (chatobj) {
-                chatobj.appendChild(messageElement);
-                const isAtBottom =
-                    chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
-                if (isAtBottom) {
-                    chatobj.scrollTop = chatobj.scrollHeight;
-                }
-                if (chatobj.childElementCount > 60) {
-                    while (chatobj.childElementCount > 60) {
-                        if (chatobj.firstChild) {
-                            chatobj.firstChild.remove();
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    socket.on("pm_fail", (failid) => {
-        if (failid == my_username) {
-            const messageElement = document.createElement("div");
-            messageElement.textContent =
-                'The format for a private message is: "/pm target_id message". Please try again.';
-            if (chatobj) {
-                chatobj.appendChild(messageElement);
-                const isAtBottom =
-                    chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
-                if (isAtBottom) {
-                    chatobj.scrollTop = chatobj.scrollHeight;
-                }
-                if (chatobj.childElementCount > 60) {
-                    while (chatobj.childElementCount > 60) {
-                        if (chatobj.firstChild) {
-                            chatobj.firstChild.remove();
-                        }
-                    }
-                }
-            }
-        }
-    });
-    let spellconversion = {
-        "1": "one",
-        "2": "two",
-        "3": "three",
-        "4": "four",
-        "5": "five",
-        "6": "six",
-        "7": "seven",
-        "8": "eight",
-        "9": "nine",
-        "10": "ten",
-    };
-    let spellcools = {
-        "1": true,
-        "2": true,
-        "3": true,
-        "4": true,
-        "5": true,
-        "6": true,
-        "7": true,
-        "8": true,
-        "9": true,
-        "10": true,
-    };
-    socket.on("spell_ready", (info) => {
-        if (info[0] == my_id) {
-            spellcools[`${info[1]}`] = true;
-            const spellElement = document.getElementById("spellone");
-            if (spellElement && Array.from(spellElement.classList).includes("dark")) {
-                const spellElement = document.getElementById(
-                    `spell${spellconversion[`${info[1]}`]}`
-                );
-                if (spellElement) {
-                    spellElement.classList.remove("dark");
-                }
-            }
-        }
-    });
-
-    window.addEventListener("beforeunload", function (e) {
-        socket.emit("offline", [my_id, localStorage.getItem("client_id")]);
-    });
-    let pressed: string[] = [];
-
-    function animate() {
-        requestAnimationFrame(animate);
-        if (player && player.cube) {
-            if (!chatopen) {
-                socket.emit("player_keys", { id: my_id, keys: pressed });
-            }
-            camera.position.x =
-                player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
-            camera.position.z =
-                player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
-            camera.position.y = player.cube.position.y + 1.7;
-            camera.lookAt(player.cube.position);
-            if (Object.keys(playersCubes).length > 0) {
-                for (const oplayer of Object.values(playersCubes)) {
-                    oplayer.updateLabel(tri(player.cube.position, oplayer.cube.position));
-                }
-            }
-            if (Object.keys(monstersCubes).length > 0 && monstersCubes != null) {
-                for (const omonster of Object.values(monstersCubes)) {
-                    if (omonster.isalive) {
-                        if (player.cube && omonster.cube) {
-                            omonster.updateLabel(
-                                tri(player.cube.position, omonster.cube.position)
-                            );
-                        }
-                        if (omonster.lerpStart && omonster.lerpTarget) {
-                            const now = performance.now();
-                            const t = Math.min(
-                                1,
-                                (now - omonster.lerpStartTime) / omonster.lerpDuration
-                            );
-                            omonster.cube.position.lerpVectors(
-                                omonster.lerpStart,
-                                omonster.lerpTarget,
-                                t
-                            );
-                            omonster.cube.quaternion.slerp(omonster.lerpTargetR, t);
-                            if (t === 1) {
-                                omonster.lerpStart = null;
-                                omonster.lerpTarget = null;
-                                omonster.lerpStartR = null;
-                                omonster.lerpTargetR = null;
-                            }
-                        }
-                        // update minimap icon for monster
-                        minimap.updateIcon(omonster.id, omonster.cube.position.x, omonster.cube.position.z);
-                    }
-                }
-            }
-            // update minimap icon for player
-            const adjustedRotation = -player.cube.rotation.y + Math.PI / 2;
-            minimap.updateIcon(my_id, player.cube.position.x, player.cube.position.z, adjustedRotation);
-
-            // center the minimap so player is always at the center
-            minimap.centerOnPlayer(player.cube.position.x, player.cube.position.z);
-        }
-        renderer.render(scene, camera);
-        labelRenderer.render(scene, camera);
-    }
-
-    let repeatInterval;
-
-    window.addEventListener("keydown", (event) => {
-        if (!pressed.includes(event.key)) {
-            pressed.push(event.key);
-        }
-        if (chatopen && event.key.length === 1) {
-            if (!repeatInterval) {
-                repeatInterval = setInterval(() => {
-                    if (enterInput) {
-                        (enterInput as HTMLInputElement).value += event.key;
-                        enterInput.focus();
-                    }
-                }, 200);
-            }
-        }
-    });
-
-    let chatobj = document.getElementById("chat");
-    let enterInput = document.getElementById("chatInput");
-    let chatopen = false;
-    window.addEventListener("keyup", (event) => {
-        pressed = pressed.filter((key) => key !== event.key);
-        if (event.key.length === 1 && chatopen) {
-            clearInterval(repeatInterval);
-            repeatInterval = null;
-        }
-        if (event.key === "Enter") {
-            if (chatopen) {
-                sendMessage();
-                chatopen = false;
-                if (enterInput) {
-                    enterInput.style.zIndex = "99";
-                    enterInput.style.opacity = "0";
-                }
-                if (chatobj) {
-                    chatobj.style.opacity = "0.5";
-                }
-                clearInterval(repeatInterval);
-                repeatInterval = null;
-            } else {
-                chatopen = true;
-                if (enterInput) {
-                    enterInput.style.zIndex = "101";
-                    enterInput.style.opacity = "1";
-                    enterInput.focus();
-                }
-                if (chatobj) {
-                    chatobj.style.opacity = "1";
-                }
-            }
-        } else if (chatopen) {
-            if (event.key === "Backspace") {
-                if (enterInput) {
-                    (enterInput as HTMLInputElement).value = (
-                        enterInput as HTMLInputElement
-                    ).value.slice(0, -1);
-                }
-            }
-        }
-        if (event.key === "1" && !chatopen) {
-            if (spellcools["1"] == true) {
-                if (selected) {
-                    if (selected.id != my_id) {
-                        socket.emit("player_hit", [selected.id, my_id, selected.type]);
-                        spellcools["1"] = false;
-                        const spellOneElement = document.getElementById("spellone");
-                        if (
-                            spellOneElement &&
-                            !Array.from(spellOneElement.classList).includes("dark")
-                        ) {
-                            const spellOneElement = document.getElementById("spellone");
-                            if (spellOneElement) {
-                                spellOneElement.classList.add("dark");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    if (enterInput) {
-        enterInput.addEventListener("blur", (_event) => {
-            if (chatopen && enterInput) {
-                enterInput.focus();
-            }
+  window.addEventListener("mousemove", (event) => {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const cubes = Object.values(playersCubes)
+      .map((player) => player.cube)
+      .concat(Object.values(monstersCubes).map((monster) => monster.cube))
+      .filter((cube) => cube !== null && cube !== undefined)
+      .flatMap((cube) => {
+        const meshes: THREE.Mesh[] = [];
+        cube.traverse((child) => {
+          if (child.isMesh) {
+            meshes.push(child as THREE.Mesh);
+          }
         });
-    }
-
-    window.addEventListener("click", (event) => {
-        if (chatopen) {
-            const clicked = event.target as HTMLElement;
-            if (clicked && clicked.id !== "chat" && clicked.id !== "chatInput") {
-                chatopen = false;
-                if (enterInput) {
-                    (enterInput as HTMLInputElement).value = "";
-                    enterInput.style.zIndex = "99";
-                    enterInput.style.opacity = "0";
-                }
-                if (chatobj) {
-                    chatobj.style.opacity = "0.5";
-                }
-                clearInterval(repeatInterval);
-                repeatInterval = null;
-            }
+        return meshes;
+      });
+    const intersects = raycaster.intersectObjects(cubes, false);
+    if (intersects.length > 0) {
+      const intersectedCube = intersects[0].object;
+      for (const oplayer of Object.values(playersCubes)) {
+        if (oplayer.cube && oplayer.cube === intersectedCube.parent) {
+          hovered = oplayer;
+          break;
         }
-    });
+      }
+      for (const omonster of Object.values(monstersCubes)) {
+        if (omonster.cube && omonster.cube === intersectedCube.parent) {
+          hovered = omonster;
+          break;
+        }
+      }
+    } else {
+      hovered = null;
+    }
+  });
 
-    function sendMessage() {
+  window.addEventListener("mouseup", (event) => {
+    selected = hovered;
+  });
+
+  socket.on("update_threat", (data) => {
+    const monster = monstersCubes[data.monsterid];
+    if (monster) {
+      monster.threats = data.threats;
+    }
+  });
+
+  socket.on("render_players", (players: { [id: number]: SocketPlayer }) => {
+    for (const [id, data] of Object.entries(players)) {
+      if (!playersCubes[id]) {
+        playersCubes[id] = new PlayerCube(
+          id,
+          data.pos,
+          data.rot,
+          data.hp,
+          data.name,
+          data.totalhp,
+          data.modelpath,
+        );
+        scene.add(playersCubes[id].cube);
+
+        // add icon to minimap for this player
+        // if this is the local player use the playerMarker svg and rotatable
+        const iconIsRotatable = id === my_id;
+        const iconSrc = id === my_id ? "/static/playerMarker.svg" : "blue";
+        minimap.addIcon(id, iconSrc, id === my_id ? 20 : 8, iconIsRotatable);
+      } else {
+        playersCubes[id].updatePosition(data.pos);
+        playersCubes[id].updateRotation(data.rot);
+        if (data.hp != playersCubes[id].hp) {
+          const damageNumber = new DamageNumber(
+            scene,
+            playersCubes[id],
+            playersCubes[id].hp - data.hp,
+          );
+          setInterval(() => {
+            damageNumber.update();
+          }, 250);
+        }
+        playersCubes[id].updateHp(data.hp);
+      }
+      if (!player) {
+        if (my_id == id) {
+          player = playersCubes[id];
+        }
+      }
+    }
+    for (const [id, cube] of Object.entries(playersCubes)) {
+      if (!players[id]) {
+        cube.cleanup();
+        scene.remove(cube.cube);
+        if (cube.cube.geometry) {
+          cube.cube.geometry.dispose();
+        }
+        if (Array.isArray(cube.cube.material)) {
+          cube.cube.material.forEach((material) => material.dispose());
+        } else if (cube.cube.material) {
+          cube.cube.material.dispose();
+        }
+        if (playersCubes[id]) {
+          minimap.removeIcon(id);
+          delete playersCubes[id];
+        }
+      }
+    }
+  });
+
+  socket.on("monster_position_update", (mon) => {
+    if (monstersCubes[mon.id]) {
+      if (monstersCubes[mon.id].isalive == true) {
+        monstersCubes[mon.id].startLerp(mon.pos, mon.rot);
+      } else {
+        monstersCubes[mon.id].respawn(mon);
+      }
+    }
+  });
+  socket.on("player_dead", (player) => {
+    if (playersCubes[player.id]) {
+      playersCubes[player.id].handleDeath();
+    }
+    if (selected && selected.id == player.id) {
+      selected = null;
+    }
+    if (player.id == my_id) {
+      playersCubes[player.id].showDeathMessage(socket);
+    }
+  });
+
+  socket.on("monster_dead", (monster) => {
+    if (monstersCubes[monster.id]) {
+      monstersCubes[monster.id].handleDeath();
+    }
+    if (selected && selected.id == monster.id) {
+      selected = null;
+    }
+    minimap.removeIcon(monster.id);
+  });
+  socket.on("render_monsters", (mons: { [id: number]: SocketMonster }) => {
+    for (const [id, data] of Object.entries(mons)) {
+      if (!monstersCubes[id]) {
+        monstersCubes[id] = new MonsterCube(
+          id,
+          data.name,
+          data.hp,
+          data.totalhp,
+          data.attack,
+          data.arange,
+          data.cooldown,
+          data.pos,
+          data.rot,
+          data.aggrorange,
+          data.followrange,
+          data.speed,
+          data.modelpath,
+        );
+        minimap.addIcon(id, "red", 8, false);
+      } else {
+        if (monstersCubes[id].isalive) {
+          monstersCubes[id].startLerp(data.pos, data.rot);
+          if (data.hp != monstersCubes[id].hp) {
+            const damageNumber = new DamageNumber(
+              scene,
+              monstersCubes[id],
+              monstersCubes[id].hp - data.hp,
+            );
+            setInterval(() => {
+              damageNumber.update();
+            }, 250);
+          }
+          monstersCubes[id].updateHp(data.hp);
+        }
+      }
+    }
+  });
+
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatMessage(vals, p) {
+    if (!p) {
+      const sanitizedMessage = escapeHTML(vals[0]);
+      return `<p class='name'>${vals[1]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
+    } else {
+      const sanitizedMessage = escapeHTML(vals[0]);
+      return `<p class='name'>(PRIVATE) ${vals[1]} -> ${vals[2]}</p><div class='message'><p class='text'>${sanitizedMessage}</p></div>`;
+    }
+  }
+
+  socket.on("append_msg", (vals) => {
+    const messageElement = document.createElement("div");
+    messageElement.innerHTML = formatMessage(vals, false);
+    messageElement.classList.add("message-container");
+    if (chatobj) {
+      const isAtBottom =
+        Math.abs(
+          chatobj.scrollHeight - chatobj.scrollTop - chatobj.clientHeight,
+        ) < 1;
+      chatobj.appendChild(messageElement);
+      if (isAtBottom) {
+        chatobj.scrollTop = chatobj.scrollHeight;
+      }
+      if (chatobj.childElementCount > 60) {
+        const excessMessages = chatobj.childElementCount - 60;
+        for (let i = 0; i < excessMessages; i++) {
+          if (chatobj.firstChild) {
+            chatobj.firstChild.remove();
+          }
+        }
+      }
+    }
+  });
+
+  socket.on("private_msg", (vals) => {
+    if (vals[1] == my_username || vals[2] == my_username) {
+      const messageElement = document.createElement("div");
+      messageElement.innerHTML = formatMessage(vals, true);
+      messageElement.classList.add("message-container");
+      if (chatobj) {
+        chatobj.appendChild(messageElement);
+        const isAtBottom =
+          chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
+        if (isAtBottom) {
+          chatobj.scrollTop = chatobj.scrollHeight;
+        }
+        if (chatobj.childElementCount > 60) {
+          while (chatobj.childElementCount > 60) {
+            if (chatobj.firstChild) {
+              chatobj.firstChild.remove();
+            }
+          }
+        }
+      }
+    }
+  });
+
+  socket.on("pm_fail", (failid) => {
+    if (failid == my_username) {
+      const messageElement = document.createElement("div");
+      messageElement.textContent =
+        'The format for a private message is: "/pm target_id message". Please try again.';
+      if (chatobj) {
+        chatobj.appendChild(messageElement);
+        const isAtBottom =
+          chatobj.scrollHeight - chatobj.scrollTop === chatobj.clientHeight;
+        if (isAtBottom) {
+          chatobj.scrollTop = chatobj.scrollHeight;
+        }
+        if (chatobj.childElementCount > 60) {
+          while (chatobj.childElementCount > 60) {
+            if (chatobj.firstChild) {
+              chatobj.firstChild.remove();
+            }
+          }
+        }
+      }
+    }
+  });
+  let spellconversion = {
+    "1": "one",
+    "2": "two",
+    "3": "three",
+    "4": "four",
+    "5": "five",
+    "6": "six",
+    "7": "seven",
+    "8": "eight",
+    "9": "nine",
+    "10": "ten",
+  };
+  let spellcools = {
+    "1": true,
+    "2": true,
+    "3": true,
+    "4": true,
+    "5": true,
+    "6": true,
+    "7": true,
+    "8": true,
+    "9": true,
+    "10": true,
+  };
+  socket.on("spell_ready", (info) => {
+    if (info[0] == my_id) {
+      spellcools[`${info[1]}`] = true;
+      const spellElement = document.getElementById("spellone");
+      if (spellElement && Array.from(spellElement.classList).includes("dark")) {
+        const spellElement = document.getElementById(
+          `spell${spellconversion[`${info[1]}`]}`,
+        );
+        if (spellElement) {
+          spellElement.classList.remove("dark");
+        }
+      }
+    }
+  });
+
+  window.addEventListener("beforeunload", function (e) {
+    socket.emit("offline", [my_id, localStorage.getItem("client_id")]);
+  });
+  let pressed: string[] = [];
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (player && player.cube) {
+      if (!chatopen) {
+        socket.emit("player_keys", { id: my_id, keys: pressed });
+      }
+      camera.position.x =
+        player.cube.position.x - Math.sin(player.cube.rotation.y) * 4;
+      camera.position.z =
+        player.cube.position.z - Math.cos(player.cube.rotation.y) * 4;
+      camera.position.y = player.cube.position.y + 1.7;
+      camera.lookAt(player.cube.position);
+      if (Object.keys(playersCubes).length > 0) {
+        for (const oplayer of Object.values(playersCubes)) {
+          oplayer.updateLabel(tri(player.cube.position, oplayer.cube.position));
+        }
+      }
+      if (Object.keys(monstersCubes).length > 0 && monstersCubes != null) {
+        for (const omonster of Object.values(monstersCubes)) {
+          if (omonster.isalive) {
+            if (player.cube && omonster.cube) {
+              omonster.updateLabel(
+                tri(player.cube.position, omonster.cube.position),
+              );
+            }
+            if (omonster.lerpStart && omonster.lerpTarget) {
+              const now = performance.now();
+              const t = Math.min(
+                1,
+                (now - omonster.lerpStartTime) / omonster.lerpDuration,
+              );
+              omonster.cube.position.lerpVectors(
+                omonster.lerpStart,
+                omonster.lerpTarget,
+                t,
+              );
+              omonster.cube.quaternion.slerp(omonster.lerpTargetR, t);
+              if (t === 1) {
+                omonster.lerpStart = null;
+                omonster.lerpTarget = null;
+                omonster.lerpStartR = null;
+                omonster.lerpTargetR = null;
+              }
+            }
+            // update minimap icon for monster
+            minimap.updateIcon(
+              omonster.id,
+              omonster.cube.position.x,
+              omonster.cube.position.z,
+            );
+          }
+        }
+      }
+      // update minimap icon for player
+      const adjustedRotation = -player.cube.rotation.y + Math.PI / 2;
+      minimap.updateIcon(
+        my_id,
+        player.cube.position.x,
+        player.cube.position.z,
+        adjustedRotation,
+      );
+
+      // center the minimap so player is always at the center
+      minimap.centerOnPlayer(player.cube.position.x, player.cube.position.z);
+    }
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+  }
+
+  let repeatInterval;
+
+  window.addEventListener("keydown", (event) => {
+    if (!pressed.includes(event.key)) {
+      pressed.push(event.key);
+    }
+    if (chatopen && event.key.length === 1) {
+      if (!repeatInterval) {
+        repeatInterval = setInterval(() => {
+          if (enterInput) {
+            (enterInput as HTMLInputElement).value += event.key;
+            enterInput.focus();
+          }
+        }, 200);
+      }
+    }
+  });
+
+  let chatobj = document.getElementById("chat");
+  let enterInput = document.getElementById("chatInput");
+  let chatopen = false;
+  window.addEventListener("keyup", (event) => {
+    pressed = pressed.filter((key) => key !== event.key);
+    if (event.key.length === 1 && chatopen) {
+      clearInterval(repeatInterval);
+      repeatInterval = null;
+    }
+    if (event.key === "Enter") {
+      if (chatopen) {
+        sendMessage();
+        chatopen = false;
         if (enterInput) {
-            const message = (enterInput as HTMLInputElement).value.trim();
-            if (message) {
-                socket.emit("new_msg", [message, my_username]);
-                (enterInput as HTMLInputElement).value = "";
-            }
+          enterInput.style.zIndex = "99";
+          enterInput.style.opacity = "0";
         }
+        if (chatobj) {
+          chatobj.style.opacity = "0.5";
+        }
+        clearInterval(repeatInterval);
+        repeatInterval = null;
+      } else {
+        chatopen = true;
+        if (enterInput) {
+          enterInput.style.zIndex = "101";
+          enterInput.style.opacity = "1";
+          enterInput.focus();
+        }
+        if (chatobj) {
+          chatobj.style.opacity = "1";
+        }
+      }
+    } else if (chatopen) {
+      if (event.key === "Backspace") {
+        if (enterInput) {
+          (enterInput as HTMLInputElement).value = (
+            enterInput as HTMLInputElement
+          ).value.slice(0, -1);
+        }
+      }
     }
-    animate();
+    if (event.key === "1" && !chatopen) {
+      if (spellcools["1"] == true) {
+        if (selected) {
+          if (selected.id != my_id) {
+            socket.emit("player_hit", [selected.id, my_id, selected.type]);
+            spellcools["1"] = false;
+            const spellOneElement = document.getElementById("spellone");
+            if (
+              spellOneElement &&
+              !Array.from(spellOneElement.classList).includes("dark")
+            ) {
+              const spellOneElement = document.getElementById("spellone");
+              if (spellOneElement) {
+                spellOneElement.classList.add("dark");
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  if (enterInput) {
+    enterInput.addEventListener("blur", (_event) => {
+      if (chatopen && enterInput) {
+        enterInput.focus();
+      }
+    });
+  }
+
+  window.addEventListener("click", (event) => {
+    if (chatopen) {
+      const clicked = event.target as HTMLElement;
+      if (clicked && clicked.id !== "chat" && clicked.id !== "chatInput") {
+        chatopen = false;
+        if (enterInput) {
+          (enterInput as HTMLInputElement).value = "";
+          enterInput.style.zIndex = "99";
+          enterInput.style.opacity = "0";
+        }
+        if (chatobj) {
+          chatobj.style.opacity = "0.5";
+        }
+        clearInterval(repeatInterval);
+        repeatInterval = null;
+      }
+    }
+  });
+
+  function sendMessage() {
+    if (enterInput) {
+      const message = (enterInput as HTMLInputElement).value.trim();
+      if (message) {
+        socket.emit("new_msg", [message, my_username]);
+        (enterInput as HTMLInputElement).value = "";
+      }
+    }
+  }
+  animate();
 }

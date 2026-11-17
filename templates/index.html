@@ -1,39 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NextRealm - Login</title>
     {%- if not is_production %}
     <script type="module" src="{{ asset('@vite/client') }}"></script>
     {%- endif %}
-    <link rel="icon" href="/static/NextRealm.jpg">
-</head>
+    <link rel="icon" href="/static/NextRealm.jpg" />
+  </head>
 
-<body>
+  <body>
     <form action="{{ url_for('signup') }}" method="POST">
-        <label for="username_signup">Username:</label>
-        <input type="text" name="username" id="username_signup" required>
-        <input type="hidden" name="client_id" id="client_id" required>
-        <button type="submit">Sign Up</button>
+      <label for="username_signup">Username:</label>
+      <input type="text" name="username" id="username_signup" required />
+      <input type="hidden" name="client_id" id="client_id" required />
+      <button type="submit">Sign Up</button>
     </form>
     <form action="{{ url_for('login') }}" method="POST">
-        <label for="username_login">Username:</label>
-        <input type="text" name="username" id="username_login" required>
-        <input type="hidden" name="client_id" id="client_id" required>
-        <button type="submit">Login</button>
+      <label for="username_login">Username:</label>
+      <input type="text" name="username" id="username_login" required />
+      <input type="hidden" name="client_id" id="client_id" required />
+      <button type="submit">Login</button>
     </form>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
     <ul class="flashes">
-        {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
+      {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
     </ul>
-    {% endif %}
-    {% endwith %}
+    {% endif %} {% endwith %}
     <script type="module" src="{{ asset('scripts/app.ts') }}"></script>
-</body>
-
+  </body>
 </html>

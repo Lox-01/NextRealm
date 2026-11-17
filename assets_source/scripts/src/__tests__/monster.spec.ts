@@ -1,9 +1,9 @@
-import { MonsterCube } from '../monster';
-import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { MonsterCube } from "../monster";
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
-describe('MonsterCube', () => {
-  const mockId = 'monster1';
-  const mockName = 'TestMonster';
+describe("MonsterCube", () => {
+  const mockId = "monster1";
+  const mockName = "TestMonster";
   const mockHp = 50;
   const mockTotalHp = 100;
   const mockAttack = 10;
@@ -32,11 +32,11 @@ describe('MonsterCube', () => {
       mockAggroRange,
       mockFollowRange,
       mockSpeed,
-      mockModel
+      mockModel,
     );
   });
 
-  it('should initialize with the correct properties', () => {
+  it("should initialize with the correct properties", () => {
     expect(monster.id).toBe(mockId);
     expect(monster.name).toBe(mockName);
     expect(monster.hp).toBe(mockHp);
@@ -51,7 +51,7 @@ describe('MonsterCube', () => {
     expect(monster.modelpath).toBe(mockModel);
   });
 
-  it('should create a label', () => {
+  it("should create a label", () => {
     expect(monster.label).toBeDefined();
     if (monster.label) {
       expect(monster.label).toBeInstanceOf(CSS2DObject);
@@ -59,14 +59,14 @@ describe('MonsterCube', () => {
     }
   });
 
-  it('should create a health bar', () => {
+  it("should create a health bar", () => {
     expect(monster.hpbar).toBeDefined();
     if (monster.hpbar) {
       expect(monster.hpbar).toBeInstanceOf(CSS2DObject);
     }
   });
 
-  it('should update position', () => {
+  it("should update position", () => {
     expect(monster.cube).toBeDefined();
     const newPosition = { x: 1, y: 2, z: 3 };
     monster.updatePosition(newPosition);
@@ -77,7 +77,7 @@ describe('MonsterCube', () => {
     }
   });
 
-  it('should update rotation', () => {
+  it("should update rotation", () => {
     expect(monster.cube).toBeDefined();
     const newRotation = { xr: Math.PI, yr: Math.PI / 2, zr: 0 };
     monster.updateRotation(newRotation);
@@ -88,13 +88,15 @@ describe('MonsterCube', () => {
     }
   });
 
-  it('should update HP and reflect it on the health bar', () => {
+  it("should update HP and reflect it on the health bar", () => {
     expect(monster.hpbar).toBeDefined();
     if (monster.hpbar) {
       monster.updateHp(25);
       expect(monster.hp).toBe(25);
-      const hpFront = monster.hpbar.element.getElementsByClassName('hpfront')[0] as HTMLElement;
-      expect(hpFront.style.width).toBe('25%');
+      const hpFront = monster.hpbar.element.getElementsByClassName(
+        "hpfront",
+      )[0] as HTMLElement;
+      expect(hpFront.style.width).toBe("25%");
     }
   });
 });

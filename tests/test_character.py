@@ -1,4 +1,5 @@
 import unittest
+
 from character import Character
 
 
@@ -51,7 +52,15 @@ class TestCharacter(unittest.TestCase):
 
     def test_initial_hp_at_zero_is_dead(self):
         """Test that a character with initial HP of zero is dead."""
-        character = Character("dead", {"x": 0, "y": 0, "z": 0}, {"xr": 0, "yr": 0, "zr": 0}, 0, 100, "Dead", "model.glb")
+        character = Character(
+            "dead",
+            {"x": 0, "y": 0, "z": 0},
+            {"xr": 0, "yr": 0, "zr": 0},
+            0,
+            100,
+            "Dead",
+            "model.glb",
+        )
         self.assertFalse(character.alive)
 
     def test_to_dict(self):

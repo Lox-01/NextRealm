@@ -13,18 +13,18 @@ export default mergeConfig(
           ["lcov", { projectRoot: "./src" }],
           ["json", { file: "coverage.json" }],
           ["clover"],
-          ["text"]
-        ]
+          ["text"],
+        ],
       },
       reporters: ["junit", "json", "verbose"],
       outputFile: {
         junit: "./assets_testreports/junit.xml",
-        json: "./assets_testreports/json-report.json"
+        json: "./assets_testreports/json-report.json",
       },
       environment: "jsdom",
       exclude: [...configDefaults.exclude, "e2e/*"],
       setupFiles: ["./vitest.setup.ts"],
-      root: fileURLToPath(new URL("./", import.meta.url))
-    }
-  })
+      root: fileURLToPath(new URL("./", import.meta.url)),
+    },
+  }),
 );
