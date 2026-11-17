@@ -148,9 +148,6 @@ def on_debug(data):
 
 
 def process_hit(hit, hitter, socketio, entity_type, entity_dict):
-    now = time.time()
-    if not hasattr(hitter, "spell_cooldowns"):
-        hitter.spell_cooldowns = {}
     spell_id = "1"
     cooldown = 2
     if not (hitter.alive and hit.alive):

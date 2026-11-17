@@ -1,11 +1,9 @@
 import * as THREE from "three";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import { io } from "socket.io-client"; // For client-side
-// or
-// import { Server } from "socket.io"; // For server-side
+import { io } from "socket.io-client";
 
 import { DamageNumber } from "./damagenumber";
-import { PlayerCube, SocketPlayer as SocketPlayer } from "./player";
+import { PlayerCube, SocketPlayer } from "./player";
 import { MonsterCube, SocketMonster } from "./monster";
 import { tri } from "./shared";
 
@@ -267,9 +265,7 @@ export function scriptPage() {
                 const excessMessages = chatobj.childElementCount - 60;
                 for (let i = 0; i < excessMessages; i++) {
                     if (chatobj.firstChild) {
-                        if (chatobj.firstChild) {
-                            chatobj.firstChild.remove();
-                        }
+                        chatobj.firstChild.remove();
                     }
                 }
             }

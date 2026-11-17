@@ -3,8 +3,6 @@ import unittest
 from unittest.mock import patch
 from character import Character
 from monster import Monster
-from random import randint
-import math
 import time
 
 
