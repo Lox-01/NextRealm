@@ -61,15 +61,39 @@ class TestMonster(unittest.TestCase):
         self.monster.decay_threat(self.player)
         self.assertIn(self.player.id, self.monster.threats)
 
+    def test_decay_threat_removes_elapsed_threat_at_zero(self):
+        self.monster.threats[self.player.id] = [0.1, time.time() - 3]
+        self.monster.decay_threat(self.player)
+        self.assertNotIn(self.player.id, self.monster.threats)
+
+    def test_decay_threat_ignores_other_player(self):
+        self.monster.threats[999] = [1.0, time.time() - 3]
+        self.monster.decay_threat(self.player)
+        self.assertIn(999, self.monster.threats)
+
     def test_move_to_origin_not_moved(self):
         self.monster.move_to_origin()
         self.assertEqual(self.monster.position, self.monster.origin)
         self.assertEqual(self.monster.rotation, self.monster.orotation)
 
+    def test_move_to_origin_snaps_near_destination(self):
+        self.monster.position = {"x": 1, "y": 0, "z": 0}
+        self.monster.move_to_origin()
+        self.assertEqual(self.monster.position, self.monster.origin)
+
     def test_move_to_player(self):
         self.monster.move_to_player(self.player)
         # self.assertEqual(self.monster.position, self.player.position)
         # self.assertEqual(self.monster.rotation, self.player.rotation)
+
+    def test_move_to_player_snaps_near_destination(self):
+        self.monster.position = {"x": 9, "y": 10, "z": 10}
+        self.monster.move_to_player(self.player)
+        self.assertEqual(self.monster.position, self.player.position)
+
+    def test_turn_to_player_updates_rotation(self):
+        self.monster.turn_to_player(self.player)
+        self.assertNotEqual(self.monster.rotation["yr"], 0)
 
     def test_to_dict(self):
         result = {

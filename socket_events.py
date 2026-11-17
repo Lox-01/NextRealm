@@ -127,18 +127,19 @@ def on_player_move(data, players, socketio):
 
 
 def on_new_msg(vals, players, socketio):
-    msg = vals[0]
-    splitted = msg.split(" ")
-    if splitted[0].lower() == "/pm":
-        if len(splitted) < 3:
+    msg = str(vals[0]).strip()
+    parts = msg.split()
+    if not parts:
+        return
+    if parts[0].lower() == "/pm":
+        if len(parts) < 3:
             socketio.emit("pm_fail", vals[1])
-        else:
-            usern = splitted[1]
-            if str(usern) in [player.name for player in players.values()]:
-                newvals = [" ".join(splitted[2:]), usern, vals[1]]
-                socketio.emit("private_msg", newvals)
-            else:
-                socketio.emit("pm_fail", vals[1])
+            return
+        target_name = parts[1]
+        if target_name not in [player.name for player in players.values()]:
+            socketio.emit("pm_fail", vals[1])
+            return
+        socketio.emit("private_msg", [" ".join(parts[2:]), target_name, vals[1]])
     else:
         socketio.emit("append_msg", vals)
 

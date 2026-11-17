@@ -17,7 +17,11 @@ class Character:
         self.rotation.update(rot)
 
     def decrease_hp(self, amount):
+        if amount < 0:
+            raise ValueError("amount must be non-negative")
         self.hp = max(0, self.hp - amount)
+        if self.hp == 0:
+            self.alive = False
 
     def to_dict(self):
         return {

@@ -58,15 +58,16 @@ class Monster(Character):
         )
 
     def decay_threat(self, player):
-        if player.id in self.threats:
-            curr = time.time()
-            for player_id, threat_time in list(self.threats.items()):
-                if curr - threat_time[1] > 2:
-                    self.threats[player_id][0] = round(
-                        self.threats[player_id][0] - 0.2, 2
-                    )
-                if self.threats[player_id][0] <= 0:
-                    del self.threats[player_id]
+        if player.id not in self.threats:
+            return
+
+        curr = time.time()
+        threat = self.threats[player.id]
+        if curr - threat[1] > 2:
+            threat[0] = round(threat[0] - 0.2, 2)
+            threat[1] = curr
+        if threat[0] <= 0:
+            del self.threats[player.id]
 
     def move_to_origin(self):
         direction = {

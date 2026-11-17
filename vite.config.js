@@ -3,11 +3,11 @@ import path from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  root: path.join(__dirname, "./assets_source/"),
+  root: path.join(import.meta.dirname, "./assets_source/"),
   base: "/assets/",
   build: {
     sourcemap: true,
-    outDir: path.join(__dirname, "./assets_compiled/"),
+    outDir: path.join(import.meta.dirname, "./assets_compiled/"),
     manifest: "manifest.json",
     assetsDir: "bundled",
     rollupOptions: {
